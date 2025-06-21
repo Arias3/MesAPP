@@ -8,7 +8,7 @@ Este sistema permite gestionar de manera integral las órdenes, ventas, usuarios
 
 ## 🚀 Tecnologías Usadas
 
-- **Frontend:** JavaScript (HTML, CSS, JS puro o frameworks a definir)
+- **Frontend:** JavaScript (HTML, CSS, VITE REACT)
 - **Backend complementario:** Python (Impresión de comandas, automatización, generación de reportes, integración con sistemas externos)
 - **Base de datos:** MySQL
 - **Otros:** Exportación a Excel, integración futura con SAP
