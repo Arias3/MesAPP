@@ -353,7 +353,7 @@ app.get('/api/estadisticas', async (req, res) => {
 initializeDatabase();
 
 app.listen(port, () => {
-  console.log(`FullInventory API corriendo en http://localhost:${port}`);
+  console.log(`Backend corriendo en http://localhost:${port}`);
   console.log('Endpoints disponibles:');
   console.log('- GET /api/productos - Obtener productos');
   console.log('- POST /api/productos - Crear producto');
@@ -363,3 +363,32 @@ app.listen(port, () => {
   console.log('- GET /api/movimientos - Obtener movimientos');
   console.log('- GET /api/estadisticas - Obtener estadísticas');
 });
+
+
+// === RUTAS PARA LOGIN  & REGISTER === //}
+
+// Ruta POST para login
+app.post('/login', (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({ success: false, message: 'Username requerido' });
+  }
+
+  const query = 'SELECT role FROM usuarios WHERE username = ? LIMIT 1';
+
+  db.query(query, [username], (err, results) => {
+    if (err) {
+      console.error('Error en consulta:', err);
+      return res.status(500).json({ success: false, message: 'Error en el servidor' });
+    }
+
+    if (results.length > 0) {
+      const role = results[0].role;
+      return res.json({ success: true, role });
+    } else {
+      return res.json({ success: false });
+    }
+  });
+});
+

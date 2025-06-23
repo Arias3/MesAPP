@@ -11,12 +11,6 @@ function App() {
 
   return (
     <Router>
-      <nav>
-        <Link to="/">Inicio</Link> |{' '}
-        <Link to="/inventario">Inventario</Link> |{' '}
-        <Link to="/ordenes">Ordenes</Link> |{' '}
-        <Link to="/caja">Caja</Link>
-      </nav>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/inventario" element={<Inventario />} />
