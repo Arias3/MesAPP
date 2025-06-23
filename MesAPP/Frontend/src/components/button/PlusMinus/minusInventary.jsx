@@ -1,4 +1,4 @@
-import styles from "./module.module.css";
+import styles from "./../module.module.css";
 
 const Minus = ({ initialValue, step, onSubtract }) => {
   const handleSubtract = () => {
@@ -7,7 +7,7 @@ const Minus = ({ initialValue, step, onSubtract }) => {
   };
 
   return (
-    <button onClick={handleSubtract} className={styles.btnMinus}>
+    <button onClick={handleSubtract} className={styles.btnMinusInventary}>
       Restar: {initialValue - step}
     </button>
   );

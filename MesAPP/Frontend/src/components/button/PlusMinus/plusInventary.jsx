@@ -1,4 +1,4 @@
-import styles from "./module.module.css";
+import styles from "./../module.module.css";
 
 const Plus = ({ initialValue, step, onSum }) => {
   const handleSum = () => {
@@ -7,7 +7,7 @@ const Plus = ({ initialValue, step, onSum }) => {
   };
 
   return (
-    <button onClick={handleSum} className={styles.btnPlus}>
+    <button onClick={handleSum} className={styles.btnPlusInventary}>
       Sumar: {initialValue + step}
     </button>
   );
