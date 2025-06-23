@@ -1,4 +1,4 @@
-import styles from "./module.module.css";
+import styles from "./../module.module.css";
 
 const Minus = ({ initialValue, step, onSubtract }) => {
   const handleSubtract = () => {

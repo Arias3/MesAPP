@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Download, AlertTriangle, Info, CheckCircle, X } from 'lucide-react';
 import { ImportButtonLogic } from './importInventary.js';
-import styles from './module.module.css';
+import styles from './../module.module.css';
 
 const ImportButton = ({ onImportComplete, apiBaseUrl = 'http://localhost:5000/api' }) => {
   const [showModal, setShowModal] = useState(false);

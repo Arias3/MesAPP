@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Plus, Edit, Trash2, Eye, Package, TrendingUp, AlertTriangle, Download } from "lucide-react";
-import ImportButton from './../../../components/button/importInventary.jsx';
+import ImportButton from './../../../components/button/Import/importInventary.jsx';
 import './FullInventory.css';
 
 function FullInventory() {
@@ -154,9 +154,9 @@ function FullInventory() {
             </button>
           </div>
 
-          {/* Estadísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 stats-card stat-card-blue">
+          {/* Estadísticas - 1 fila con 4 columnas */}
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 bg-blue-50 p-4 rounded-lg border border-blue-200 stats-card stat-card-blue">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-600 text-sm font-medium">Total Productos</p>
@@ -166,7 +166,7 @@ function FullInventory() {
               </div>
             </div>
             
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200 stats-card stat-card-green">
+            <div className="flex-1 bg-green-50 p-4 rounded-lg border border-green-200 stats-card stat-card-green">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-600 text-sm font-medium">Valor Total</p>
@@ -176,7 +176,7 @@ function FullInventory() {
               </div>
             </div>
             
-            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 stats-card stat-card-yellow">
+            <div className="flex-1 bg-yellow-50 p-4 rounded-lg border border-yellow-200 stats-card stat-card-yellow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-yellow-600 text-sm font-medium">Stock Bajo</p>
@@ -186,7 +186,7 @@ function FullInventory() {
               </div>
             </div>
             
-            <div className="bg-red-50 p-4 rounded-lg border border-red-200 stats-card stat-card-red">
+            <div className="flex-1 bg-red-50 p-4 rounded-lg border border-red-200 stats-card stat-card-red">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-red-600 text-sm font-medium">Agotados</p>
