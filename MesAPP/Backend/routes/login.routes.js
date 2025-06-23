@@ -3,28 +3,28 @@ const router = express.Router();
 const pool = require('../db/pool');
 
 // Ruta POST para login
-router.post('/login', (req, res) => {
+// Ejemplo en server.js o en un archivo routes/login.js
+router.post('/login', async (req, res) => {
   const { username } = req.body;
 
   if (!username) {
-    return res.status(400).json({ success: false, message: 'Username requerido' });
+    return res.status(400).json({ success: false, message: 'Usuario requerido' });
   }
 
-  const query = 'SELECT role FROM usuarios WHERE username = ? LIMIT 1';
+  try {
+    const [rows] = await pool.execute('SELECT role FROM staff WHERE name = ?', [username]);
 
-  db.query(query, [username], (err, results) => {
-    if (err) {
-      console.error('Error en consulta:', err);
-      return res.status(500).json({ success: false, message: 'Error en el servidor' });
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
 
-    if (results.length > 0) {
-      const role = results[0].role;
-      return res.json({ success: true, role });
-    } else {
-      return res.json({ success: false });
-    }
-  });
+    const role = rows[0].role;
+    return res.json({ success: true, token: 'falso-token', role }); // token falso de ejemplo
+  } catch (error) {
+    console.error('Error al buscar usuario:', error);
+    res.status(500).json({ success: false, message: 'Error interno' });
+  }
 });
+
 
 module.exports = router;

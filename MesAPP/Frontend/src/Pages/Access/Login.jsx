@@ -1,11 +1,22 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 
 function Login() {
   const [username, setUsername] = useState("");
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!username.trim()) {
+      setError("Por favor ingresa un nombre de usuario");
+      return;
+    }
+
+
+
     try {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
@@ -16,10 +27,14 @@ function Login() {
       const data = await response.json();
 
       if (data.success) {
-        // Guarda el rol en el almacenamiento local
         localStorage.setItem('role', data.role);
         localStorage.setItem('username', username);
-        navigate('/home');
+
+        if (data.role.toLowerCase() === 'mesero') {
+          navigate('/ordenes');
+        } else {
+          navigate('/home'); // o /admin, /dashboard, etc.
+        }
       } else {
         setError('Usuario no encontrado');
       }
@@ -28,9 +43,8 @@ function Login() {
     }
   };
 
-
   return (
-    <div className="login-container">
+    <div className="login-background">
       <div className="login-box">
         <img src="/logo.png" alt="Logo de la app" className="login-logo" />
         <div className="login-title">Iniciar sesión</div>
@@ -41,7 +55,8 @@ function Login() {
           onChange={(e) => setUsername(e.target.value)}
           className="login-input"
         />
-        <button className="login-button" onClick={handleLogin}>
+        {error && <p className="error-message">{error}</p>}
+        <button type="submit" className="login-button" onClick={handleLogin}>
           Ingresar
         </button>
       </div>
