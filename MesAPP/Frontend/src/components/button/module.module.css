@@ -1,0 +1,18 @@
+.btnPlus {
+  background-color: #4CAF50; /* Verde */
+  color: white;
+  padding: 8px 16px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btnMinus {
+  background-color: #f44336; /* Rojo */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import Inventario from './Pages/Inventario'
-import Ordenes from './Pages/Ordenes'
-import Caja from './Pages/Caja'
-import Login from './Pages/Login'
+import Inventario from './Pages/Inventario/Inventario'
+import Ordenes from './Pages/Ordenes/Ordenes'
+import Caja from './Pages/Caja/Caja'
+import Login from './Pages/Access/Login'
 import { useState } from 'react'
 import './App.css'
 
