@@ -7,10 +7,10 @@ const Minus = ({ initialValue, step, onSubtract }) => {
   };
 
   return (
-    <button onClick={handleSubtract} className={styles.btnMinus}>
+    <button onClick={handleSubtract} className={styles.btnMinusInventary}>
       Restar: {initialValue - step}
     </button>
   );
 };
 
-export default MinusInventary;
+export default Minus;

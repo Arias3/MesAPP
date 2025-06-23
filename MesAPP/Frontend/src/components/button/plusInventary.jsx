@@ -7,10 +7,10 @@ const Plus = ({ initialValue, step, onSum }) => {
   };
 
   return (
-    <button onClick={handleSum} className={styles.btnPlus}>
+    <button onClick={handleSum} className={styles.btnPlusInventary}>
       Sumar: {initialValue + step}
     </button>
   );
 };
 
-export default PlusInventary;
+export default Plus;
