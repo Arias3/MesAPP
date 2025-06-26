@@ -50,21 +50,30 @@ function Login() {
         <div className="login-box">
           <img src="/logo.png" alt="Logo de la app" className="login-logo" />
           <div className="login-title">Iniciar sesión</div>
-          <input
-            type="text"
-            placeholder="Usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="login-input"
-          />
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit" className="login-button" onClick={handleLogin}>
-            Ingresar
-          </button>
+
+          {/* Formulario que permite enviar con Enter */}
+          <form onSubmit={handleLogin}>
+            <input
+              type="text"
+              placeholder="Usuario"
+              value={username}
+              onChange={(e) => {
+                const value = e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-zñáéíóúü]/g, '');
+                setUsername(value);
+              }}
+              className="login-input"
+            />
+            {error && <p className="error-message">{error}</p>}
+            <button type="submit" className="login-button">
+              Ingresar
+            </button>
+          </form>
         </div>
       </div>
     </>
   );
 }
 
-  export default Login;
+export default Login;
