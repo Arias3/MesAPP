@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './ProductoDialog.css'; // Asegúrate de tener estilos para el diálogo
 
 const fetchProductos = async () => {
-    const res = await fetch('http://localhost:5000/api/ordenar/productos');
+    const API_HOST = import.meta.env.VITE_API_HOST;
+    const res = await fetch(`http://${API_HOST}:5000/api/ordenar/productos`);
     const text = await res.text();
     console.log('fetchProductos response:', text);
     if (!res.ok) throw new Error('Error al obtener productos');
@@ -10,7 +11,8 @@ const fetchProductos = async () => {
 };
 
 const fetchSabores = async () => {
-    const res = await fetch('http://localhost:5000/api/ordenar/sabores');
+    const API_HOST = import.meta.env.VITE_API_HOST;
+    const res = await fetch(`http://${API_HOST}:5000/api/ordenar/sabores`);
     const text = await res.text();
     console.log('fetchSabores response:', text);
     if (!res.ok) throw new Error('Error al obtener sabores');

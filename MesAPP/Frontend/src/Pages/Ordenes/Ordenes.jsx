@@ -52,12 +52,13 @@ function Ordenes() {
   };
 
   const enviarPedido = () => {
-    const ws = new WebSocket("ws://localhost:3000");
+    const API_HOST = import.meta.env.VITE_API_HOST;
+    const ws = new WebSocket(`ws://${API_HOST}:3000`);
     ws.onopen = () => {
       ws.send(JSON.stringify(pedido));
       ws.close();
     };
-  };
+};
 
   return (
     <div className="ordenes-background">
