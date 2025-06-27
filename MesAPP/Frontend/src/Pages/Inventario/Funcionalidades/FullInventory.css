@@ -37,12 +37,32 @@
   animation: slideIn 0.3s ease-out;
 }
 
+/* Contenedor específico para las estadísticas */
+.stats-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 columnas iguales */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* Cada elemento de estadística ocupa exactamente una columna */
+.stats-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
 /* Efectos de hover para cards */
 .stats-card {
   transition: all 0.3s ease;
 }
 
-.stats-card:hover {
+.stats-card:hover,
+.stats-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
@@ -127,16 +147,6 @@
   color: #6b7280;
 }
 
-/* Efecto de loading para el spinner en modal */
-.loading-spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* Efectos para inputs en focus */
 .input-focus-effect {
   transition: all 0.3s ease;
@@ -147,32 +157,27 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Efectos para modales */
-.modal-backdrop {
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  animation: slideIn 0.3s ease;
-}
-
 /* Efectos para cards de estadísticas */
-.stat-card-blue {
+.stat-card-blue,
+.stats-item.blue {
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   border: 1px solid #93c5fd;
 }
 
-.stat-card-green {
+.stat-card-green,
+.stats-item.green {
   background: linear-gradient(135deg, #d1fae5, #a7f3d0);
   border: 1px solid #6ee7b7;
 }
 
-.stat-card-yellow {
+.stat-card-yellow,
+.stats-item.yellow {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   border: 1px solid #fcd34d;
 }
 
-.stat-card-red {
+.stat-card-red,
+.stats-item.red {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   border: 1px solid #f87171;
 }
@@ -213,6 +218,24 @@
 }
 
 /* Responsive helpers */
+@media (max-width: 1024px) {
+  .stats-container {
+    gap: 0.75rem;
+  }
+  
+  .stats-item {
+    padding: 0.75rem;
+  }
+  
+  .stats-item p {
+    font-size: 0.875rem;
+  }
+  
+  .stats-item .text-2xl {
+    font-size: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .mobile-stack {
     flex-direction: column;
@@ -226,15 +249,92 @@
   .mobile-text-center {
     text-align: center;
   }
+  
+  .stats-container {
+    gap: 0.5rem;
+    grid-template-columns: 1fr 1fr 1fr 1fr; /* Mantener 4 columnas */
+  }
+  
+  .stats-item {
+    padding: 0.5rem;
+  }
+  
+  .stats-item p {
+    font-size: 0.75rem;
+    line-height: 1.1;
+  }
+  
+  .stats-item .text-2xl {
+    font-size: 1.25rem;
+    line-height: 1.1;
+  }
+  
+  .stats-item .h-8 {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
 }
 
 @media (max-width: 640px) {
+  .stats-container {
+    grid-template-columns: 1fr 1fr 1fr 1fr; /* Mantener 4 columnas */
+    gap: 0.25rem;
+  }
+  
+  .stats-item {
+    padding: 0.375rem;
+  }
+  
+  .stats-item p {
+    font-size: 0.625rem;
+    line-height: 1.0;
+  }
+  
+  .stats-item .text-2xl {
+    font-size: 1rem;
+    line-height: 1.0;
+  }
+  
+  .stats-item .h-8 {
+    height: 1.25rem;
+    width: 1.25rem;
+  }
+  
   .table-responsive {
     font-size: 0.875rem;
   }
   
   .action-btn {
     padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-container {
+    grid-template-columns: 1fr 1fr 1fr 1fr; /* Mantener 4 columnas */
+    gap: 0.25rem;
+  }
+  
+  .stats-item {
+    padding: 0.25rem;
+  }
+  
+  .stats-item p {
+    font-size: 0.5rem;
+    line-height: 1.0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .stats-item .text-2xl {
+    font-size: 0.875rem;
+    line-height: 1.0;
+  }
+  
+  .stats-item .h-8 {
+    height: 1rem;
+    width: 1rem;
   }
 }
 

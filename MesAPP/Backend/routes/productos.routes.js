@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
+const ProductValidator = require('../utils/ProductValidator');
 
 // Función para calcular rentabilidad automáticamente
 function calcularRentabilidad(costo, precio) {
@@ -14,47 +15,79 @@ function calcularRentabilidad(costo, precio) {
 // Obtener todos los productos con búsqueda opcional
 router.get('/api/productos', async (req, res) => {
   try {
-    const { search = '', limit = 50, offset = 0 } = req.query;
+    const search = req.query.search || '';
     
-    let query = 'SELECT * FROM productos';
+    let query = 'SELECT * FROM products';
     let params = [];
     
-    if (search) {
-      query += ' WHERE nombre LIKE ? OR barcode LIKE ?';
+    if (search.trim()) {
+      query += ' WHERE name LIKE ? OR barcode LIKE ?';
       const searchParam = `%${search}%`;
       params = [searchParam, searchParam];
     }
     
-    query += ' ORDER BY nombre ASC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
+    // SIN LIMIT NI OFFSET - esto elimina el problema completamente
+    query += ' ORDER BY name ASC';
+    
+    console.log('🔍 Query sin LIMIT:', query);
+    console.log('📝 Params:', params);
     
     const [rows] = await pool.execute(query, params);
     
-    // Formatear rentabilidad con símbolo de porcentaje
+    console.log('✅ Filas obtenidas:', rows.length);
+    
+    // Formatear datos para mantener compatibilidad con frontend
     const formattedRows = rows.map(row => ({
-      ...row,
-      rentabilidad: `${row.rentabilidad.toFixed(2)}%`
+      id: row.id,
+      codigo: row.id,
+      category: row.category,
+      nombre: row.name,
+      costo: row.cost,
+      precio: row.price,
+      rentabilidad: `${parseFloat(row.profitability || 0).toFixed(2)}%`,
+      stock: row.stock,
+      barcode: row.barcode,
+      unit: row.unit,
+      image_url: row.image_url,
+      flavor_count: row.flavor_count,
+      description: row.description
     }));
+    
+    console.log('✅ Datos formateados:', formattedRows.length, 'productos');
     
     res.json({ success: true, data: formattedRows });
   } catch (error) {
-    console.error('Error al obtener productos:', error);
+    console.error('💥 Error al obtener productos:', error);
     res.status(500).json({ success: false, message: 'Error al obtener productos' });
   }
 });
 
 // Obtener un producto específico por código
-router.get('/api/productos/:codigo', async (req, res) => {
+router.get('/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
-    const [rows] = await pool.execute('SELECT * FROM productos WHERE codigo = ?', [codigo]);
+    const [rows] = await pool.execute('SELECT * FROM products WHERE id = ?', [codigo]);
     
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Producto no encontrado' });
     }
     
-    const producto = rows[0];
-    producto.rentabilidad = `${producto.rentabilidad.toFixed(2)}%`;
+    const row = rows[0];
+    const producto = {
+      id: row.id,
+      codigo: row.id,
+      category: row.category,
+      nombre: row.name,
+      costo: row.cost,
+      precio: row.price,
+      rentabilidad: `${parseFloat(row.profitability || 0).toFixed(2)}%`,
+      stock: row.stock,
+      barcode: row.barcode,
+      unit: row.unit,
+      image_url: row.image_url,
+      flavor_count: row.flavor_count,
+      description: row.description
+    };
     
     res.json({ success: true, data: producto });
   } catch (error) {
@@ -64,9 +97,9 @@ router.get('/api/productos/:codigo', async (req, res) => {
 });
 
 // Crear nuevo producto
-router.post('/api/productos', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const { nombre, costo, precio, stock, barcode } = req.body;
+    const { nombre, costo, precio, stock, barcode, category, unit, image_url, flavor_count, description } = req.body;
     
     // Validaciones básicas
     if (!nombre || costo < 0 || precio < 0 || stock < 0) {
@@ -80,14 +113,44 @@ router.post('/api/productos', async (req, res) => {
     const rentabilidad = calcularRentabilidad(costo, precio);
     
     const [result] = await pool.execute(
-      'INSERT INTO productos (nombre, costo, precio, rentabilidad, stock, barcode) VALUES (?, ?, ?, ?, ?, ?)',
-      [nombre, costo, precio, rentabilidad, stock, barcode || null]
+      `INSERT INTO products 
+       (category, code, name, cost, price, profitability, stock, barcode, unit, image_url, flavor_count, description) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        category || 'Sin categoría',
+        `CODE_${Date.now()}`, // Generar código único
+        nombre,
+        costo,
+        precio,
+        `${rentabilidad.toFixed(2)}%`,
+        stock || '0',
+        barcode || null,
+        unit || 'unidad',
+        image_url || null,
+        flavor_count || 0,
+        description || null
+      ]
     );
     
     // Obtener el producto recién creado
-    const [newProduct] = await pool.execute('SELECT * FROM productos WHERE codigo = ?', [result.insertId]);
-    const producto = newProduct[0];
-    producto.rentabilidad = `${producto.rentabilidad.toFixed(2)}%`;
+    const [newProduct] = await pool.execute('SELECT * FROM products WHERE id = ?', [result.insertId]);
+    const row = newProduct[0];
+    
+    const producto = {
+      id: row.id,
+      codigo: row.id,
+      category: row.category,
+      nombre: row.name,
+      costo: row.cost,
+      precio: row.price,
+      rentabilidad: `${parseFloat(row.profitability || 0).toFixed(2)}%`,
+      stock: row.stock,
+      barcode: row.barcode,
+      unit: row.unit,
+      image_url: row.image_url,
+      flavor_count: row.flavor_count,
+      description: row.description
+    };
     
     res.status(201).json({ success: true, data: producto });
   } catch (error) {
@@ -101,13 +164,13 @@ router.post('/api/productos', async (req, res) => {
 });
 
 // Actualizar producto
-router.put('/api/productos/:codigo', async (req, res) => {
+router.put('/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
-    const { nombre, costo, precio, stock, barcode } = req.body;
+    const { nombre, costo, precio, stock, barcode, category, unit, image_url, flavor_count, description } = req.body;
     
     // Verificar que el producto existe
-    const [existing] = await pool.execute('SELECT * FROM productos WHERE codigo = ?', [codigo]);
+    const [existing] = await pool.execute('SELECT * FROM products WHERE id = ?', [codigo]);
     if (existing.length === 0) {
       return res.status(404).json({ success: false, message: 'Producto no encontrado' });
     }
@@ -116,14 +179,45 @@ router.put('/api/productos/:codigo', async (req, res) => {
     const rentabilidad = calcularRentabilidad(costo, precio);
     
     await pool.execute(
-      'UPDATE productos SET nombre = ?, costo = ?, precio = ?, rentabilidad = ?, stock = ?, barcode = ? WHERE codigo = ?',
-      [nombre, costo, precio, rentabilidad, stock, barcode || null, codigo]
+      `UPDATE products SET 
+       category = ?, name = ?, cost = ?, price = ?, profitability = ?, 
+       stock = ?, barcode = ?, unit = ?, image_url = ?, flavor_count = ?, description = ? 
+       WHERE id = ?`,
+      [
+        category || existing[0].category,
+        nombre,
+        costo,
+        precio,
+        `${rentabilidad.toFixed(2)}%`,
+        stock,
+        barcode || null,
+        unit || existing[0].unit,
+        image_url || existing[0].image_url,
+        flavor_count || existing[0].flavor_count,
+        description || existing[0].description,
+        codigo
+      ]
     );
     
     // Obtener el producto actualizado
-    const [updated] = await pool.execute('SELECT * FROM productos WHERE codigo = ?', [codigo]);
-    const producto = updated[0];
-    producto.rentabilidad = `${producto.rentabilidad.toFixed(2)}%`;
+    const [updated] = await pool.execute('SELECT * FROM products WHERE id = ?', [codigo]);
+    const row = updated[0];
+    
+    const producto = {
+      id: row.id,
+      codigo: row.id,
+      category: row.category,
+      nombre: row.name,
+      costo: row.cost,
+      precio: row.price,
+      rentabilidad: `${parseFloat(row.profitability || 0).toFixed(2)}%`,
+      stock: row.stock,
+      barcode: row.barcode,
+      unit: row.unit,
+      image_url: row.image_url,
+      flavor_count: row.flavor_count,
+      description: row.description
+    };
     
     res.json({ success: true, data: producto });
   } catch (error) {
@@ -137,11 +231,11 @@ router.put('/api/productos/:codigo', async (req, res) => {
 });
 
 // Eliminar producto
-router.delete('/api/productos/:codigo', async (req, res) => {
+router.delete('/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
     
-    const [result] = await pool.execute('DELETE FROM productos WHERE codigo = ?', [codigo]);
+    const [result] = await pool.execute('DELETE FROM products WHERE id = ?', [codigo]);
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: 'Producto no encontrado' });
@@ -153,4 +247,118 @@ router.delete('/api/productos/:codigo', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al eliminar producto' });
   }
 });
+
+// ===== RUTA DE IMPORTACIÓN MASIVA CORREGIDA =====
+router.post('/import', async (req, res) => {
+  try {
+    const { productos, replaceAll } = req.body;
+    
+    if (!productos || !Array.isArray(productos)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Se requiere un array de productos'
+      });
+    }
+
+    console.log(`📦 Iniciando importación de ${productos.length} productos...`);
+
+    // Paso 1: Validar con ProductValidator
+    const validator = new ProductValidator();
+    const validationResult = await validator.validateAndPrepare(productos);
+
+    if (!validationResult.success) {
+      console.log('❌ Validación fallida:', validationResult.message);
+      
+      // DEVOLVER ERRORES DETALLADOS DE PRODUCTVALIDATOR
+      return res.status(400).json({
+        success: false,
+        message: validationResult.message, // Error principal
+        errors: validationResult.errors || [], // Errores específicos por fila
+        errorReport: validationResult.errorReport || {}, // Reporte detallado
+        summary: validationResult.summary || {}, // Resumen de errores
+        validProducts: validationResult.validProducts || [], // Productos que sí pasaron
+        frontendMessage: 'Error de validación: Revise que todos los campos estén completos y las categorías sean válidas.'
+      });
+    }
+
+    console.log(`✅ Validación exitosa: ${validationResult.data.length} productos válidos`);
+
+    // Paso 2: Si replaceAll es true, eliminar todos los productos existentes
+    if (replaceAll) {
+      await pool.execute('DELETE FROM products');
+      console.log('🗑️ Productos existentes eliminados');
+    }
+
+    // Paso 3: Insertar todos los productos validados
+    let insertedCount = 0;
+    const insertErrors = [];
+
+    for (let i = 0; i < validationResult.data.length; i++) {
+      const producto = validationResult.data[i];
+      
+      try {
+        // Calcular rentabilidad automáticamente
+        const rentabilidad = calcularRentabilidad(producto.cost, producto.price);
+        
+        await pool.execute(
+          `INSERT INTO products 
+           (category, code, name, cost, price, profitability, stock, barcode, unit, image_url, flavor_count, description) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            producto.category,
+            producto.code,
+            producto.name,
+            producto.cost,
+            producto.price,
+            `${rentabilidad.toFixed(2)}%`,
+            producto.stock,
+            producto.barcode,
+            producto.unit,
+            producto.image_url,
+            producto.flavor_count,
+            producto.description
+          ]
+        );
+        insertedCount++;
+      } catch (error) {
+        console.error(`Error insertando producto ${producto.code}:`, error);
+        insertErrors.push(`Producto ${producto.code}: ${error.message}`);
+      }
+    }
+
+    // Paso 4: Respuesta final
+    if (insertErrors.length > 0 && insertedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se pudo importar ningún producto a la base de datos',
+        errors: insertErrors,
+        frontendMessage: 'Error en base de datos: No se pudieron insertar los productos.'
+      });
+    }
+
+    console.log(`✅ Importación completada: ${insertedCount}/${validationResult.data.length} productos`);
+
+    // RESPUESTA DE ÉXITO DETALLADA
+    res.json({
+      success: true,
+      message: `Se importaron ${insertedCount} productos exitosamente`,
+      imported: insertedCount,
+      total: productos.length,
+      validated: validationResult.data.length,
+      validationSummary: validationResult.summary,
+      insertErrors: insertErrors.length > 0 ? insertErrors : null,
+      frontendMessage: `¡Importación exitosa! ${insertedCount} productos agregados a la base de datos.`
+    });
+
+  } catch (error) {
+    console.error('Error en importación masiva:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message,
+      frontendMessage: 'Error del servidor: Intente nuevamente o contacte al administrador.'
+    });
+  }
+});
+
 module.exports = router;

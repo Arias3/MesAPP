@@ -18,6 +18,7 @@ const TABLES = {
   products: `
     CREATE TABLE IF NOT EXISTS products (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      category VARCHAR(40) NOT NULL,
       code VARCHAR(20) NOT NULL UNIQUE,
       name VARCHAR(100) NOT NULL,
       cost DECIMAL(10,2) NOT NULL,
@@ -75,7 +76,16 @@ const TABLES = {
       seller VARCHAR(100) NOT NULL,
       status ENUM('PAID', 'PENDING', 'PREPARING') DEFAULT 'PENDING'
     ) ENGINE=InnoDB
-  `
+  `,
+  categories: `
+    CREATE TABLE IF NOT EXISTS categories (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      categoria VARCHAR(50) NOT NULL UNIQUE,
+      activo BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB
+`
 };
 
 // Función que crea base de datos y tablas

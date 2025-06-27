@@ -1,102 +1,397 @@
-/* Estilos generales para todo el componente Inventario */
+/* Estilos base completamente relativos */
 .inventario-container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 100vw;
   margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  padding: 2vw;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #f8fafc;
 }
 
 .inventario-container h1 {
-  color: #333;
+  color: #1f2937;
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 2rem;
+  margin-bottom: 3vh;
+  font-size: clamp(3vw, 4vw, 5vw);
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 /* Estilos para la barra de navegación */
 .tab-navigation {
   display: flex;
   justify-content: center;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 3vh;
+  border-bottom: 0.2vh solid #e5e7eb;
+  background: white;
+  border-radius: 1.5vh 1.5vh 0 0;
+  padding: 1vh;
+  box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tab-button {
   background: none;
   border: none;
-  padding: 12px 24px;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
-  font-size: 16px;
-  color: #666;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+  color: #6b7280;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
-  margin: 0 5px;
+  margin: 0 0.25rem;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  min-width: fit-content;
+  font-weight: 500;
 }
 
 .tab-button:hover {
-  color: #007bff;
-  background-color: #f8f9fa;
+  color: #3b82f6;
+  background-color: #f3f4f6;
+  transform: translateY(-1px);
 }
 
 .tab-button.active {
-  color: #007bff;
-  border-bottom-color: #007bff;
-  font-weight: bold;
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+  font-weight: 600;
+  background-color: #eff6ff;
 }
 
 /* Contenedor del contenido de los tabs */
 .tab-content {
-  min-height: 400px;
-  padding: 20px 0;
+  width: 100%;
+  min-height: calc(100vh - 25vh);
+  padding: 0;
+  background: white;
+  border-radius: 0 0 1.5vh 1.5vh;
+  box-shadow: 0 0.8vh 1.2vh -0.2vh rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Responsive breakpoints */
+
+/* Mobile First - Base (0px - 640px) */
+@media (max-width: 640px) {
+  .inventario-container {
+    padding: 1vw;
+  }
+  
+  .inventario-container h1 {
+    margin-bottom: 2vh;
+    font-size: clamp(4vw, 5vw, 6vw);
+  }
+  
+  .tab-navigation {
+    margin-bottom: 2vh;
+    padding: 0.5vh;
+    border-radius: 1vh 1vh 0 0;
+  }
+  
+  .tab-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    margin: 0 0.125rem;
+  }
+  
+  .tab-content {
+    min-height: calc(100vh - 20vh);
+    border-radius: 0 0 1vh 1vh;
+  }
+}
+
+/* Small tablets (641px - 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+  .inventario-container {
+    max-width: 100%;
+    padding: 1.5vw;
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(3.5vw, 4.5vw, 5.5vw);
+  }
+  
+  .tab-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Medium tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .inventario-container {
+    max-width: 95%;
+    padding: 2vw;
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(3vw, 4vw, 5vw);
+  }
+  
+  .tab-navigation {
+    padding: 1.2vh;
+  }
+  
+  .tab-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Específico para aspect ratio de tablets portrait grandes (como 1024 x 1366) */
+@media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/5) {
+  .inventario-container {
+    max-width: 95%;
+    padding: 1.5vw;
+  }
+  
+  .inventario-container h1 {
+    font-size: 2.8vw;
+    margin-bottom: 2.5vh;
+  }
+  
+  .tab-navigation {
+    margin-bottom: 2.5vh;
+    padding: 1vh;
+  }
+  
+  .tab-button {
+    padding: 1.3vh 2.2vw;
+    font-size: 1.8vw;
+  }
+  
+  .tab-content {
+    min-height: calc(100vh - 20vh);
+  }
+  
+  .inventario-container .table th,
+  .inventario-container .table td {
+    padding: 1vh 1.2vw;
+    font-size: 1.3vw;
+  }
+  
+  .inventario-container .btn-primary {
+    padding: 1vh 2.5vw;
+    font-size: 1.6vw;
+  }
+}
+
+/* Large tablets and small desktops (1025px - 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+  .inventario-container {
+    max-width: 95%;
+    padding: 2vw;
+  }
+}
+
+/* Large desktops (1201px and up) */
+@media (min-width: 1201px) {
+  .inventario-container {
+    max-width: 95%;
+    padding: 2vw;
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(2.5vw, 3vw, 3.5vw);
+    margin-bottom: 3vh;
+  }
+  
+  .tab-navigation {
+    margin-bottom: 3vh;
+  }
+}
+
+/* Ultra-wide screens (1400px and up) */
+@media (min-width: 1400px) {
+  .inventario-container {
+    max-width: 95%;
+  }
 }
 
 /* Estilos generales que se aplicarán a ambos componentes hijos */
 .inventario-container .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 2vh;
 }
 
 .inventario-container .btn-primary {
-  background-color: #007bff;
+  background-color: #3b82f6;
   color: white;
-  padding: 10px 20px;
+  padding: 1.5vh 3vw;
   border: none;
-  border-radius: 4px;
+  border-radius: 1vh;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: clamp(1.5vw, 2vw, 2.5vw);
+  display: inline-flex;
+  align-items: center;
+  gap: 1vw;
 }
 
 .inventario-container .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: #2563eb;
+  transform: translateY(-0.1vh);
+  box-shadow: 0 0.8vh 2.4vh rgba(59, 130, 246, 0.15);
+}
+
+.inventario-container .btn-primary:active {
+  transform: translateY(0);
 }
 
 .inventario-container .table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 2vh;
+  background: white;
+  border-radius: 1vh;
+  overflow: hidden;
+  box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
 }
 
 .inventario-container .table th,
 .inventario-container .table td {
-  padding: 12px;
+  padding: 1.5vh 2vw;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 0.1vh solid #e5e7eb;
+  font-size: clamp(1.2vw, 1.5vw, 1.8vw);
 }
 
 .inventario-container .table th {
-  background-color: #f8f9fa;
-  font-weight: bold;
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  font-size: clamp(1vw, 1.2vw, 1.5vw);
+  letter-spacing: 0.05em;
+}
+
+.inventario-container .table tr:hover {
+  background-color: #f9fafb;
 }
 
 .inventario-container .input-field {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 1.5vh 2vw;
+  border: 0.1vh solid #d1d5db;
+  border-radius: 1vh;
+  font-size: clamp(1.2vw, 1.5vw, 1.8vw);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .inventario-container .input-field:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.3vh rgba(59, 130, 246, 0.1);
+  transform: scale(1.02);
+}
+
+/* Responsive table for mobile */
+@media (max-width: 768px) {
+  .inventario-container .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .inventario-container .table th,
+  .inventario-container .table td {
+    padding: 1vh 1.5vw;
+    font-size: clamp(1.5vw, 2vw, 2.5vw);
+  }
+  
+  .inventario-container .btn-primary {
+    padding: 1vh 2vw;
+    font-size: clamp(2vw, 2.5vw, 3vw);
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .inventario-container {
+    padding: 1vw;
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(2vw, 2.5vw, 3vw);
+    margin-bottom: 1.5vh;
+  }
+  
+  .tab-navigation {
+    margin-bottom: 1.5vh;
+  }
+  
+  .tab-content {
+    min-height: calc(100vh - 15vh);
+  }
+}
+
+/* Print styles */
+@media print {
+  .inventario-container {
+    max-width: none;
+    padding: 0;
+    background: white;
+  }
+  
+  .tab-navigation {
+    display: none;
+  }
+  
+  .inventario-container h1 {
+    color: black;
+    font-size: 1.5rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .tab-button,
+  .inventario-container .btn-primary,
+  .inventario-container .input-field {
+    transition: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .inventario-container {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+  
+  .inventario-container h1 {
+    color: #f9fafb;
+  }
+  
+  .tab-navigation {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+  
+  .tab-content {
+    background: #1f2937;
+  }
+  
+  .inventario-container .table {
+    background: #1f2937;
+  }
+  
+  .inventario-container .table th {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+  
+  .inventario-container .table td {
+    border-bottom-color: #374151;
+  }
+  
+  .inventario-container .input-field {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
 }

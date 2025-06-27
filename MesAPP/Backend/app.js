@@ -6,6 +6,7 @@ const productosRoutes = require('./routes/productos.routes');
 const movimientosRoutes = require('./routes/movimientos.routes');
 const loginRoutes = require('./routes/login.routes');
 const estadisticasRoutes = require('./routes/estadisticas.routes');
+const categoriesRoutes = require('./routes/categorias.routes'); // ← AGREGAR ESTA LÍNEA
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/api/productos', productosRoutes);
 app.use('/api/movimientos', movimientosRoutes);
 app.use('/api/estadisticas', estadisticasRoutes);
+app.use('/api/categorias', categoriesRoutes); // ← AGREGAR ESTA LÍNEA
 
 // ⚠️ Asegúrate que tu frontend esté enviando POST a /login (no /api/login)
 app.use('/', loginRoutes); // Esto permite que /login funcione directamente
