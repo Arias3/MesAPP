@@ -1,7 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Inventario from './Pages/Inventario/Inventario'
 import Ordenes from './Pages/Ordenes/Ordenes'
 import Caja from './Pages/Caja/Caja'
+import Ventas from './Pages/Ventas/Ventas'
+import Reportes from './Pages/Reportes/Reportes'
+import Personal from './Pages/Personal/Personal'
 import Login from './Pages/Access/Login'
 import { useState } from 'react'
 import './App.css'
@@ -13,9 +16,12 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/inventario" element={<Inventario />} />
-        <Route path="/ordenes" element={<Ordenes />} />
+        <Route path="/ordenar" element={<Ordenes />} />
         <Route path="/caja" element={<Caja />} />
+        <Route path="/ventas" element={<Ventas />} />
+        <Route path="/inventario" element={<Inventario />} />
+        <Route path="/reportes" element={<Reportes />} />
+        <Route path="/personal" element={<Personal />} />
       </Routes>
     </Router>
   )

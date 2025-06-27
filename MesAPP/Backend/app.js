@@ -7,6 +7,7 @@ const movimientosRoutes = require('./routes/movimientos.routes');
 const loginRoutes = require('./routes/login.routes');
 const estadisticasRoutes = require('./routes/estadisticas.routes');
 const categoriesRoutes = require('./routes/categorias.routes'); // ← AGREGAR ESTA LÍNEA
+const ordenarRoutes = require('./routes/ordenar.routes'); 
 
 const app = express();
 
@@ -27,5 +28,10 @@ app.use('/', loginRoutes); // Esto permite que /login funcione directamente
 app.get('/ping', (req, res) => {
   res.json({ success: true, message: 'Servidor activo' });
 });
+
+// Rutas Ordenes
+app.use('/api/ordenar', ordenarRoutes);
+
+
 
 module.exports = app;
