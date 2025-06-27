@@ -214,6 +214,8 @@ function FullInventory() {
           </div>
 
           {/* Estadísticas - 1 fila con 4 columnas */}
+          <div className="stats-container">
+            <div className="stats-item blue">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-600 text-sm font-medium">Total Productos</p>
