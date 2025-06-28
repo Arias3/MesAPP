@@ -7,7 +7,8 @@ const botones = [
   'VENTAS',
   'INVENTARIO',
   'REPORTES',
-  'PERSONAL'
+  'PERSONAL',
+  'HELADOS'
 ];
 
 function MenuBotton() {

@@ -5,7 +5,6 @@ const fetchProductos = async () => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const res = await fetch(`http://${API_HOST}:5000/api/ordenar/productos`);
     const text = await res.text();
-    console.log('fetchProductos response:', text);
     if (!res.ok) throw new Error('Error al obtener productos');
     return JSON.parse(text);
 };
@@ -14,7 +13,6 @@ const fetchSabores = async () => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const res = await fetch(`http://${API_HOST}:5000/api/ordenar/sabores`);
     const text = await res.text();
-    console.log('fetchSabores response:', text);
     if (!res.ok) throw new Error('Error al obtener sabores');
     return JSON.parse(text);
 };

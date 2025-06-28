@@ -1,10 +1,15 @@
 .ordenes-background {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
+  min-height: 100vh;
+  height: 100vh;
   background: #1f484e;
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 0; /* Asegúrate que no tape otros elementos */
 }
 
 .ordenes-container {
