@@ -66,7 +66,7 @@ function Login() {
               }}
               className="login-input"
             />
-            {error && <p className="error-message">{error}</p>}
+            {error && <p className="error-message-login">{error}</p>}
             <button type="submit" className="login-button">
               Ingresar
             </button>
