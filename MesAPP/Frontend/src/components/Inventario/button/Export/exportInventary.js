@@ -7,7 +7,7 @@ import {
 } from './templateData.js';
 
 export class ExportButtonLogic {
-  constructor(apiBaseUrl = 'http://localhost:5000/api') {
+  constructor(apiBaseUrl = `http://${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api`) {
     this.apiBaseUrl = apiBaseUrl;
   }
 

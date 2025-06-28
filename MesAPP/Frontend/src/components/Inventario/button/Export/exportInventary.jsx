@@ -3,7 +3,7 @@ import { Download, FileSpreadsheet, Filter, BarChart3, X, CheckCircle, AlertTria
 import { ExportButtonLogic } from './exportInventary.js';
 import styles from './../button.module.css';
 
-const ExportButton = ({ apiBaseUrl = 'http://localhost:5000/api' }) => {
+const ExportButton = ({ apiBaseUrl = `http://${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api` }) => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [exportType, setExportType] = useState('current');
@@ -101,7 +101,7 @@ const ExportButton = ({ apiBaseUrl = 'http://localhost:5000/api' }) => {
         disabled={loading}
       >
         <Download className="h-4 w-4" />
-        <span>Exportar</span>
+        <span>Exportar mi inventario</span>
       </button>
 
       {/* Modal de exportación */}

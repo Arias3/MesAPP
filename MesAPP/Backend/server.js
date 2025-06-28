@@ -3,7 +3,7 @@ require('dotenv').config(); // Asegúrate de cargar variables de entorno
 const app = require('./app'); // Tu archivo donde defines app = express()
 const { initializeDatabase } = require('./db/init'); // Función para crear tablas y base de datos
 
-const ipLocalhost = process.env.IP_LOCALHOST || 'localhost';
+const ipLocalhost = process.env.IP_LOCALHOST;
 const port = 5000;
 
 // Inicializar base de datos si aplica

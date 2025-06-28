@@ -4,13 +4,7 @@ import { ImportButtonLogic } from './importInventary.js';
 import styles from './../button.module.css';
 
 const ImportButton = ({ 
-  onImportComplete, 
-  onNeedsManualEdit, 
-  apiBaseUrl = 'http://localhost:5000/api',
-  fixedTable = 0,
-  importOpen = 1,
-  setImportOpen,
-  correctedData = null
+  apiBaseUrl = `http://${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api`
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -18,6 +12,7 @@ const ImportButton = ({
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isClosing, setIsClosing] = useState(false);
   const fileInputRef = useRef(null);
 
   const importLogic = new ImportButtonLogic(apiBaseUrl);
@@ -36,7 +31,7 @@ const ImportButton = ({
       ];
       
       if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
-        alert('Por favor seleccione un archivo Excel válido (.xlsx o .xls)');
+        alert('No se preocupe, solo necesitamos que seleccione un archivo de Excel. Por favor elija un archivo que termine en .xlsx o .xls');
         return;
       }
 
@@ -44,20 +39,45 @@ const ImportButton = ({
       setShowModal(true);
       setError('');
       setSuccess('');
+      setIsClosing(false);
     }
   };
 
-  // ✅ FUNCIÓN CALLBACK PARA CONTROLAR importOpen
-  const handleImportOpenChange = (newState) => {
-    if (setImportOpen) {
-      setImportOpen(newState);
-    }
+  // ✅ FUNCIÓN MEJORADA PARA CERRAR MODAL CON CONFIRMACIÓN
+  const closeModalWithConfirmation = (shouldEmitEvent = false, eventData = null) => {
+    console.log('🔄 ImportButton: Iniciando cierre de modal...');
+    setIsClosing(true);
+    
+    // Limpiar estados
+    setTimeout(() => {
+      setShowModal(false);
+      setSelectedFile(null);
+      setError('');
+      setSuccess('');
+      setProgress('');
+      setIsClosing(false);
+      
+      // Limpiar el input de archivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      console.log('✅ ImportButton: Modal cerrado completamente');
+      
+      // ✅ EMITIR EVENTO DESPUÉS DE QUE EL MODAL SE HAYA CERRADO
+      if (shouldEmitEvent && eventData) {
+        console.log('📡 ImportButton: Emitiendo evento después del cierre:', eventData);
+        window.dispatchEvent(new CustomEvent('importModalClosed', {
+          detail: eventData
+        }));
+      }
+      
+    }, 300); // Dar tiempo para la animación de cierre
   };
 
   const handleConfirmImport = async () => {
-    // Si fixedTable = 1, usar correctedData; si fixedTable = 0, usar selectedFile
-    if (!selectedFile && fixedTable === 0) return;
-    if (!correctedData && fixedTable === 1) return;
+    // Validar que tengamos archivo para procesar
+    if (!selectedFile) return;
 
     setLoading(true);
     setError('');
@@ -66,34 +86,38 @@ const ImportButton = ({
     try {
       const result = await importLogic.processImport(
         selectedFile, 
-        setProgress,
-        fixedTable,
-        correctedData,
-        handleImportOpenChange // ✅ Callback para controlar importOpen
+        setProgress
       );
       
       if (result.success) {
         setSuccess(result.message);
-        if (onImportComplete) {
-          setTimeout(() => {
-            onImportComplete();
-          }, 1000);
-        }
+        
+        // Cerrar modal después de éxito completo
+        setTimeout(() => {
+          closeModalWithConfirmation();
+          
+          // Emitir evento para recargar productos
+          window.dispatchEvent(new CustomEvent('importCompleted'));
+        }, 3000); // Reducido de 8000 a 3000ms
+        
       } else if (result.needsManualEdit) {
-        // ✅ SOLO PASAR DATOS A FULLINVENTORY - NO LLAMAR MANUALEDITINTERFACE
-        console.log('Se necesita edición manual, enviando datos a FullInventory...');
+        console.log('🚨 ImportButton: Se necesita edición manual');
+        console.log('📦 ImportButton: Datos completos a enviar:', result);
         
-        if (onNeedsManualEdit) {
-          onNeedsManualEdit(result.data);
-        }
+        // Mostrar mensaje positivo al usuario
+        setSuccess('¡Perfecto! Vamos a mejorar juntos algunos productos. Preparando la ventana de edición...');
         
-        // ✅ IMPORTANTE: No cerrar modal, FullInventory controlará la superposición
+        // ✅ CERRAR MODAL PRIMERO, LUEGO EMITIR EVENTO
+        setTimeout(() => {
+          console.log('🔄 ImportButton: Cerrando modal antes de abrir ManualEditInterface...');
+          closeModalWithConfirmation(true, result); // Cerrar Y emitir evento
+        }, 2500); // Reducido de 5000 a 2500ms
         
       } else {
         setError(result.message);
       }
     } catch (err) {
-      setError('Error inesperado: ' + err.message);
+      setError('No se preocupe, solo necesitamos intentar de nuevo: ' + err.message);
     } finally {
       setLoading(false);
       setProgress('');
@@ -101,22 +125,8 @@ const ImportButton = ({
   };
 
   const handleCloseModal = () => {
-    if (!loading) {
-      setShowModal(false);
-      setSelectedFile(null);
-      setError('');
-      setSuccess('');
-      setProgress('');
-      
-      // Limpiar el input de archivo
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      
-      // ✅ RESETEAR importOpen a activo cuando se cierre manualmente
-      if (setImportOpen) {
-        setImportOpen(1);
-      }
+    if (!loading && !isClosing) {
+      closeModalWithConfirmation();
     }
   };
 
@@ -128,13 +138,6 @@ const ImportButton = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // ✅ EFECTO PARA CONTROLAR VISIBILIDAD DEL MODAL BASADO EN importOpen
-  React.useEffect(() => {
-    if (importOpen === 0 && showModal) {
-      setShowModal(false);
-    }
-  }, [importOpen, showModal]);
-
   return (
     <>
       {/* Botón principal */}
@@ -144,7 +147,7 @@ const ImportButton = ({
         disabled={loading}
       >
         <Upload className="h-5 w-5" />
-        <span>Importar Excel</span>
+        <span>Cargar mis productos</span>
       </button>
 
       {/* Input de archivo oculto */}
@@ -156,140 +159,124 @@ const ImportButton = ({
         className={styles.fileInput}
       />
 
-      {/* ✅ MODAL DE CONFIRMACIÓN - Solo se muestra si importOpen === 1 */}
-      {showModal && importOpen === 1 && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
+      {/* Modal de confirmación */}
+      {showModal && (
+        <div className={`${styles.modalOverlay} ${isClosing ? styles.modalClosing : ''}`}>
+          <div className={`${styles.modalContent} ${isClosing ? styles.modalContentClosing : ''}`}>
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Importar Productos desde Excel</h3>
+              <h3 className={styles.modalTitle}>Cargar sus Productos desde Excel</h3>
               <button 
                 onClick={handleCloseModal} 
                 className={styles.closeButton}
-                disabled={loading}
+                disabled={loading || isClosing}
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className={styles.modalBody}>
-              {/* ✅ MOSTRAR INFORMACIÓN DIFERENTE SEGÚN fixedTable */}
-              {fixedTable === 1 ? (
-                <div className={styles.fixedTableInfo}>
-                  <div className={styles.fixedTableTitle}>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    Datos corregidos listos para importar
+              {/* Información del archivo seleccionado */}
+              {selectedFile && (
+                <div className={styles.fileInfo}>
+                  <div className={styles.fileInfoTitle}>Su archivo seleccionado:</div>
+                  <div className={styles.fileInfoItem}>
+                    <span className={styles.fileInfoLabel}>Nombre:</span>
+                    <span className={styles.fileInfoValue}>{selectedFile.name}</span>
                   </div>
-                  <p className={styles.fixedTableText}>
-                    Los datos han sido corregidos y están listos para ser procesados.
-                    Se procesarán {correctedData ? correctedData.length : 0} productos.
-                  </p>
+                  <div className={styles.fileInfoItem}>
+                    <span className={styles.fileInfoLabel}>Tamaño:</span>
+                    <span className={styles.fileInfoValue}>{formatFileSize(selectedFile.size)}</span>
+                  </div>
                 </div>
-              ) : (
-                <>
-                  {/* Información del archivo seleccionado */}
-                  {selectedFile && (
-                    <div className={styles.fileInfo}>
-                      <div className={styles.fileInfoTitle}>Archivo seleccionado:</div>
-                      <div className={styles.fileInfoItem}>
-                        <span className={styles.fileInfoLabel}>Nombre:</span>
-                        <span className={styles.fileInfoValue}>{selectedFile.name}</span>
-                      </div>
-                      <div className={styles.fileInfoItem}>
-                        <span className={styles.fileInfoLabel}>Tamaño:</span>
-                        <span className={styles.fileInfoValue}>{formatFileSize(selectedFile.size)}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Formato esperado */}
-                  <div className={styles.formatSection}>
-                    <div className={styles.formatTitle}>
-                      <Info className="h-5 w-5" />
-                      Formato esperado del Excel:
-                    </div>
-                    <ul className={styles.formatList}>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Code:</strong> Código único del producto (obligatorio)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Category:</strong> Categoría del producto (obligatorio)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Name:</strong> Nombre del producto (obligatorio)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Cost:</strong> Costo del producto (obligatorio, número)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Price:</strong> Precio de venta (obligatorio, número)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Stock:</strong> Cantidad en inventario (Depende unidad medida)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Barcode:</strong> Código de barras (opcional)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Unit:</strong> Unidad de medida (obligatorio)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Image_URL:</strong> URL de la imagen (opcional)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Flavor_Count:</strong> Cantidad de sabores (Depende categoría)
-                      </li>
-                      <li className={styles.formatItem}>
-                        <CheckCircle className="h-4 w-4" />
-                        <strong>Description:</strong> Descripción del producto (opcional)
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Advertencias */}
-                  <div className={styles.warningSection}>
-                    <div className={styles.warningTitle}>
-                      <AlertTriangle className="h-5 w-5" />
-                      ¡IMPORTANTE! Advertencias:
-                    </div>
-                    <ul className={styles.warningList}>
-                      <li className={styles.warningItem}>
-                        <AlertTriangle className="h-4 w-4" />
-                        Esta acción <strong>ELIMINARÁ TODOS</strong> los productos existentes
-                      </li>
-                      <li className={styles.warningItem}>
-                        <AlertTriangle className="h-4 w-4" />
-                        Se reemplazarán con los productos del archivo Excel
-                      </li>
-                      <li className={styles.warningItem}>
-                        <AlertTriangle className="h-4 w-4" />
-                        Esta acción <strong>NO SE PUEDE DESHACER</strong>
-                      </li>
-                      <li className={styles.warningItem}>
-                        <AlertTriangle className="h-4 w-4" />
-                        Asegúrese de tener una copia de seguridad si es necesario
-                      </li>
-                      <li className={styles.warningItem}>
-                        <AlertTriangle className="h-4 w-4" />
-                        <strong>VERIFICAR obligatoriedad de los campos</strong> 
-                      </li>
-                      <li className={styles.warningItem}>
-                        <AlertTriangle className="h-4 w-4" />
-                        En el botón <strong>Exportar</strong> encuentra una <strong>plantilla válida</strong>
-                      </li>
-                    </ul>
-                  </div>
-                </>
               )}
+
+              {/* Formato esperado */}
+              <div className={styles.formatSection}>
+                <div className={styles.formatTitle}>
+                  <Info className="h-5 w-5" />
+                  Su archivo de Excel debe tener estas columnas:
+                </div>
+                <ul className={styles.formatList}>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Code:</strong> Código por producto (requerido)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Category:</strong> Categoría del producto (requerido)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Name:</strong> Nombre del producto (requerido)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Cost:</strong> Costo de producción (requerido, solo números)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Price:</strong> Precio de venta (requerido, solo números)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Stock:</strong> Total en inventario (requerido)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Barcode:</strong> Código de barras (opcional)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Unit:</strong> Unidad de medida (requerido)[kg, unidad]
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Image_URL:</strong> Nombre guardado (opcional)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Flavor_Count:</strong> Sabores de helado (opcional, solo números)
+                  </li>
+                  <li className={styles.formatItem}>
+                    <CheckCircle className="h-4 w-4" />
+                    <strong>Description:</strong> Descripción del producto (opcional)
+                  </li>
+                </ul>
+              </div>
+
+              {/* Advertencias */}
+              <div className={styles.warningSection}>
+                <div className={styles.warningTitle}>
+                  <AlertTriangle className="h-5 w-5" />
+                  Advertencias:
+                </div>
+                <ul className={styles.warningList}>
+                  <li className={styles.warningItem}>
+                    <AlertTriangle className="h-4 w-4" />
+                    Esta acción <strong>ELIMINARÁ TODOS</strong> los productos existentes
+                  </li>
+                  <li className={styles.warningItem}>
+                    <AlertTriangle className="h-4 w-4" />
+                    Se reemplazarán con los productos del archivo Excel
+                  </li>
+                  <li className={styles.warningItem}>
+                    <AlertTriangle className="h-4 w-4" />
+                    Esta acción <strong>NO SE PUEDE DESHACER</strong>
+                  </li>
+                  <li className={styles.warningItem}>
+                    <AlertTriangle className="h-4 w-4" />
+                    Asegúrese de tener una copia de seguridad si es necesario
+                  </li>
+                  <li className={styles.warningItem}>
+                    <AlertTriangle className="h-4 w-4" />
+                    <strong>VERIFICAR obligatoriedad de los campos</strong>
+                  </li>
+                  <li className={styles.formatItem}>
+                    <AlertTriangle className="h-4 w-4" />
+                    En el botón <strong>Exportar</strong> encuentra una <strong>plantilla válida</strong>
+                  </li>
+                </ul>
+              </div>
 
               {/* Progreso de importación */}
               {loading && (
@@ -304,16 +291,23 @@ const ImportButton = ({
               {/* Mensaje de error */}
               {error && (
                 <div className={styles.errorMessage}>
-                  <div className={styles.errorTitle}>Error al importar:</div>
+                  <div className={styles.errorTitle}>Necesitamos revisar algo:</div>
                   <div className={styles.errorText}>{error}</div>
                 </div>
               )}
 
-              {/* Mensaje de éxito */}
+              {/* Mensaje de éxito o información */}
               {success && (
                 <div className={styles.successMessage}>
-                  <div className={styles.successTitle}>¡Importación exitosa!</div>
+                  <div className={styles.successTitle}>
+                    {success.includes('Perfecto') ? '🎯 Vamos a mejorar juntos' : '¡Felicidades! Todo salió perfecto'}
+                  </div>
                   <div className={styles.successText}>{success}</div>
+                  {success.includes('Perfecto') && (
+                    <div className={styles.progressText} style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                      {isClosing ? 'Cerrando...' : 'Esta ventana se cerrará en unos segundos...'}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -321,7 +315,7 @@ const ImportButton = ({
               {loading && (
                 <div className={styles.loading}>
                   <div className={styles.loadingSpinner}></div>
-                  <span className={styles.loadingText}>Procesando...</span>
+                  <span className={styles.loadingText}>Trabajando en sus productos...</span>
                 </div>
               )}
 
@@ -331,26 +325,27 @@ const ImportButton = ({
                   <button
                     onClick={handleCloseModal}
                     className={styles.cancelButton}
-                    disabled={loading}
+                    disabled={loading || isClosing}
                   >
-                    Cancelar
+                    Mejor no ahora
                   </button>
                   <button
                     onClick={handleConfirmImport}
                     className={styles.confirmButton}
-                    disabled={loading || (fixedTable === 0 && !selectedFile) || (fixedTable === 1 && !correctedData)}
+                    disabled={loading || !selectedFile || isClosing}
                   >
-                    {loading ? 'Importando...' : (fixedTable === 1 ? 'Procesar Datos Corregidos' : 'Confirmar Importación')}
+                    {loading ? 'Trabajando...' : 'Sí, cargar mis productos'}
                   </button>
                 </div>
               )}
 
-              {/* Botón de cerrar cuando hay éxito */}
-              {success && (
+              {/* Botón de cerrar solo para importación exitosa completa */}
+              {success && !success.includes('Perfecto') && (
                 <div className={styles.actionButtons}>
                   <button
                     onClick={handleCloseModal}
                     className={styles.confirmButton}
+                    disabled={isClosing}
                   >
                     Cerrar
                   </button>

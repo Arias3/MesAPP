@@ -1,31 +1,41 @@
 import { useState, useEffect } from "react";
-import { Search, Package, TrendingUp, AlertTriangle, Edit, Trash2, Eye, X } from "lucide-react";
-import ImportButton from './../../../components/Inventario/button/Import/importInventary.jsx';
-import ExportButton from './../../../components/Inventario/button/Export/exportInventary.jsx';
-import NewProductInventary from './../../../components/Inventario/button/PlusMinus/NewProduct/NewProductInventary.jsx';
+import { Search, Package, TrendingUp, AlertTriangle } from "lucide-react";
+import InventoryActionsBar from './../../../components/Inventario/Handlers/Importaciones/ActionBar.jsx';
+import ProductTable from './../../../components/Inventario/Tables/ProductTable.jsx';
+import EditProductModal from '../../../components/Inventario/Modals/Ediciones/EditProductModal.jsx';
 import { ManualEditInterface } from './../../../components/Inventario/Interface/ManualEdition/ManualEditInterface.jsx';
+import { useConfirmationModal, confirmationPresets } from '../../../components/Inventario/Modals/Confirmaciones/ConfirmationModal.jsx';
+import ViewProductModal from './../../../components/Inventario/Modals/Visualizaciones/ViewProductModal.jsx';
 import './FullInventory.css';
 
 function FullInventory() {
   const [searchTerm, setSearchTerm] = useState("");
+  const API_BASE_URL = `http://${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}`;
   
-  // Estado para productos - inicialmente vacío (vendrá de la base de datos)
+  // Estado para productos
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
 
-  // ✅ ESTADOS PARA CONTROL DE IMPORTACIÓN
-  const [fixedTable, setFixedTable] = useState(0); // 0: inicial, 1: después de ManualEditInterface
-  const [importOpen, setImportOpen] = useState(1); // 1: activo, 0: cerrado
-  const [manualEditData, setManualEditData] = useState(null); // Datos para ManualEditInterface
-  const [showManualEdit, setShowManualEdit] = useState(false); // Mostrar ManualEditInterface
-  const [correctedData, setCorrectedData] = useState(null); // Datos corregidos desde ManualEditInterface
+  // Estados para ManualEditInterface
+  const [manualEditData, setManualEditData] = useState(null);
+  const [showManualEdit, setShowManualEdit] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // ✅ FUNCIÓN FETCHPRODUCTSAPI CORREGIDA
+  // Estados para modal de edición
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Hook para confirmaciones estilizadas
+  const { ConfirmationModalComponent, showConfirmation } = useConfirmationModal();
+
+  // Función para cargar productos desde la API
   const fetchProductsFromAPI = async () => {
     setLoading(true);
     try {
       console.log('🔄 Cargando productos desde la API...');
-      const response = await fetch('http://localhost:5000/api/productos');
+      const response = await fetch(`${API_BASE_URL}/api/productos`);
       
       console.log('📡 Respuesta del servidor:', response.status, response.statusText);
       
@@ -33,20 +43,22 @@ function FullInventory() {
         const data = await response.json();
         console.log('📦 Datos recibidos del servidor:', data);
         
-        // ✅ FIX: Verificar estructura y mapear correctamente
         if (data.success && Array.isArray(data.data)) {
           console.log('👀 Primer producto del backend:', data.data[0]);
           
-          // ✅ FIX: Mapeo CORRECTO según lo que devuelve el backend
           const mappedProducts = data.data.map(product => ({
             id: product.id,
-            name: product.nombre,           // ✅ backend devuelve 'nombre'
-            category: product.category,     // ✅ backend devuelve 'category'
-            stock: parseInt(product.stock) || 0,
-            cost: parseFloat(product.costo) || 0,   // ✅ backend devuelve 'costo'
-            price: parseFloat(product.precio) || 0, // ✅ backend devuelve 'precio'
+            name: product.nombre,
+            category: product.category,
+            stock: parseInt(product.stock),
+            cost: parseFloat(product.costo),
+            price: parseFloat(product.precio),
             barcode: product.barcode,
-            codigo: product.codigo
+            codigo: product.codigo,
+            unity: product.unity,
+            image_url: product.image_url,
+            flavor_count: product.flavor_count,
+            description: product.description
           }));
           
           console.log('✅ Productos mapeados correctamente:', mappedProducts.length, 'productos');
@@ -54,15 +66,12 @@ function FullInventory() {
           setProducts(mappedProducts);
         } else {
           console.error('❌ Formato de respuesta inesperado:', data);
-          alert('Error: Formato de respuesta del servidor no válido');
         }
       } else {
         console.error('❌ Error HTTP:', response.status, response.statusText);
-        alert(`Error del servidor: ${response.status}`);
       }
     } catch (error) {
       console.error('💥 Error completo al cargar productos:', error);
-      alert('Error de conexión al cargar productos desde el servidor');
     } finally {
       setLoading(false);
     }
@@ -73,114 +82,201 @@ function FullInventory() {
     fetchProductsFromAPI();
   }, []);
 
+  // Listeners de eventos
+  useEffect(() => {
+    console.log('🔧 FullInventory: Configurando listeners de eventos...');
+    
+    const handleImportModalClosed = (event) => {
+      console.log('🎯 FullInventory: Modal de import cerrado, procesando resultado...');
+      const result = event.detail;
+      
+      if (!result) {
+        console.error('❌ FullInventory: No hay datos en event.detail');
+        return;
+      }
+      
+      if (result.needsManualEdit && result.data) {
+        console.log('🚨 FullInventory: Se necesita edición manual');
+        
+        if (!result.data.incompleteRows || result.data.incompleteRows.length === 0) {
+          console.log('⚠️ FullInventory: No hay filas incompletas para editar');
+          fetchProductsFromAPI();
+          return;
+        }
+        
+        console.log('⏰ FullInventory: Iniciando transición a ManualEditInterface...');
+        setIsTransitioning(true);
+        
+        setTimeout(() => {
+          console.log('🔓 FullInventory: Abriendo ManualEditInterface...');
+          setManualEditData(result.data);
+          setShowManualEdit(true);
+          setIsTransitioning(false);
+        }, 500);
+        
+      } else if (result.success) {
+        console.log('✅ FullInventory: Import exitoso, recargando productos...');
+        fetchProductsFromAPI();
+      }
+    };
+    
+    const handleImportCompleted = () => {
+      console.log('✅ FullInventory: Importación completada exitosamente, recargando productos...');
+      fetchProductsFromAPI();
+    };
+
+    const handleDatabaseUpdated = (event) => {
+      console.log('🎯 FullInventory: Base de datos actualizada, procesando resultado...');
+      const result = event.detail;
+      
+      if (result.success) {
+        console.log('✅ FullInventory: Base de datos actualizada exitosamente');
+        console.log(`📊 FullInventory: ${result.processedCount} productos procesados por ${result.source}`);
+        fetchProductsFromAPI();
+        console.log(`🎉 ${result.message}`);
+      }
+    };
+
+    const handleDatabaseUpdateError = (event) => {
+      console.error('❌ FullInventory: Error en actualización de base de datos:', event.detail);
+      const result = event.detail;
+      console.error(`💥 Error desde ${result.source}: ${result.error}`);
+    };
+
+    const handleManualEditCompleted = (event) => {
+      console.log('🎯 FullInventory: ManualEditInterface completado (legacy), procesando resultado...');
+      const result = event.detail;
+      
+      if (result.success) {
+        console.log('✅ FullInventory: Edición manual exitosa (legacy), recargando productos...');
+        fetchProductsFromAPI();
+      } else {
+        console.error('❌ FullInventory: Error en edición manual (legacy):', result.message);
+      }
+    };
+
+    const handleProductUpdated = (event) => {
+      console.log('🎯 FullInventory: Producto actualizado, procesando resultado...');
+      console.log('📦 Event.detail completo:', event.detail);
+      
+      const result = event.detail;
+      
+      if (result.success && result.updatedProduct) {
+        console.log('✅ FullInventory: Producto actualizado exitosamente');
+        console.log(`📊 FullInventory: Producto ${result.updatedProduct.id} actualizado por ${result.source}`);
+        
+        setProducts(prevProducts => 
+          prevProducts.map(product => 
+            product.id === result.updatedProduct.id ? {
+              ...product,
+              ...result.updatedProduct,
+              name: result.updatedProduct.nombre || result.updatedProduct.name,
+              cost: parseFloat(result.updatedProduct.costo) || parseFloat(result.updatedProduct.cost),
+              price: parseFloat(result.updatedProduct.precio) || parseFloat(result.updatedProduct.price),
+              stock: parseInt(result.updatedProduct.stock),
+              category: result.updatedProduct.category,
+              codigo: result.updatedProduct.codigo,
+              barcode: result.updatedProduct.barcode,
+              unity: result.updatedProduct.unity,
+              image_url: result.updatedProduct.image_url,
+              flavor_count: parseInt(result.updatedProduct.flavor_count) || 0,
+              description: result.updatedProduct.description
+            } : product
+          )
+        );
+        
+        console.log(`🎉 ${result.message}`);
+      } else {
+        console.error('❌ FullInventory: Error al actualizar producto:', result.message);
+      }
+    };
+    
+    // Registrar listeners
+    window.addEventListener('importModalClosed', handleImportModalClosed);
+    window.addEventListener('importCompleted', handleImportCompleted);
+    window.addEventListener('databaseUpdated', handleDatabaseUpdated);
+    window.addEventListener('databaseUpdateError', handleDatabaseUpdateError);
+    window.addEventListener('manualEditCompleted', handleManualEditCompleted);
+    window.addEventListener('productUpdated', handleProductUpdated);
+    
+    console.log('✅ FullInventory: Listeners configurados correctamente');
+    
+    // Cleanup
+    return () => {
+      console.log('🧹 FullInventory: Limpiando listeners...');
+      window.removeEventListener('importModalClosed', handleImportModalClosed);
+      window.removeEventListener('importCompleted', handleImportCompleted);
+      window.removeEventListener('databaseUpdated', handleDatabaseUpdated);
+      window.removeEventListener('databaseUpdateError', handleDatabaseUpdateError);
+      window.removeEventListener('manualEditCompleted', handleManualEditCompleted);
+      window.removeEventListener('productUpdated', handleProductUpdated);
+    };
+  }, []);
+
+  // Filtrar productos
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (product.codigo && product.codigo.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const getStockBadgeClass = (stock) => {
-    if (stock === 0) return "bg-red-100 text-red-800 badge-danger";
-    if (stock < 10) return "bg-yellow-100 text-yellow-800 badge-warning";
-    return "bg-green-100 text-green-800 badge-normal";
-  };
-
-  const getMargin = (price, cost) => {
-    if (cost === 0) return 0;
-    return (((price - cost) / cost) * 100).toFixed(1);
-  };
-
-  const getMarginClass = (margin) => {
-    if (margin > 50) return "bg-green-100 text-green-800 badge-normal";
-    if (margin > 20) return "bg-yellow-100 text-yellow-800 badge-warning";
-    return "bg-red-100 text-red-800 badge-danger";
-  };
-
+  // Handlers para modal de edición
   const handleEdit = (product) => {
-    console.log('Editar producto:', product);
-    // Funcionalidad de edición se implementará externamente
+    console.log('✏️ Editando producto:', product);
+    setEditingProduct(product);
+    setShowEditModal(true);
+  };
+
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
+    setEditingProduct(null);
+  };
+
+  const handleProductUpdated = (updatedProduct) => {
+    console.log('✅ Producto actualizado via props:', updatedProduct);
   };
 
   const handleDelete = async (id) => {
-    if (confirm('¿Está seguro de que desea eliminar este producto?')) {
+    const confirmed = await showConfirmation(confirmationPresets.deleteProduct);
+    
+    if (confirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/productos/${id}`, {
           method: 'DELETE'
         });
         if (response.ok) {
           setProducts(products.filter(p => p.id !== id));
-          alert('Producto eliminado exitosamente');
+          console.log('✅ Producto eliminado exitosamente');
         } else {
-          alert('Error al eliminar el producto');
+          console.error('❌ Error al eliminar el producto');
         }
       } catch (error) {
         console.error('Error al eliminar producto:', error);
-        alert('Error al eliminar el producto');
       }
     }
   };
 
   const handleView = (product) => {
-    console.log('Ver producto:', product);
-    // Funcionalidad de vista se implementará externamente
+    console.log('👁️ Ver producto:', product);
+    setViewingProduct(product);
+    setShowViewModal(true);
   };
 
-  // ✅ FUNCIÓN CALLBACK PARA CUANDO SE COMPLETE LA IMPORTACIÓN
-  const handleImportComplete = () => {
-    console.log('✅ Importación completada, recargando productos...');
-    fetchProductsFromAPI(); // Recargar productos después de importar
-    
-    // ✅ RESETEAR TODOS LOS ESTADOS DE IMPORTACIÓN
-    setFixedTable(0);
-    setImportOpen(1);
-    setManualEditData(null);
-    setShowManualEdit(false);
-    setCorrectedData(null);
+  const handleViewModalClose = () => {
+    setShowViewModal(false);
+    setViewingProduct(null);
   };
 
-  // ✅ FUNCIÓN PARA MANEJAR CUANDO SE NECESITA EDICIÓN MANUAL
-  const handleNeedsManualEdit = (editData) => {
-    console.log('📝 Se necesita edición manual, abriendo ManualEditInterface...');
-    console.log('📦 Datos recibidos para edición:', editData);
-    
-    // Guardar datos para ManualEditInterface
-    setManualEditData(editData);
-    setShowManualEdit(true);
-    
-    // importOpen permanece en 1 para mantener el modal abierto debajo
-  };
-
-  // ✅ FUNCIÓN PARA MANEJAR GUARDADO DESDE MANUALEDITINTERFACE
-  const handleManualEditSave = (correctedRows) => {
-    console.log('💾 Guardando datos corregidos desde ManualEditInterface...');
-    console.log('📋 Filas corregidas:', correctedRows);
-    
-    // Cambiar estados para el siguiente procesamiento
-    setFixedTable(1);
-    setCorrectedData(correctedRows);
+  const handleManualEditClose = () => {
+    console.log('🔄 FullInventory: Cerrando ManualEditInterface...');
     setShowManualEdit(false);
     setManualEditData(null);
-    
-    // El ImportButton se activará con fixedTable=1 y correctedData
-    console.log('🔄 Estados actualizados: fixedTable=1, correctedData preparada');
+    setIsTransitioning(false);
   };
 
-  // ✅ FUNCIÓN PARA CANCELAR EDICIÓN MANUAL
-  const handleManualEditCancel = () => {
-    console.log('❌ Cancelando edición manual...');
-    setShowManualEdit(false);
-    setManualEditData(null);
-    setFixedTable(0);
-    setCorrectedData(null);
-    
-    // El ImportButton debería cerrar su modal también
-    setImportOpen(1);
-  };
-
-  // Función callback para cuando se cree un nuevo producto
   const handleProductCreated = () => {
     console.log('➕ Nuevo producto creado, recargando productos...');
-    fetchProductsFromAPI(); // Recargar productos después de crear
+    fetchProductsFromAPI();
   };
 
   // Estadísticas calculadas
@@ -194,26 +290,26 @@ function FullInventory() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 fullinventory-container">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        
+        {/* Header Section - SIMPLIFICADO */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6 shadow-hover">
-          <div className="flex items-center justify-between mb-6">
+          
+          {/* Título - SIN botón de nuevo producto */}
+          <div className="flex items-center mb-6">
             <div className="flex items-center space-x-3">
               <div className="bg-blue-600 p-2 rounded-lg">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 gradient-text">Inventario Completo</h1>
+                <h1 className="text-2xl font-bold text-gray-900 gradient-text">
+                  Inventario Completo
+                </h1>
                 <p className="text-gray-600">Gestión de productos</p>
               </div>
             </div>
-            {/* Botón de Nuevo Producto */}
-            <NewProductInventary 
-              onProductCreated={handleProductCreated}
-              apiBaseUrl="http://localhost:5000/api"
-            />
           </div>
 
-          {/* Estadísticas - 1 fila con 4 columnas */}
+          {/* Estadísticas en 4 columnas */}
           <div className="stats-container">
             <div className="stats-item blue">
               <div className="flex items-center justify-between">
@@ -256,7 +352,7 @@ function FullInventory() {
             </div>
           </div>
 
-          {/* Barra de búsqueda */}
+          {/* Barra de búsqueda - SIN botones de import/export */}
           <div className="flex flex-col md:flex-row gap-4 items-center mobile-stack">
             <div className="flex-1 relative search-container">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -268,155 +364,85 @@ function FullInventory() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex space-x-2">
-              <ExportButton 
-                apiBaseUrl="http://localhost:5000/api"
-              />
-              
-              {/* ✅ IMPORTBUTTON CON TODOS LOS PROPS NECESARIOS */}
-              <ImportButton 
-                onImportComplete={handleImportComplete}
-                onNeedsManualEdit={handleNeedsManualEdit}
-                apiBaseUrl="http://localhost:5000/api"
-                fixedTable={fixedTable}
-                importOpen={importOpen}
-                setImportOpen={setImportOpen}
-                correctedData={correctedData}
-              />
-            </div>
           </div>
 
-          {/* Resumen */}
+          {/* Resumen de información */}
           <div className="flex items-center space-x-6 mt-4 text-sm text-gray-600">
-            <span>Total de productos: <span className="font-semibold text-gray-900">{products.length}</span></span>
-            <span>Productos mostrados: <span className="font-semibold text-gray-900">{filteredProducts.length}</span></span>
+            <span>
+              Total de productos: <span className="font-semibold text-gray-900">{products.length}</span>
+            </span>
+            <span>
+              Productos mostrados: <span className="font-semibold text-gray-900">{filteredProducts.length}</span>
+            </span>
             {loading && <span className="text-blue-600">Cargando productos...</span>}
-            {/* ✅ DEBUG INFO */}
-            {process.env.NODE_ENV === 'development' && (
-              <>
-                <span className="text-xs text-gray-400">fixedTable: {fixedTable}</span>
-                <span className="text-xs text-gray-400">importOpen: {importOpen}</span>
-                <span className="text-xs text-gray-400">showManualEdit: {showManualEdit ? 'true' : 'false'}</span>
-              </>
-            )}
+            {isTransitioning && <span className="text-orange-600">Preparando edición manual...</span>}
           </div>
         </div>
+
+        {/* ✅ NUEVA BARRA DE ACCIONES */}
+        <InventoryActionsBar 
+          apiBaseUrl={API_BASE_URL}
+          onProductCreated={handleProductCreated}
+        />
 
         {/* Tabla de productos */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden shadow-hover">
-          <div className="overflow-x-auto">
-            <table className="w-full table-responsive">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Margen</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {loading ? (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
-                      Cargando productos...
-                    </td>
-                  </tr>
-                ) : filteredProducts.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
-                      {searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda.' : 'No hay productos registrados'}
-                    </td>
-                  </tr>
-                ) : (
-                  filteredProducts.map(product => {
-                    const margin = getMargin(product.price, product.cost);
-                    return (
-                      <tr key={product.id} className="hover:bg-gray-50 table-hover-row smooth-transition">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {product.codigo || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                          {product.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            {product.category}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStockBadgeClass(product.stock)}`}>
-                            {product.stock}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          ${product.cost?.toFixed(2) || '0.00'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          ${product.price.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMarginClass(margin)}`}>
-                            {margin}%
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStockBadgeClass(product.stock)}`}>
-                            {product.stock === 0 ? "Sin Stock" : 
-                             product.stock < 10 ? "Bajo Stock" : "Normal"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                          <div className="flex justify-center space-x-2">
-                            <button
-                              onClick={() => handleEdit(product)}
-                              className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors duration-200 action-btn edit-btn"
-                              title="Editar"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(product.id)}
-                              className="text-red-600 hover:text-red-900 p-1 rounded transition-colors duration-200 action-btn delete-btn"
-                              title="Eliminar"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleView(product)}
-                              className="text-gray-600 hover:text-gray-900 p-1 rounded transition-colors duration-200 action-btn view-btn"
-                              title="Ver detalles"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ProductTable
+          products={products}
+          loading={loading}
+          filteredProducts={filteredProducts}
+          searchTerm={searchTerm}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onView={handleView}
+        />
 
-        {/* ✅ MANUALEDITINTERFACE - SE SOBREPONE CUANDO showManualEdit = true */}
+        {/* Modal de edición de producto */}
+        {showEditModal && editingProduct && (
+          <EditProductModal
+            product={editingProduct}
+            onClose={handleEditModalClose}
+            onProductUpdated={handleProductUpdated}
+            apiBaseUrl={API_BASE_URL}
+          />
+        )}
+
+        {/* Modal de edición manual */}
         {showManualEdit && manualEditData && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-auto">
+          <div className="manual-edit-modal-overlay">
+            <div className="manual-edit-modal-container">
               <ManualEditInterface
                 data={manualEditData}
-                onSave={handleManualEditSave}
-                onCancel={handleManualEditCancel}
+                onCancel={handleManualEditClose}
+                apiBaseUrl={API_BASE_URL}
               />
             </div>
           </div>
         )}
+
+        {showViewModal && viewingProduct && (
+          <ViewProductModal
+            product={viewingProduct}
+            onClose={handleViewModalClose}
+          />
+        )}
+
+        {/* Debug panel (solo en desarrollo) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="debug-panel">
+            <div>showManualEdit: {showManualEdit ? '✅' : '❌'}</div>
+            <div>showEditModal: {showEditModal ? '✅' : '❌'}</div>
+            <div>editingProduct: {editingProduct ? '✅' : '❌'}</div>
+            <div>manualEditData: {manualEditData ? '✅' : '❌'}</div>
+            <div>isTransitioning: {isTransitioning ? '✅' : '❌'}</div>
+            <div>Products: {products.length}</div>
+            <div>showViewModal: {showViewModal ? '✅' : '❌'}</div>
+            <div>viewingProduct: {viewingProduct ? '✅' : '❌'}</div>
+          </div>
+        )}
       </div>
+
+      {/* Modal de confirmación */}
+      <ConfirmationModalComponent />
     </div>
   );
 }

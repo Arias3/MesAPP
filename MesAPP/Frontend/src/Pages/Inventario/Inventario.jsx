@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Fastview from "./Funcionalidades/FastView";
 import FullInventory from "./Funcionalidades/FullInventory";
+import MenuButton from '../../components/Ordenar/MenuBotton.jsx';
+
 import "./Inventario.css"; // CSS general
 
 function Inventario() {
@@ -8,6 +10,7 @@ function Inventario() {
 
   return (
     <div className="inventario-container">
+      <MenuButton />
       <h1>Inventario</h1>
       
       {/* Barra de navegación superior */}

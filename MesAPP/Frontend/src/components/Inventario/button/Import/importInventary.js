@@ -1,12 +1,12 @@
 import * as XLSX from 'xlsx';
-import { FieldNormalizer } from './FieldNormalizer.js';
-import { CategoryValidator } from './CategoryValidator.js';
+import { FieldNormalizer } from './Procesamiento/FieldNormalizer.js';
+import { CategoryValidator } from './Procesamiento/CategoryValidator.js';
 
 export class ImportButtonLogic {
-  constructor(apiBaseUrl = 'http://localhost:5000/api') {
+  constructor(apiBaseUrl = `http://${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}`) {
     this.apiBaseUrl = apiBaseUrl;
     this.categoryValidator = new CategoryValidator(apiBaseUrl);
-    // Columnas obligatorias
+    // Columnas mínimas requeridas
     this.requiredColumns = [
       'Code', 'Category', 'Name', 'Cost', 'Price', 'Stock',
       'Barcode', 'Unit', 'Image_URL', 'Flavor_Count', 'Description'
@@ -26,60 +26,84 @@ export class ImportButtonLogic {
           const worksheet = workbook.Sheets[firstSheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
+          console.log('📁 ImportButtonLogic: Archivo Excel leído correctamente');
+          console.log('   - Filas encontradas:', jsonData.length);
+          console.log('   - Primera fila:', jsonData[0]);
+
           resolve(jsonData);
         } catch (error) {
-          reject(new Error('Error al leer el archivo Excel: ' + error.message));
+          console.error('❌ ImportButtonLogic: Error al leer Excel:', error);
+          reject(new Error('No se preocupe, solo hubo un pequeño problema al abrir su archivo. Por favor revise que sea un archivo de Excel y no esté dañado.'));
         }
       };
 
       reader.onerror = () => {
-        reject(new Error('Error al leer el archivo'));
+        console.error('❌ ImportButtonLogic: Error en FileReader');
+        reject(new Error('Tranquilo, vamos a intentarlo de nuevo. Por favor seleccione el archivo otra vez.'));
       };
 
       reader.readAsArrayBuffer(file);
     });
   }
 
-  // Validar estructura básica del Excel
+  // Validar que sea Excel y tenga columnas mínimas
   validateExcelStructure(data) {
+    console.log('🔍 ImportButtonLogic: Validando estructura del Excel...');
+    
     if (!data || data.length === 0) {
+      console.log('❌ ImportButtonLogic: Archivo vacío');
       return {
         valid: false,
-        error: 'El archivo está vacío o no contiene datos válidos'
+        error: 'Su archivo parece estar vacío. No se preocupe, esto pasa a veces. Por favor asegúrese de que tenga información de productos.'
       };
     }
 
     const firstRow = data[0];
     const fileColumns = Object.keys(firstRow);
-
-    // Verificar que tenga las columnas básicas
     const missingColumns = this.requiredColumns.filter(col => !fileColumns.includes(col));
 
+    console.log('📋 ImportButtonLogic: Columnas encontradas:', fileColumns);
+    console.log('📋 ImportButtonLogic: Columnas requeridas:', this.requiredColumns);
+    console.log('❌ ImportButtonLogic: Columnas faltantes:', missingColumns);
+
     if (missingColumns.length > 0) {
+      console.log('❌ ImportButtonLogic: Estructura inválida - faltan columnas');
       return {
         valid: false,
-        error: 'Por favor, enviar archivo Excel con formato adecuado, descargue modelo en Exportar'
+        error: 'Todo está bien, solo necesitamos usar el formato correcto. Por favor descargue la plantilla desde "Exportar" y copie su información ahí. Es muy fácil, no se preocupe.'
       };
     }
 
+    console.log('✅ ImportButtonLogic: Estructura válida');
     return {
       valid: true,
-      message: 'Estructura del Excel válida'
+      message: '¡Excelente! Su archivo está perfecto y listo para usar.'
     };
   }
 
-  // Convertir filas a productos normalizados (formato para FieldNormalizer)
+  // Convertir filas a productos normalizados
   convertRowsToProducts(rows) {
-    return rows.map(rowData => {
-      // TODOS los productos pasan por FieldNormalizer
+    console.log('🔄 ImportButtonLogic: Convirtiendo filas a productos normalizados...');
+    console.log('   - Filas a convertir:', rows.length);
+    
+    const products = rows.map(rowData => {
       return FieldNormalizer.normalizeFromExcelRow(rowData.originalRow, rowData.rowNumber);
     });
+    
+    console.log('✅ ImportButtonLogic: Productos normalizados:', products.length);
+    console.log('   - Primer producto normalizado:', products[0]);
+    
+    return products;
   }
 
-  // Enviar datos normalizados al servidor
+  // Enviar datos al servidor
   async importToDatabase(products) {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/productos/import`, {
+      console.log('📡 ImportButtonLogic: Enviando productos a la base de datos...');
+      console.log('   - Total productos a enviar:', products.length);
+      console.log('   - URL de destino:', `${this.apiBaseUrl}/api/productos/import`);
+      
+      const response = await fetch(`${this.apiBaseUrl}/api/productos/import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,120 +115,136 @@ export class ImportButtonLogic {
       });
 
       const data = await response.json();
+      
+      console.log('📡 ImportButtonLogic: Respuesta del servidor:', response.status, response.statusText);
+      console.log('📦 ImportButtonLogic: Datos de respuesta:', data);
 
       if (!response.ok) {
-        throw new Error(data.frontendMessage || data.message || 'Error al importar productos');
+        throw new Error(data.frontendMessage || data.message || 'No se preocupe, solo necesitamos intentar guardar nuevamente. Todo está bien.');
       }
 
+      console.log('✅ ImportButtonLogic: Productos guardados exitosamente');
       return data;
     } catch (error) {
-      throw new Error('Error de conexión: ' + error.message);
+      console.error('❌ ImportButtonLogic: Error al enviar a BD:', error);
+      throw new Error('Parece que no hay conexión a internet en este momento. Por favor revise su conexión y lo intentamos de nuevo. No se preocupe, es normal que esto pase.');
     }
   }
 
-  // PROCESO PRINCIPAL FINAL
-  async processImport(file, onProgress, fixedTable = 0, correctedData = null, onImportOpen = null) {
+  // ✅ PROCESO PRINCIPAL CON DEBUG COMPLETO
+  async processImport(file, onProgress) {
     try {
-      // LÓGICA CUANDO fixedTable = 1 (datos ya corregidos)
-      if (fixedTable === 1 && correctedData) {
-        onProgress?.('Procesando datos corregidos...');
-        
-        // Normalizar datos corregidos directamente
-        const normalizedProducts = this.convertRowsToProducts(correctedData);
-        
-        // Enviar al servidor
-        onProgress?.(`Enviando ${normalizedProducts.length} productos al servidor...`);
-        const result = await this.importToDatabase(normalizedProducts);
+      console.log('🚀 ImportButtonLogic: INICIANDO PROCESO DE IMPORTACIÓN');
+      console.log('📁 ImportButtonLogic: Archivo recibido:', file.name, '(' + file.size + ' bytes)');
 
-        // Notificar que importOpen debe ser 0 (cerrar modal)
-        onImportOpen?.(0);
-
-        return {
-          success: true,
-          message: result.frontendMessage || result.message,
-          data: result,
-          summary: {
-            total: correctedData.length,
-            processed: normalizedProducts.length,
-            imported: result.imported || 0
-          }
-        };
-      }
-
-      // LÓGICA CUANDO fixedTable = 0 (proceso inicial)
-      
       // Paso 1: Leer archivo Excel
-      onProgress?.('Leyendo archivo Excel...');
+      console.log('\n📖 ImportButtonLogic: PASO 1 - Leyendo archivo Excel...');
+      onProgress?.('Abriendo su archivo ...');
       const rawData = await this.readExcelFile(file);
 
       // Paso 2: Validar estructura básica
-      onProgress?.('Validando estructura del archivo...');
+      console.log('\n🔍 ImportButtonLogic: PASO 2 - Validando estructura...');
+      onProgress?.('Revisando que todo esté en orden...');
       const structureValidation = this.validateExcelStructure(rawData);
       if (!structureValidation.valid) {
+        console.log('❌ ImportButtonLogic: Estructura inválida, terminando proceso');
         throw new Error(structureValidation.error);
       }
 
-      // Paso 3: CategoryValidator - separar completos de incompletos
-      onProgress?.('Validando categorías y completitud de campos...');
+      // Paso 3: CategoryValidator
+      console.log('\n🏷️ ImportButtonLogic: PASO 3 - Ejecutando CategoryValidator...');
+      onProgress?.('Verificando la información de sus productos...');
       const categoryValidation = await this.categoryValidator.validateExcelData(rawData);
       
+      console.log('📊 ImportButtonLogic: Resultado de CategoryValidator:');
+      console.log('   - success:', categoryValidation.success);
+      console.log('   - error:', categoryValidation.error);
+      console.log('   - data keys:', categoryValidation.data ? Object.keys(categoryValidation.data) : 'NO DATA');
+      
       if (!categoryValidation.success) {
+        console.log('❌ ImportButtonLogic: CategoryValidator falló, terminando proceso');
         throw new Error(categoryValidation.error);
       }
 
-      const { completeRows, incompleteRows, availableCategories } = categoryValidation.data;
+      // ✅ DEBUG CRÍTICO - EXTRACCIÓN DE DATOS
+      console.log('\n🎯 ImportButtonLogic: PASO 4 - Evaluando resultados de CategoryValidator:');
+      const { completeRows, incompleteRows } = categoryValidation.data;
+      
+      console.log('🔍 ImportButtonLogic: DATOS EXTRAÍDOS:');
+      console.log('   - categoryValidation.success:', categoryValidation.success);
+      console.log('   - completeRows existe:', !!completeRows);
+      console.log('   - completeRows.length:', completeRows ? completeRows.length : 'UNDEFINED');
+      console.log('   - incompleteRows existe:', !!incompleteRows);
+      console.log('   - incompleteRows.length:', incompleteRows ? incompleteRows.length : 'UNDEFINED');
+      console.log('   - categoryValidation.data completo:', categoryValidation.data);
+      
+      if (completeRows) {
+        console.log('   - Ejemplo completeRow:', completeRows[0]);
+      }
+      if (incompleteRows && incompleteRows.length > 0) {
+        console.log('   - Ejemplo incompleteRow:', incompleteRows[0]);
+      }
 
-      // Paso 4: Decisión de flujo
+      // Paso 4: Decisión simple con logs detallados
+      console.log('\n⚖️ ImportButtonLogic: TOMANDO DECISIÓN...');
+      
       if (incompleteRows.length === 0) {
-        // TODO PERFECTO: enviar directamente a FieldNormalizer
-        onProgress?.('Todos los productos están completos. Normalizando...');
+        console.log('🎯 ImportButtonLogic: DECISIÓN -> TODOS PERFECTOS (incompleteRows.length === 0)');
+        console.log('✅ ImportButtonLogic: Procesando con FieldNormalizer y enviando a BD...');
+        
+        // TODO PERFECTO: procesar con FieldNormalizer
+        onProgress?.('¡Maravilloso! Todos sus productos están perfectos. Guardando con cuidado...');
         const normalizedProducts = this.convertRowsToProducts(completeRows);
 
         // Enviar al servidor
-        onProgress?.(`Enviando ${normalizedProducts.length} productos al servidor...`);
+        onProgress?.(`Guardando sus ${normalizedProducts.length} productos en el sistema...`);
         const result = await this.importToDatabase(normalizedProducts);
 
-        // Notificar que importOpen debe ser 0 (cerrar modal)
-        onImportOpen?.(0);
-
-        return {
+        const successResult = {
           success: true,
-          message: result.frontendMessage || result.message,
-          data: result,
-          summary: {
-            total: rawData.length,
-            processed: normalizedProducts.length,
-            imported: result.imported || 0,
-            complete: completeRows.length,
-            incomplete: 0
-          }
+          message: result.frontendMessage || '¡Felicidades! Todos sus productos se han guardado correctamente. Ya puede verlos en su inventario.',
+          imported: result.imported || 0
         };
+        
+        console.log('✅ ImportButtonLogic: RETORNANDO RESULTADO DE ÉXITO:', successResult);
+        return successResult;
 
       } else {
-        // HAY PROBLEMAS: retornar datos para ManualEditInterface
-        onProgress?.(`Se encontraron ${incompleteRows.length} productos con problemas.`);
+        console.log('🚨 ImportButtonLogic: DECISIÓN -> HAY ERRORES (incompleteRows.length =', incompleteRows.length, ')');
+        console.log('🔧 ImportButtonLogic: Preparando datos para ManualEditInterface...');
         
-        return {
+        // HAY ERRORES: devolver exactamente lo que devuelve CategoryValidator
+        onProgress?.('Preparando ayuda para mejorar algunos productos...');
+        
+        const manualEditResult = {
           success: false,
           needsManualEdit: true,
-          data: {
-            completeRows: completeRows,
-            incompleteRows: incompleteRows,
-            availableCategories: availableCategories,
-            summary: {
-              total: rawData.length,
-              complete: completeRows.length,
-              incomplete: incompleteRows.length
-            }
-          }
+          message: '¡Perfecto! Vamos a mejorar juntos algunos productos. En un momento se abrirá una ventana para ayudarle paso a paso. No se preocupe, es muy sencillo.',
+          data: categoryValidation.data// ✅ Devolver tal cual CategoryValidator
         };
+        
+        console.log('🚨 ImportButtonLogic: RETORNANDO RESULTADO DE EDICIÓN MANUAL:');
+        console.log('   - success:', manualEditResult.success);
+        console.log('   - needsManualEdit:', manualEditResult.needsManualEdit);
+        console.log('   - message:', manualEditResult.message);
+        console.log('   - data existe:', !!manualEditResult.data);
+        console.log('   - data.completeRows:', manualEditResult.data?.completeRows?.length);
+        console.log('   - data.incompleteRows:', manualEditResult.data?.incompleteRows?.length);
+        console.log('   - Resultado completo:', manualEditResult);
+        
+        return manualEditResult;
       }
 
     } catch (error) {
-      return {
+      console.error('💥 ImportButtonLogic: ERROR EN EL PROCESO:', error);
+      
+      const errorResult = {
         success: false,
         message: error.message
       };
+      
+      console.log('❌ ImportButtonLogic: RETORNANDO RESULTADO DE ERROR:', errorResult);
+      return errorResult;
     }
   }
 }

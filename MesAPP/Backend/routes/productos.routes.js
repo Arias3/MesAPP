@@ -13,7 +13,7 @@ function calcularRentabilidad(costo, precio) {
 // === RUTAS PARA PRODUCTOS ===
 
 // Obtener todos los productos con búsqueda opcional
-router.get('/api/productos', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const search = req.query.search || '';
     
@@ -39,7 +39,7 @@ router.get('/api/productos', async (req, res) => {
     // Formatear datos para mantener compatibilidad con frontend
     const formattedRows = rows.map(row => ({
       id: row.id,
-      codigo: row.id,
+      codigo: row.code,
       category: row.category,
       nombre: row.name,
       costo: row.cost,
@@ -75,7 +75,7 @@ router.get('/:codigo', async (req, res) => {
     const row = rows[0];
     const producto = {
       id: row.id,
-      codigo: row.id,
+      codigo: row.code,
       category: row.category,
       nombre: row.name,
       costo: row.cost,
@@ -138,7 +138,7 @@ router.post('/', async (req, res) => {
     
     const producto = {
       id: row.id,
-      codigo: row.id,
+      codigo: row.code,
       category: row.category,
       nombre: row.name,
       costo: row.cost,
@@ -205,7 +205,7 @@ router.put('/:codigo', async (req, res) => {
     
     const producto = {
       id: row.id,
-      codigo: row.id,
+      codigo: row.code,
       category: row.category,
       nombre: row.name,
       costo: row.cost,
