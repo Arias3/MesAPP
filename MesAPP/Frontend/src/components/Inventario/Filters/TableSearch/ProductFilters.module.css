@@ -1,0 +1,267 @@
+/* ProductFilters.module.css - Estilos compartidos para todos los filtros */
+
+/* ===== BASE DE FILTROS ===== */
+.name-filter,
+.category-filter,
+.stock-status-filter,
+.margin-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+  max-width: 280px;
+}
+
+/* ===== ETIQUETAS ===== */
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ===== CONTENEDORES DE INPUT ===== */
+.filter-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper,
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.input-wrapper:hover,
+.select-wrapper:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.input-wrapper:focus-within,
+.select-wrapper:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ===== ICONOS ===== */
+.input-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 36px;
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===== INPUTS Y SELECTS ===== */
+.filter-input {
+  width: 100%;
+  padding: 10px 40px 10px 40px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #111827;
+  background: transparent;
+}
+
+.filter-input::placeholder {
+  color: #9ca3af;
+}
+
+.filter-input:disabled {
+  background-color: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 40px 10px 40px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #111827;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.filter-select:disabled {
+  background-color: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.filter-select option {
+  padding: 8px 12px;
+  color: #111827;
+  background: white;
+}
+
+/* ===== BOTÓN DE LIMPIAR ===== */
+.clear-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.clear-button:hover {
+  background: #dc2626;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.clear-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.clear-button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(1);
+}
+
+/* ===== INFORMACIÓN DE FILTRO ===== */
+.filter-info {
+  font-size: 12px;
+  color: #6b7280;
+  padding: 4px 8px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+}
+
+.filter-info strong {
+  color: #111827;
+}
+
+/* ===== TEXTO DE AYUDA ===== */
+.filter-help {
+  margin-top: 4px;
+}
+
+.help-text {
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ===== RESUMEN DE STOCK (solo para StockStatusFilter) ===== */
+.stock-summary {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.summary-text {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ===== ESTADOS ESPECIALES ===== */
+.name-filter .filter-info {
+  border-left-color: #10b981;
+}
+
+.category-filter .filter-info {
+  border-left-color: #8b5cf6;
+}
+
+.stock-status-filter .filter-info {
+  border-left-color: #f59e0b;
+}
+
+.margin-filter .filter-info {
+  border-left-color: #06b6d4;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .name-filter,
+  .category-filter,
+  .stock-status-filter,
+  .margin-filter {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .stock-summary {
+    justify-content: center;
+  }
+  
+  .filter-input,
+  .filter-select {
+    padding: 12px 40px 12px 40px;
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-input,
+  .filter-select {
+    padding: 14px 40px 14px 40px;
+  }
+  
+  .clear-button {
+    width: 28px;
+    height: 28px;
+    right: 6px;
+  }
+  
+  .stock-summary {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+}

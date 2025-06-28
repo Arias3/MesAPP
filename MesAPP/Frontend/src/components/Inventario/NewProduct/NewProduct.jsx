@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, X, Package, Save } from 'lucide-react';
-import styles from './NewProductInventary.module.css';
+import styles from './NewProduct.module.css';
 
 function NewProductInventary({ onProductCreated, apiBaseUrl }) {
   const [showModal, setShowModal] = useState(false);
@@ -122,7 +122,7 @@ function NewProductInventary({ onProductCreated, apiBaseUrl }) {
         disabled={isLoading}
       >
         <Plus className={styles.buttonIcon} />
-        <span>Nuevo Producto</span>
+        <span>Añadir nuevo producto</span>
       </button>
 
       {/* Modal */}
