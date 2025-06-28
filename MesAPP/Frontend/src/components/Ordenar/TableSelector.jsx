@@ -1,18 +1,28 @@
 import React from 'react';
 import Select from 'react-select';
 
-const opciones = Array.from({ length: 13 }, (_, i) => ({
-  value: i + 1,
-  label: (i + 1).toString()
-}));
+const opciones = [
+  { value: null, label: '' }, // Opción en blanco
+  ...Array.from({ length: 13 }, (_, i) => ({
+    value: i + 1,
+    label: (i + 1).toString()
+  }))
+];
 
-function TableSelector({ mesa, setMesa }) {
+function TableSelector({ mesa, setMesa, mesasOcupadas = [] }) {
+  // Marca como deshabilitadas las mesas ocupadas
+  const opcionesFiltradas = opciones.map(opt => ({
+    ...opt,
+    isDisabled: opt.value !== null && mesasOcupadas.includes(opt.value)
+  }));
+
   return (
     <Select
-      options={opciones}
-      value={opciones.find(o => o.value === mesa)}
+      options={opcionesFiltradas}
+      value={opcionesFiltradas.find(o => o.value === mesa) || opcionesFiltradas[0]}
       onChange={option => setMesa(option.value)}
       placeholder="Selecciona mesa"
+      isOptionDisabled={option => option.isDisabled}
       styles={{
         control: (base) => ({
           ...base,
@@ -36,12 +46,13 @@ function TableSelector({ mesa, setMesa }) {
         }),
         option: (base, state) => ({
           ...base,
-          color: '#111',
+          color: state.isDisabled ? '#aaa' : '#111',
           backgroundColor: state.isSelected
             ? '#e6e6e6'
             : state.isFocused
               ? '#f5f5f5'
               : '#fff',
+          cursor: state.isDisabled ? 'not-allowed' : 'pointer',
         }),
       }}
     />

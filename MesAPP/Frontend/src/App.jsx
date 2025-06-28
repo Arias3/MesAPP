@@ -5,6 +5,7 @@ import Caja from './Pages/Caja/Caja'
 import Ventas from './Pages/Ventas/Ventas'
 import Reportes from './Pages/Reportes/Reportes'
 import Personal from './Pages/Personal/Personal'
+import Helados from './Pages/Helados/helados'
 import Login from './Pages/Access/Login'
 import { useState } from 'react'
 import './App.css'
@@ -22,6 +23,7 @@ function App() {
         <Route path="/inventario" element={<Inventario />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/personal" element={<Personal />} />
+        <Route path="/Helados" element={<Helados />} />
       </Routes>
     </Router>
   )

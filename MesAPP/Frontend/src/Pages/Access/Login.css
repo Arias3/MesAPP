@@ -98,7 +98,7 @@ html, body {
   background-color: #64ac93;
 }
 
-.error-message {
+.error-message-login {
   color: red;
   margin-top: 10px;
   font-weight: bold;

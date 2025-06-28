@@ -24,4 +24,41 @@ router.get('/productos', async (req, res) => {
   }
 });
 
+router.post('/sales', async (req, res) => {
+  try {
+    const { table_number, date, time, description, total, type, seller, status } = req.body;
+    await pool.execute(
+      'INSERT INTO sales (table_number, date, time, description, total, type, seller, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [table_number, date, time, description, total, type, seller, status]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error al agregar orden:', error);
+    res.status(500).json({ success: false, message: 'Error interno' });
+  }
+});
+
+router.get('/sales/last-id', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT MAX(id) as lastId FROM sales');
+    res.json({ lastId: rows[0].lastId || 0 });
+  } catch (error) {
+    console.error('Error al obtener el último id:', error);
+    res.status(500).json({ success: false, message: 'Error interno' });
+  }
+});
+
+router.get('/sales/pending-tables', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      "SELECT table_number FROM sales WHERE status = 'PENDING'"
+    );
+    const mesasOcupadas = rows.map(r => r.table_number);
+    res.json({ mesasOcupadas });
+  } catch (error) {
+    console.error('Error al obtener mesas ocupadas:', error);
+    res.status(500).json({ success: false, message: 'Error interno' });
+  }
+});
+
 module.exports = router;
