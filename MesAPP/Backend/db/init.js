@@ -72,9 +72,9 @@ const TABLES = {
       time TIME NOT NULL,
       description TEXT,
       total DECIMAL(10,2) NOT NULL,
-      type ENUM('Table', 'Takeaway', 'App') NOT NULL,
+      type ENUM('Efectivo', 'Transferencia', 'Tarjeta') NOT NULL,
       seller VARCHAR(100) NOT NULL,
-      status ENUM('PAID', 'PENDING', 'PREPARING') DEFAULT 'PENDING'
+      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE'
     ) ENGINE=InnoDB
   `,
   categories: `

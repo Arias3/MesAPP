@@ -10,6 +10,7 @@ const categoriesRoutes = require('./routes/categorias.routes');
 const ordenarRoutes = require('./routes/ordenar.routes'); 
 const heladosRoutes = require('./routes/helados.routes'); 
 const staffRoutes = require('./routes/staff.routes'); 
+const salesRoutes = require('./routes/sales.routes');
 const app = express();
 
 // Middlewares
@@ -24,6 +25,7 @@ app.use('/api/categorias', categoriesRoutes);
 app.use('/api/helados', heladosRoutes);
 app.use('/api/ordenar', ordenarRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/ventas', salesRoutes);
 app.use('/', loginRoutes);
 
 // Ruta opcional para probar si el servidor responde

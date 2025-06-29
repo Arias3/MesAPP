@@ -85,7 +85,7 @@ function Ordenes() {
       total: total,
       type: type,
       seller: seller,
-      status: "PENDING"
+      status: "PENDIENTE"
     };
     await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales`, {
       method: 'POST',
@@ -109,7 +109,7 @@ function Ordenes() {
       return;
     }
     const API_HOST = import.meta.env.VITE_API_HOST;
-    const type = cards.some(card => card.takeaway) ? "Takeaway" : "Table";
+    const type = null;
     const total = cards.reduce((acc, card) =>
       acc + (Number(card.price) || 0) + (card.takeaway ? 1000 : 0), 0);
 
@@ -121,7 +121,7 @@ function Ordenes() {
       numero: numero.toString().padStart(6, "0"),
       fecha: new Date().toISOString().slice(0, 10),
       hora: new Date().toTimeString().slice(0, 8), // "HH:MM:SS"
-      Mesa: `Mesa ${mesa}`,
+      Mesa: mesa === 0 ? "Mesa: Mostrador" : `Mesa ${mesa}`,
       total: subtotal,
       items: cards.map(card => ({
         nombre: card.nombre,
@@ -196,7 +196,13 @@ function Ordenes() {
                   }}
                   onClick={() => {
                     setShowConfirm(false);
-                    window.location.reload(); // Recarga la página al presionar OK
+                    // Solo recarga si el mensaje es de éxito
+                    if (
+                      confirmMsg === "¡Pedido enviado correctamente!" ||
+                      confirmMsg === "¡Pedido enviado e impresión solicitada!"
+                    ) {
+                      window.location.reload();
+                    }
                   }}
                 >
                   OK
