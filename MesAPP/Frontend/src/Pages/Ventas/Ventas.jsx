@@ -61,7 +61,7 @@ function Ventas() {
     <div className="ordenes-background">
       <MenuButton />
       <div className="ventas-title-outer">
-        Historial de ventas y pedidos
+        HISTORIAL DE VENTAS
       </div>
       <div className="ventas-container">
         <div>
@@ -87,36 +87,38 @@ function Ventas() {
         {loading ? (
           <div style={{ marginTop: 24, textAlign: "center" }}>Cargando...</div>
         ) : (
-          <table className="ventas-table">
-            <thead>
-              <tr>
-                <th>Hora</th>
-                <th>Descripción</th>
-                <th>Total</th>
-                <th>Método</th>
-                <th>Vendedor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ventas.length === 0 ? (
+          <div className="ventas-table-wrapper">
+            <table className="ventas-table">
+              <thead>
                 <tr>
-                  <td colSpan={5} style={{ textAlign: "center", color: "#888" }}>
-                    No hay ventas para esta fecha.
-                  </td>
+                  <th>Hora</th>
+                  <th>Descripción</th>
+                  <th>Total</th>
+                  <th>Método</th>
+                  <th>Vendedor</th>
                 </tr>
-              ) : (
-                ventas.map((venta) => (
-                  <tr key={venta.id}>
-                    <td>{formatTime(venta.time)}</td>
-                    <td className="descripcion-cell">{venta.description}</td>
-                    <td>${Number(venta.total).toFixed(2)}</td>
-                    <td>{venta.type}</td>
-                    <td>{venta.seller}</td>
+              </thead>
+              <tbody>
+                {ventas.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: "center", color: "#888" }}>
+                      No hay ventas para esta fecha.
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  ventas.map((venta) => (
+                    <tr key={venta.id}>
+                      <td>{formatTime(venta.time)}</td>
+                      <td className="descripcion-cell">{venta.description}</td>
+                      <td>${Number(venta.total).toFixed(2)}</td>
+                      <td>{venta.type}</td>
+                      <td>{venta.seller}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
       <div className="ventas-footer">

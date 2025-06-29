@@ -5,68 +5,82 @@
     max-width: 900px;
     margin: 32px auto 0 auto;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    height: 520px;
+    /* Ajusta este valor según tu preferencia */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.ventas-title-outer {
-    font-size: 2.2rem;
-    font-weight: bold;
-    color: #f7fafb;
-    margin-bottom: 18px;
-    text-align: center;
-    margin-top: 32px;
-    letter-spacing: 1px;
-    font-family: 'Inter', sans-serif;
+.ventas-table-wrapper {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: 450px;
+    border-radius: 1em;
+    background: #d9d9d9;
 }
 
-.ventas-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #1f484e;
-    margin-bottom: 18px;
-    text-align: center;
+/* Oculta la barra de scroll pero mantiene el scroll funcional */
+.ventas-table-wrapper::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
 }
 
-.ventas-nav-btn {
-    background: #1f484e;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 18px;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 0 8px 16px 0;
-    transition: background 0.2s;
+.ventas-table-wrapper {
+    scrollbar-width: none;
 }
 
-.ventas-nav-btn:hover {
-    background: #145055;
-}
-
+/* Tabla con encabezado fijo y contenido scrolleable */
 .ventas-table {
     width: 100%;
-    border-collapse: separate;
     border-spacing: 0;
     margin-top: 12px;
-    border-radius: 14px;
-    overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    background: transparent;
+    display: block;
+}
+
+.ventas-table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.ventas-table thead th {
+    position: sticky;
+    top: 0;
+    background: #1f484e;
+    color: #fff;
+    z-index: 2;
+    font-weight: bold;
+    padding: 14px 18px;
+    text-align: left;
+}
+
+.ventas-table tbody {
+    display: block;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.ventas-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 .ventas-table th,
 .ventas-table td {
     color: #1f484e;
     padding: 14px 18px;
-    /* Aumenta el espacio interno */
     border-bottom: 1px solid #c2d1d3;
     text-align: left;
     background-clip: padding-box;
-}
-
-.ventas-table th {
-    background: #1f484e;
-    color: #fff;
-    font-weight: bold;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .ventas-table tr:last-child td {
@@ -88,42 +102,71 @@
     white-space: nowrap;
 }
 
-.ventas-table td.status-terminado {
-  color: #28a745 !important; /* Verde */
-  font-weight: bold;
+/* Título principal fuera del contenedor */
+.ventas-title-outer {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #f7fafb;
+    margin-bottom: 18px;
+    text-align: center;
+    margin-top: 32px;
+    letter-spacing: 1px;
+    font-family: 'Inter', sans-serif;
 }
 
+/* Botones de navegación */
+.ventas-nav-btn {
+    background: #1f484e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0 8px 16px 0;
+    transition: background 0.2s;
+}
+
+.ventas-nav-btn:hover {
+    background: #145055;
+}
+
+/* Footer fijo con totales */
 .ventas-footer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #d9d9d9;
-  color: #1f484e;
-  font-size: 1.15rem;
-  font-weight: bold;
-  text-align: center;
-  padding: 16px 0 12px 0;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-  z-index: 100;
-  letter-spacing: 1px;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-  display: flex;
-  justify-content: center;
-  gap: 32px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #d9d9d9;
+    color: #1f484e;
+    font-size: 1.15rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 16px 0 12px 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    letter-spacing: 1px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
 }
+
 .ventas-footer-label {
-  color: #111;
-  font-size: 0.95rem;
-  font-weight: 500;
+    color: #111;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
+
 .ventas-footer-total {
-  color: #145055;
-  font-size: 1.35rem;
-  font-weight: bold;
-  margin-left: 6px;
+    color: #145055;
+    font-size: 1.35rem;
+    font-weight: bold;
+    margin-left: 6px;
 }
-.ventas-footer > div {
-  margin-bottom: 2px;
+
+.ventas-footer>div {
+    margin-bottom: 2px;
 }
