@@ -38,7 +38,7 @@ function Ordenes() {
 
   // Calcula el subtotal sumando los precios de las cards
   const subtotal = cards.reduce((acc, card) =>
-    acc + (Number(card.price) || 0) + (card.takeaway ? 1000 : 0), 0);
+    acc + (Number(card.price) || 0), 0);
 
 
   const handleCardClick = (idx) => {
@@ -55,17 +55,11 @@ function Ordenes() {
     setCards(cards.filter((_, i) => i !== idx));
   };
 
-  const handleToggleTakeaway = (idx) => {
-    setCards(cards.map((card, i) =>
-      i === idx ? { ...card, takeaway: !card.takeaway } : card
-    ));
-  };
-
   const handleSaveCard = (data) => {
     if (editIndex === null) {
-      setCards([...cards, { ...data, takeaway: false }]);
+      setCards([...cards, { ...data }]); // Elimina takeaway
     } else {
-      setCards(cards.map((c, i) => (i === editIndex ? { ...data, takeaway: c.takeaway } : c)));
+      setCards(cards.map((c, i) => (i === editIndex ? { ...data } : c)));
     }
     setDialogOpen(false);
     setEditIndex(null);
@@ -74,7 +68,7 @@ function Ordenes() {
   const agregarOrdenDB = async (pedido, total, type) => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const API_PORT = import.meta.env.VITE_API_PORT || 5000;
-    const descripcion = pedido.items.map(item => item.nombre).join(', ');
+    const descripcion = pedido.items.map(item => item.nombre).join(',');
     const seller = localStorage.getItem('username') || "App";
 
     const body = {
@@ -85,7 +79,8 @@ function Ordenes() {
       total: total,
       type: type,
       seller: seller,
-      status: "PENDIENTE"
+      status: "PENDIENTE",
+      NumOrden: pedido.numero
     };
     await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales`, {
       method: 'POST',
@@ -124,11 +119,9 @@ function Ordenes() {
       Mesa: mesa === 0 ? "Mesa: Mostrador" : `Mesa ${mesa}`,
       total: subtotal,
       items: cards.map(card => ({
-        nombre: card.nombre,
+        nombre: card.name,
         sabores: card.sabores,
-        notas: card.takeaway
-          ? `PARA LLEVAR${card.notas ? ' - ' + card.notas : ''}`
-          : card.notas || "",
+        notas: card.notas || "",
       }))
     };
 
@@ -226,7 +219,7 @@ function Ordenes() {
             style={{ cursor: 'pointer' }}
           >
             <div className="ordenes-card-header">
-              <span className="ordenes-card-nombre">{card.nombre}</span>
+              <span className="ordenes-card-nombre">{card.name}</span>
               <button
                 className="ordenes-card-delete"
                 onClick={e => {
@@ -240,20 +233,6 @@ function Ordenes() {
             </div>
             <div className="ordenes-card-sabores">{card.sabores}</div>
             <div className="ordenes-card-notas">{card.notas}</div>
-            <label
-              style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}
-              onClick={e => e.stopPropagation()}
-            >
-              <input
-                type="checkbox"
-                checked={!!card.takeaway}
-                onChange={e => {
-                  handleToggleTakeaway(idx);
-                }}
-                style={{ marginRight: 6 }}
-              />
-              Para llevar
-            </label>
           </div>
         ))}
 

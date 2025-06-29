@@ -26,10 +26,10 @@ router.get('/productos', async (req, res) => {
 
 router.post('/sales', async (req, res) => {
   try {
-    const { table_number, date, time, description, total, type, seller, status } = req.body;
+    const { table_number, date, time, description, total, type, seller, status, NumOrden } = req.body;
     await pool.execute(
-      'INSERT INTO sales (table_number, date, time, description, total, type, seller, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [table_number, date, time, description, total, type, seller, status]
+      'INSERT INTO sales (table_number, date, time, description, total, type, seller, status, NumOrden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [table_number, date, time, description, total, type, seller, status, NumOrden]
     );
     res.json({ success: true });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/sales/last-id', async (req, res) => {
 router.get('/sales/pending-tables', async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      "SELECT table_number FROM sales WHERE status = 'PENDING'"
+      "SELECT table_number FROM sales WHERE status = 'PENDIENTE'"
     );
     const mesasOcupadas = rows.map(r => r.table_number);
     res.json({ mesasOcupadas });

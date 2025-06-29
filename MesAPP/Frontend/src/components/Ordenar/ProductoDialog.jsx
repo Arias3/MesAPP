@@ -28,11 +28,16 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
 
     useEffect(() => {
         if (!open) return;
-        // Cargar productos y sabores solo cuando se abre el diálogo
-        fetchProductos().then(setProductos);
-        fetchSabores().then(setSabores);
 
-        // Si es para agregar, limpia los campos
+        let isMounted = true;
+
+        fetchProductos().then(data => {
+            if (isMounted) setProductos(data);
+        });
+        fetchSabores().then(data => {
+            if (isMounted) setSabores(data);
+        });
+
         if (isNew) {
             setNombre('');
             setNotas('');
@@ -40,7 +45,6 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
             setProductoSeleccionado(null);
             setSaboresSeleccionados([]);
         } else {
-            // Si es para editar, carga los datos existentes
             setNombre(initialData.nombre || '');
             setNotas(initialData.notas || '');
             setAdicional(false);
@@ -51,7 +55,10 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
                     : []
             );
         }
-    }, [open, isNew, initialData]);
+
+        return () => { isMounted = false; };
+        // eslint-disable-next-line
+    }, [open]);
 
     useEffect(() => {
         // Busca el producto seleccionado por nombre exacto
@@ -91,9 +98,9 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
                     onSubmit={e => {
                         e.preventDefault();
                         onSave({
-                            nombre,
+                            name: nombre,
                             sabores: saboresSeleccionados.filter(Boolean).join(', '),
-                            notas,
+                            notas: adicional ? `PARA LLEVAR-${notas}` : notas,
                             price: productoSeleccionado?.price || 0
                         });
                     }}
@@ -134,23 +141,15 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
                             </div>
                         ))}
 
-                    {/* Adicional de helado */}
                     {productoSeleccionado && (
                         <div className="producto-dialog-field">
                             <label>
                                 <input
                                     type="checkbox"
                                     checked={adicional}
-                                    onChange={e => {
-                                        setAdicional(e.target.checked);
-                                        if (e.target.checked) {
-                                            setSaboresSeleccionados(prev => [...prev, '']);
-                                        } else {
-                                            setSaboresSeleccionados(prev => prev.slice(0, productoSeleccionado.flavor_count));
-                                        }
-                                    }}
+                                    onChange={e => setAdicional(e.target.checked)}
                                 />
-                                Adicional de helado
+                                Para llevar
                             </label>
                         </div>
                     )}

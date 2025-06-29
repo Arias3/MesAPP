@@ -1,0 +1,42 @@
+.cuentas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.cuenta-card {
+  background: #fff;
+  border-radius: 1.2em;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 28px 36px;
+  min-width: 220px;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 2px solid #d9d9d9;
+}
+.cuenta-card:hover {
+  box-shadow: 0 4px 18px rgba(31,72,78,0.13);
+  transform: translateY(-4px) scale(1.03);
+  border-color: #1f484e;
+}
+
+.title-card {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1f484e;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.label-card {
+  font-size: 1.3rem;
+  color: #145055;
+  font-weight: bold;
+  text-align: center;
+}

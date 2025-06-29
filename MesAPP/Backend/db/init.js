@@ -75,6 +75,7 @@ const TABLES = {
       type ENUM('Efectivo', 'Transferencia', 'Tarjeta') NOT NULL,
       seller VARCHAR(100) NOT NULL,
       status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE'
+      NumOrden INT NOT NULL,
     ) ENGINE=InnoDB
   `,
   categories: `
