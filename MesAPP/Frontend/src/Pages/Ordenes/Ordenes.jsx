@@ -13,7 +13,7 @@ function Ordenes() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmMsg, setConfirmMsg] = useState("");
   const [mesasOcupadas, setMesasOcupadas] = useState([]);
-  
+
 
   // Estado para las tarjetas de productos
   const [cards, setCards] = useState([
@@ -75,6 +75,8 @@ function Ordenes() {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const API_PORT = import.meta.env.VITE_API_PORT || 5000;
     const descripcion = pedido.items.map(item => item.nombre).join(', ');
+    const seller = localStorage.getItem('username') || "App";
+
     const body = {
       table_number: mesa,
       date: pedido.fecha,
@@ -82,7 +84,7 @@ function Ordenes() {
       description: descripcion,
       total: total,
       type: type,
-      seller: "App", // Puedes cambiar esto si tienes login
+      seller: seller,
       status: "PENDING"
     };
     await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales`, {
@@ -101,6 +103,11 @@ function Ordenes() {
   };
 
   const enviarPedido = async () => {
+    if (mesa === null) {
+      setConfirmMsg("Por favor, seleccionar una Mesa");
+      setShowConfirm(true);
+      return;
+    }
     const API_HOST = import.meta.env.VITE_API_HOST;
     const type = cards.some(card => card.takeaway) ? "Takeaway" : "Table";
     const total = cards.reduce((acc, card) =>
@@ -138,7 +145,6 @@ function Ordenes() {
 
     await agregarOrdenDB(pedido, total, type);
     setShowConfirm(true);
-    setTimeout(() => setShowConfirm(false), 2500);
   };
 
   return (
@@ -188,7 +194,10 @@ function Ordenes() {
                     fontWeight: "bold",
                     cursor: "pointer",
                   }}
-                  onClick={() => setShowConfirm(false)}
+                  onClick={() => {
+                    setShowConfirm(false);
+                    window.location.reload(); // Recarga la página al presionar OK
+                  }}
                 >
                   OK
                 </button>

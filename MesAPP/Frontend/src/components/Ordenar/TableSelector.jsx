@@ -2,7 +2,8 @@ import React from 'react';
 import Select from 'react-select';
 
 const opciones = [
-  { value: null, label: '' }, // Opción en blanco
+  { value: null, label: '' },
+  { value: 0, label: 'Mostrador' },
   ...Array.from({ length: 13 }, (_, i) => ({
     value: i + 1,
     label: (i + 1).toString()
@@ -13,9 +14,11 @@ function TableSelector({ mesa, setMesa, mesasOcupadas = [] }) {
   // Marca como deshabilitadas las mesas ocupadas
   const opcionesFiltradas = opciones.map(opt => ({
     ...opt,
-    isDisabled: opt.value !== null && mesasOcupadas.includes(opt.value)
+    isDisabled:
+      opt.value !== null &&
+      opt.label !== "Mostrador" && // No bloquear "Mostrador"
+      mesasOcupadas.includes(opt.value)
   }));
-
   return (
     <Select
       options={opcionesFiltradas}

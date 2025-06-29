@@ -31,10 +31,15 @@ function Login() {
         localStorage.setItem('role', data.role);
         localStorage.setItem('username', username);
 
-        if (data.role.toLowerCase() === 'mesero') {
+        const role = data.role.toLowerCase();
+        if (role === 'admin') {
+          navigate('/caja');
+        } else if (role === 'mesero') {
           navigate('/ordenar');
+        } else if (role === 'cocinero') {
+          navigate('/ventas');
         } else {
-          navigate('/home'); // o /admin, /dashboard, etc.
+          navigate('/home'); // ruta por defecto si el rol no coincide
         }
       } else {
         setError('Usuario no encontrado');

@@ -47,12 +47,12 @@ const TABLES = {
     ) ENGINE=InnoDB
   `,
   staff: `
-    CREATE TABLE IF NOT EXISTS staff (
-      id BIGINT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      role VARCHAR(50) NOT NULL
-    ) ENGINE=InnoDB
-  `,
+  CREATE TABLE IF NOT EXISTS staff (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(50) NOT NULL
+  ) ENGINE=InnoDB
+`,
   daily_closures: `
     CREATE TABLE IF NOT EXISTS daily_closures (
       id INT AUTO_INCREMENT PRIMARY KEY,
