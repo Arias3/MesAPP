@@ -25,6 +25,11 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
     const [saboresSeleccionados, setSaboresSeleccionados] = useState([]);
     const [adicional, setAdicional] = useState(false);
     const [notas, setNotas] = useState('');
+    const [llevar, setLlevar] = useState(initialData.llevar || 0);
+
+    useEffect(() => {
+        setLlevar(initialData.llevar || 0);
+    }, [initialData]);
 
     useEffect(() => {
         if (!open) return;
@@ -43,9 +48,13 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
             setNotas('');
             setAdicional(false);
             setProductoSeleccionado(null);
-            setSaboresSeleccionados([]);
+            setSaboresSeleccionados(
+                initialData.sabores
+                    ? initialData.sabores.split(',').map(s => s.trim())
+                    : []
+            );
         } else {
-            setNombre(initialData.nombre || '');
+            setNombre(initialData.name || '');
             setNotas(initialData.notas || '');
             setAdicional(false);
             setProductoSeleccionado(null);
@@ -100,7 +109,8 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
                         onSave({
                             name: nombre,
                             sabores: saboresSeleccionados.filter(Boolean).join(', '),
-                            notas: adicional ? `PARA LLEVAR-${notas}` : notas,
+                            notas,
+                            llevar,
                             price: productoSeleccionado?.price || 0
                         });
                     }}
@@ -146,8 +156,8 @@ function ProductoDialog({ open, initialData = {}, onClose, onSave, isNew }) {
                             <label>
                                 <input
                                     type="checkbox"
-                                    checked={adicional}
-                                    onChange={e => setAdicional(e.target.checked)}
+                                    checked={!!llevar}
+                                    onChange={e => setLlevar(e.target.checked ? 1 : 0)}
                                 />
                                 Para llevar
                             </label>

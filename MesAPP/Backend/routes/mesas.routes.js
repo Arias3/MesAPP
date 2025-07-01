@@ -67,4 +67,14 @@ router.delete('/', async (req, res) => {
     }
 });
 
+router.get('/productos/:mesa', async (req, res) => {
+  const mesa = req.params.mesa;
+  try {
+    const [rows] = await pool.query(`SELECT * FROM mesa${mesa}`);
+    res.json({ productos: rows });
+  } catch (err) {
+    res.status(500).json({ productos: [] });
+  }
+});
+
 module.exports = router;

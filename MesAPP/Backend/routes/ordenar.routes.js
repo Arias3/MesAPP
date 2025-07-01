@@ -61,4 +61,35 @@ router.get('/sales/pending-tables', async (req, res) => {
   }
 });
 
+router.post('/mesa/:mesa', async (req, res) => {
+  const mesa = req.params.mesa;
+  const { productos } = req.body;
+  try {
+    // Borra todos los productos actuales de la mesa SIEMPRE
+    await pool.query(`DELETE FROM mesa${mesa}`);
+
+    // Si hay productos, los insertamos
+    if (Array.isArray(productos) && productos.length > 0) {
+      for (const prod of productos) {
+        await pool.query(
+          `INSERT INTO mesa${mesa} (name, notas, sabores, llevar)
+           VALUES (?, ?, ?, ?)`,
+          [
+            prod.name,
+            prod.notas || "",
+            prod.sabores || "",
+            prod.llevar || 0
+          ]
+        );
+      }
+      return res.json({ message: 'Productos guardados en la mesa' });
+    } else {
+      // Si no hay productos, solo se borró la mesa
+      return res.json({ message: 'Mesa vaciada correctamente' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Error al guardar productos en la mesa' });
+  }
+});
+
 module.exports = router;

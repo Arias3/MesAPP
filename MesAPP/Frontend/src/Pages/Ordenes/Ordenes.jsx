@@ -36,6 +36,30 @@ function Ordenes() {
     fetchMesasOcupadas();
   }, []);
 
+  useEffect(() => {
+    const API_HOST = import.meta.env.VITE_API_HOST;
+    const API_PORT = import.meta.env.VITE_API_PORT || 5000;
+    if (mesa && mesa > 0) {
+      fetch(`http://${API_HOST}:${API_PORT}/api/mesas/productos/${mesa}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data.productos) && data.productos.length > 0) {
+            setCards(data.productos.map(prod => ({
+              name: prod.name,
+              notas: prod.notas || "",
+              llevar: prod.llevar || 0,
+              sabores: prod.sabores || "",
+            })));
+          } else {
+            setCards([]);
+          }
+        })
+        .catch(() => setCards([]));
+    } else {
+      setCards([]);
+    }
+  }, [mesa]);
+
   // Calcula el subtotal sumando los precios de las cards
   const subtotal = cards.reduce((acc, card) =>
     acc + (Number(card.price) || 0), 0);
@@ -65,27 +89,15 @@ function Ordenes() {
     setEditIndex(null);
   };
 
-  const agregarOrdenDB = async (pedido, total, type) => {
+  const agregarOrdenDB = async (mesa, productos) => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const API_PORT = import.meta.env.VITE_API_PORT || 5000;
-    const descripcion = pedido.items.map(item => item.nombre).join(',');
-    const seller = localStorage.getItem('username') || "App";
 
-    const body = {
-      table_number: mesa,
-      date: pedido.fecha,
-      time: pedido.hora,
-      description: descripcion,
-      total: total,
-      type: type,
-      seller: seller,
-      status: "PENDIENTE",
-      NumOrden: pedido.numero
-    };
-    await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales`, {
+    // Enviamos todos los productos de la mesa
+    await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/mesa/${mesa}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ productos })
     });
   };
 
@@ -104,39 +116,27 @@ function Ordenes() {
       return;
     }
     const API_HOST = import.meta.env.VITE_API_HOST;
-    const type = null;
-    const total = cards.reduce((acc, card) =>
-      acc + (Number(card.price) || 0) + (card.takeaway ? 1000 : 0), 0);
 
-    // Obtén el nuevo número de orden antes de crear el pedido
-    const numero = await obtenerNuevoNumeroOrden();
+    // Prepara los productos con los campos requeridos
+    const productos = cards.map(card => ({
+      name: card.name,
+      notas: card.notas || "",
+      sabores: card.sabores || "",
+      llevar: card.llevar || 0
+    }));
 
-    // Crea el objeto pedido aquí, usando el número generado
-    const pedido = {
-      numero: numero.toString().padStart(6, "0"),
-      fecha: new Date().toISOString().slice(0, 10),
-      hora: new Date().toTimeString().slice(0, 8), // "HH:MM:SS"
-      Mesa: mesa === 0 ? "Mesa: Mostrador" : `Mesa ${mesa}`,
-      total: subtotal,
-      items: cards.map(card => ({
-        nombre: card.name,
-        sabores: card.sabores,
-        notas: card.notas || "",
-      }))
-    };
+    await agregarOrdenDB(mesa, productos);
 
     if (imprimirFactura) {
       const ws = new WebSocket(`ws://${API_HOST}:3000`);
       ws.onopen = () => {
-        ws.send(JSON.stringify(pedido));
+        ws.send(JSON.stringify({ mesa, productos }));
         ws.close();
       };
       setConfirmMsg("¡Pedido enviado e impresión solicitada!");
     } else {
       setConfirmMsg("¡Pedido enviado correctamente!");
     }
-
-    await agregarOrdenDB(pedido, total, type);
     setShowConfirm(true);
   };
 
@@ -231,7 +231,12 @@ function Ordenes() {
                 &#10005;
               </button>
             </div>
-            <div className="ordenes-card-sabores">{card.sabores}</div>
+            {/* Mostrar sabores si existen */}
+            {card.sabores && (
+              <div className="ordenes-card-sabores">
+                {card.sabores.split(',').join(', ')}
+              </div>
+            )}
             <div className="ordenes-card-notas">{card.notas}</div>
           </div>
         ))}
