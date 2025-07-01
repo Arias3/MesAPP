@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import MenuButton from "../../components/Ordenar/MenuBotton.jsx";
 
 const API_HOST = import.meta.env.VITE_API_HOST;
 const API_PORT = import.meta.env.VITE_API_PORT || 5000;
@@ -86,90 +85,130 @@ function GestionPersonal() {
   }, []);
 
   return (
-    <div className="ordenes-background">
+    <div>
       <style>
         {`
-.container-personal {
-    background: #d9d9d9;
-    border-radius: 1.4em;
-    padding: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 18px);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: clamp(4px, 1vw, 12px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    max-width: 90vw;
-    width: min(600px, 90vw);
-    min-width: 220px;
-    flex-wrap: wrap;
-    margin-top: 32px;
-}
-.label-personal {
-    font-size: clamp(1.5rem, 2vw, 2.5rem);
-    font-weight: bold;
-    color: #1f484e;
-    margin-right: clamp(4px, 1vw, 16px);
-    text-align: center;
-    margin: 0;
-}
-.table-personal th {
-    background: #1f484e;
-    color: #fff;
-    font-weight: bold;
-    border-bottom: 2px solid #145055;
-}
-.table-personal td {
-    color: #1f484e;
-    background: #f7fafb;
-    border-bottom: 1px solid #c2d1d3;
-}
-.table-personal tr:nth-child(even) td {
-    background: #e3ecee;
-}
-select.role-select-personal {
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid #b0b0b0;
-    font-size: 1rem;
-    background: #fff;
-    color: #1f484e;
-}
-.edit-btn-personal {
-    margin-left: 8px;
-    background: #1f484e;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 2px 8px;
-    cursor: pointer;
-    font-size: 0.95em;
-    transition: background 0.2s;
-}
-.edit-btn-personal:hover {
-    background: #145055;
-}
-.save-btn-personal, .cancel-btn-personal {
-    margin-left: 4px;
-    background: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 2px 8px;
-    cursor: pointer;
-    font-size: 0.95em;
-    transition: background 0.2s;
-}
-.cancel-btn-personal {
-    background: #dc3545;
-}
-`}
+        .container-personal {
+          background: #fff;
+          border-radius: 1.4em;
+          padding: 20px 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          justify-content: flex-start;
+          gap: clamp(20px);
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+          width: 100%;
+          min-width: 320px;
+          max-width: 1500px; /* Más ancho */
+          margin: 48px auto 0 auto;
+          font-size: 1.5rem; /* Más grande */
+        }
+
+        .add-form-personal {
+          display: flex;
+          gap: 32px;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .table-personal th, .table-personal td {
+          font-size: 0.8em;
+          padding: 10px 40px;
+        }
+
+        .add-btn-personal, .save-btn-personal, .cancel-btn-personal, .edit-btn-personal {
+          font-size: 0.8em;
+          padding: 6px 20px;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s;
+        }
+
+        .add-btn-personal {
+          background: #1f484e;
+          color: #fff;
+          margin-bottom: 12px;
+        }
+
+        .add-btn-personal:hover {
+          background: #145055;
+        }
+
+        .save-btn-personal {
+          background: #28a745;
+          color: #fff;
+          margin-left: 8px;
+        }
+
+        .cancel-btn-personal {
+          background: #dc3545;
+          color: #fff;
+          margin-left: 8px;
+        }
+
+        .edit-btn-personal {
+          background: #1f484e;
+          color: #fff;
+          margin-left: 30px;
+          font-size: 1em;
+          padding: 4px 8px;
+        }
+
+        .edit-btn-personal:hover {
+          background: #145055;
+        }
+
+        input[type="text"], select.role-select-personal {
+          font-size: 1.15em;
+          padding: 10px 18px;
+          border-radius: 6px;
+          border: 1px solid #b0b0b0;
+          background: #f7fafb;
+          color: #1f484e;
+        }
+
+        .table-personal {
+          width: 100%;
+          border-radius: 12px;
+          border-collapse: separate;
+
+          border-spacing: 0;
+          overflow: hidden;
+          background: #ffff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .table-personal th {
+          background: #1f484e;
+          color: rgb(243 243 243);
+          font-weight: bold;
+          border-bottom: 2px solid #D9D9D9;
+          text-align: center;
+        }
+
+        .table-personal td {
+          color: #1f484e;
+          background: #f7fafb;
+          border-bottom: 1px solid #c2d1d3;
+        }
+
+        .table-personal tr:nth-child(even) td {
+          background: #e3ecee;
+        }
+
+        select.role-select-personal {
+          padding: 8px 14px;
+          border-radius: 6px;
+          border: 1px solid #b0b0b0;
+          font-size: 1.1em;
+          background: #fff;
+          color: #1f484e;
+        }
+        `}
       </style>
-      <MenuButton />
       <div className="container-personal">
-        <h2 className="label-personal">
-          PERSONAL
-        </h2>
         <button
           className="add-btn-personal"
           onClick={() => setShowAdd(v => !v)}
@@ -223,8 +262,8 @@ select.role-select-personal {
           >
             <thead>
               <tr>
-                <th style={{ textAlign: "left", color: "#1f484e" }}>Nombre</th>
-                <th style={{ textAlign: "center", color: "#1f484e" }}>Rol</th>
+                <th style={{ textAlign: "left", color: "#D9D9D9" }}>Nombre</th>
+                <th style={{ textAlign: "center", color: "#D9D9D9" }}>Rol</th>
               </tr>
             </thead>
             <tbody>

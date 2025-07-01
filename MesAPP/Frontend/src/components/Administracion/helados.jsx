@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import MenuButton from "../../components/Ordenar/MenuBotton.jsx";
+import MenuButton from "../Ordenar/MenuBotton.jsx";
 
 const API_HOST = import.meta.env.VITE_API_HOST;
 const API_PORT = import.meta.env.VITE_API_PORT || 5000;
@@ -46,7 +46,7 @@ function DisponibilidadHelados() {
     };
 
     return (
-        <div className="ordenes-background">
+        <div>
             <style>
                 {`
 .helados-container {
@@ -87,13 +87,30 @@ function DisponibilidadHelados() {
 .helados-table tr:nth-child(even) td {
     background: #e3ecee;
 }
+.helados-table {
+    width: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.helados-table th:first-child {
+    border-top-left-radius: 18px;
+}
+.helados-table th:last-child {
+    border-top-right-radius: 18px;
+}
+.helados-table tr:last-child td:first-child {
+    border-bottom-left-radius: 18px;
+}
+.helados-table tr:last-child td:last-child {
+   
 `}
             </style>
             <MenuButton />
             <div className="helados-container">
-                <h2 className="helados-label">
-                    DISPONIBILIDAD DE HELADOS
-                </h2>
                 <div style={{ width: "100%", marginTop: 16 }}>
                     <table
                         className="helados-table"
@@ -106,8 +123,8 @@ function DisponibilidadHelados() {
                         <thead>
                             <tr>
                                 <th style={{ width: 40 }}></th>
-                                <th style={{ textAlign: "left", color: "#1f484e" }}>Sabor</th>
-                                <th style={{ textAlign: "center", color: "#1f484e" }}>Estado</th>
+                                <th style={{ textAlign: "center", color: "#ffffff" }}>Sabor</th>
+                                <th style={{ textAlign: "center", color: "#ffffff" }}>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
