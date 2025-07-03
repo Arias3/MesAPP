@@ -59,11 +59,7 @@ function Ordenes() {
       setCards([]);
     }
   }, [mesa]);
-
-  // Calcula el subtotal sumando los precios de las cards
-  const subtotal = cards.reduce((acc, card) =>
-    acc + (Number(card.price) || 0), 0);
-
+  const cantidadParaLlevar = cards.filter(card => card.llevar === 1).length;
 
   const handleCardClick = (idx) => {
     setEditIndex(idx);
@@ -88,6 +84,14 @@ function Ordenes() {
     setDialogOpen(false);
     setEditIndex(null);
   };
+
+  const subtotal = cards.reduce(
+    (acc, card) =>
+      acc +
+      (Number(card.price) || 0) +
+      (card.llevar === 1 ? 1000 : 0),
+    0
+  );
 
   const agregarOrdenDB = async (mesa, productos) => {
     const API_HOST = import.meta.env.VITE_API_HOST;
@@ -122,15 +126,47 @@ function Ordenes() {
       name: card.name,
       notas: card.notas || "",
       sabores: card.sabores || "",
-      llevar: card.llevar || 0
+      llevar: card.llevar || 0,
+      price: Number(card.price) || 0
     }));
 
     await agregarOrdenDB(mesa, productos);
 
+    // Calcular total con recargo para llevar
+    const subtotal = cards.reduce(
+      (acc, card) =>
+        acc +
+        (Number(card.price) || 0) +
+        (card.llevar === 1 ? 1000 : 0),
+      0
+    );
+
+    const ahora = new Date();
+    const numero = await obtenerNuevoNumeroOrden();
+    const fecha = ahora.toLocaleDateString();
+    const hora = ahora.toLocaleTimeString();
+
+    const items = cards.map(card => ({
+      nombre: card.name,
+      sabores: card.sabores || "",
+      notas: card.notas || "",
+      precio: Number(card.price) || 0,
+      llevar: card.llevar || 0
+    }));
+
+    const datosImpresion = {
+      numero,
+      fecha,
+      hora,
+      items,
+      total: subtotal,
+      Mesa: `Mesa ${mesa}` 
+    };
+
     if (imprimirFactura) {
       const ws = new WebSocket(`ws://${API_HOST}:3000`);
       ws.onopen = () => {
-        ws.send(JSON.stringify({ mesa, productos }));
+        ws.send(JSON.stringify(datosImpresion));
         ws.close();
       };
       setConfirmMsg("¡Pedido enviado e impresión solicitada!");
