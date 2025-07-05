@@ -91,6 +91,7 @@ const TABLES = {
     codigoProd VARCHAR(50),
     nombre VARCHAR(100),
     precio DECIMAL(10,2),
+    sabores VARCHAR(100),
     para_llevar BOOLEAN DEFAULT FALSE
     ) ENGINE=InnoDB
 `,

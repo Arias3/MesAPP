@@ -24,20 +24,6 @@ router.get('/productos', async (req, res) => {
   }
 });
 
-router.post('/sales', async (req, res) => {
-  try {
-    const { table_number, date, time, description, total, type, seller, status, NumOrden } = req.body;
-    await pool.execute(
-      'INSERT INTO sales (table_number, date, time, description, total, type, seller, status, NumOrden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [table_number, date, time, description, total, type, seller, status, NumOrden]
-    );
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error al agregar orden:', error);
-    res.status(500).json({ success: false, message: 'Error interno' });
-  }
-});
-
 router.get('/sales/last-id', async (req, res) => {
   try {
     const [rows] = await pool.execute('SELECT MAX(id) as lastId FROM sales');
@@ -48,47 +34,52 @@ router.get('/sales/last-id', async (req, res) => {
   }
 });
 
-router.get('/sales/pending-tables', async (req, res) => {
-  try {
-    const [rows] = await pool.execute(
-      "SELECT table_number FROM sales WHERE status = 'PENDIENTE'"
-    );
-    const mesasOcupadas = rows.map(r => r.table_number);
-    res.json({ mesasOcupadas });
-  } catch (error) {
-    console.error('Error al obtener mesas ocupadas:', error);
-    res.status(500).json({ success: false, message: 'Error interno' });
-  }
-});
-
 router.post('/mesa/:mesa', async (req, res) => {
-  const mesa = req.params.mesa;
+  const mesa = parseInt(req.params.mesa, 10);
   const { productos } = req.body;
-  try {
-    // Borra todos los productos actuales de la mesa SIEMPRE
-    await pool.query(`DELETE FROM mesa${mesa}`);
 
-    // Si hay productos, los insertamos
-    if (Array.isArray(productos) && productos.length > 0) {
-      for (const prod of productos) {
-        await pool.query(
-          `INSERT INTO mesa${mesa} (name, notas, sabores, llevar)
-           VALUES (?, ?, ?, ?)`,
-          [
-            prod.name,
-            prod.notas || "",
-            prod.sabores || "",
-            prod.llevar || 0
-          ]
-        );
+  if (!Number.isInteger(mesa) || mesa < 1) {
+    return res.status(400).json({ error: 'Número de mesa inválido' });
+  }
+  if (!Array.isArray(productos) || productos.length === 0) {
+    return res.status(400).json({ error: 'No hay productos para agregar' });
+  }
+
+  try {
+    await pool.query(`DELETE FROM mesa${mesa}`);
+    for (const prod of productos) {
+      // Buscar code y price en la tabla products
+      const [rows] = await pool.query(
+        "SELECT code, price FROM products WHERE name = ? LIMIT 1",
+        [prod.name]
+      );
+      if (rows.length === 0) {
+        console.warn(`Producto no encontrado: ${prod.name}`);
+        continue;
       }
-      return res.json({ message: 'Productos guardados en la mesa' });
-    } else {
-      // Si no hay productos, solo se borró la mesa
-      return res.json({ message: 'Mesa vaciada correctamente' });
+
+      // Preparar sabores como string separado por coma
+      const saboresStr = Array.isArray(prod.sabores) ? prod.sabores.join(',') : '';
+
+      // Insertar en la mesa
+      await pool.query(
+        `INSERT INTO mesa${mesa} (codigoProd, nombre, precio, sabores, para_llevar)
+         VALUES (?, ?, ?, ?, ?)`,
+        [rows[0].code, prod.name, rows[0].price, saboresStr, prod.llevar || 0]
+      );
+      console.log(`Producto agregado a mesa${mesa}:`, prod.name, 'Sabores:', saboresStr);
     }
+
+    // Cambiar el estado de la mesa a ocupada (disponible = 0)
+    await pool.query(
+      "UPDATE mesas SET disponible = 0 WHERE numero = ?",
+      [mesa]
+    );
+
+    res.json({ message: 'Productos agregados a la mesa y mesa marcada como ocupada' });
   } catch (err) {
-    res.status(500).json({ error: 'Error al guardar productos en la mesa' });
+    console.error('Error al agregar productos a la mesa:', err);
+    res.status(500).json({ error: 'Error al agregar productos a la mesa' });
   }
 });
 

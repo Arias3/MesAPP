@@ -20,23 +20,6 @@ function Ordenes() {
   ]);
 
   useEffect(() => {
-    const fetchMesasOcupadas = async () => {
-      const API_HOST = import.meta.env.VITE_API_HOST;
-      const API_PORT = import.meta.env.VITE_API_PORT || 5000;
-      try {
-        const res = await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales/pending-tables`);
-        const data = await res.json();
-        // Si la API devuelve strings, convierte a número:
-        const mesas = (data.mesasOcupadas || []).map(Number);
-        setMesasOcupadas(mesas);
-      } catch (e) {
-        setMesasOcupadas([]);
-      }
-    };
-    fetchMesasOcupadas();
-  }, []);
-
-  useEffect(() => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const API_PORT = import.meta.env.VITE_API_PORT || 5000;
     if (mesa && mesa > 0) {
@@ -45,10 +28,11 @@ function Ordenes() {
         .then(data => {
           if (Array.isArray(data.productos) && data.productos.length > 0) {
             setCards(data.productos.map(prod => ({
-              name: prod.name,
+              name: prod.nombre || prod.name || "",
               notas: prod.notas || "",
-              llevar: prod.llevar || 0,
+              llevar: prod.para_llevar ?? prod.llevar ?? 0,
               sabores: prod.sabores || "",
+              price: Number(prod.precio ?? prod.price ?? 0)
             })));
           } else {
             setCards([]);
@@ -59,7 +43,6 @@ function Ordenes() {
       setCards([]);
     }
   }, [mesa]);
-  const cantidadParaLlevar = cards.filter(card => card.llevar === 1).length;
 
   const handleCardClick = (idx) => {
     setEditIndex(idx);
@@ -125,7 +108,7 @@ function Ordenes() {
     const productos = cards.map(card => ({
       name: card.name,
       notas: card.notas || "",
-      sabores: card.sabores || "",
+      sabores: Array.isArray(card.sabores) ? card.sabores : (card.sabores ? card.sabores.split(',') : []),
       llevar: card.llevar || 0,
       price: Number(card.price) || 0
     }));
@@ -160,7 +143,7 @@ function Ordenes() {
       hora,
       items,
       total: subtotal,
-      Mesa: `Mesa ${mesa}` 
+      Mesa: `Mesa ${mesa}`
     };
 
     if (imprimirFactura) {
