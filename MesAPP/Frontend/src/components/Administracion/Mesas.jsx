@@ -140,6 +140,7 @@ function Mesas() {
           className="mesas-input"
           type="number"
           min={1}
+          max={20}
           step={1}
           value={cantidad}
           onChange={handleChange}

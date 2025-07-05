@@ -82,8 +82,16 @@ const TABLES = {
     CREATE TABLE IF NOT EXISTS mesas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       numero INT NOT NULL UNIQUE,
-      disponible BOOLEAN DEFAULT TRUE
+      disponible BOOLEAN DEFAULT TRUE,
+      ordenNum INT,
+      subtotal INT DEFAULT 0
     ) ENGINE=InnoDB
+  `,
+  control: `
+    CREATE TABLE IF NOT EXISTS control (
+    fecha DATE PRIMARY KEY,
+    ultimo_numero INT NOT NULL DEFAULT 0
+  ) ENGINE=InnoDB
   `,
   mesa0: `
     CREATE TABLE IF NOT EXISTS mesa0 (
@@ -94,7 +102,7 @@ const TABLES = {
     sabores VARCHAR(100),
     para_llevar BOOLEAN DEFAULT FALSE
     ) ENGINE=InnoDB
-`,
+  `,
   categories: `
     CREATE TABLE IF NOT EXISTS categories (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,7 +111,7 @@ const TABLES = {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB
-`
+  `
 };
 
 // Función que crea base de datos y tablas

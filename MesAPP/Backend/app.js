@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-// Rutas
+// Importación de rutas
 const productosRoutes = require('./routes/productos.routes');
 const movimientosRoutes = require('./routes/movimientos.routes');
 const loginRoutes = require('./routes/login.routes');
@@ -13,13 +13,14 @@ const staffRoutes = require('./routes/staff.routes');
 const salesRoutes = require('./routes/sales.routes');
 const cajaRoutes = require('./routes/caja.routes');
 const mesasRoutes = require('./routes/mesas.routes');
+
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+// Endpoints
 app.use('/api/productos', productosRoutes);
 app.use('/api/movimientos', movimientosRoutes);
 app.use('/api/estadisticas', estadisticasRoutes);
@@ -32,7 +33,7 @@ app.use('/api/caja', cajaRoutes);
 app.use('/api/mesas', mesasRoutes);
 app.use('/', loginRoutes);
 
-// Ruta opcional para probar si el servidor responde
+// Ruta de prueba
 app.get('/ping', (req, res) => {
   res.json({ success: true, message: 'Servidor activo' });
 });

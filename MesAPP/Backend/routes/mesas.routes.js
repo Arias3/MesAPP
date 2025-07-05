@@ -22,12 +22,12 @@ router.post('/', async (req, res) => {
     if (!Number.isInteger(cantidad) || cantidad < 1) {
         return res.status(400).json({ error: 'Cantidad inválida. Debe ser un número entero mayor que 0.' });
     }
-    
+
     try {
         const mesasCreadas = [];
 
         for (let i = 1; i <= cantidad; i++) {
-            
+            // Crear la tabla mesa{i} si no existe
             await pool.query(`
                 CREATE TABLE IF NOT EXISTS mesa${i} (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,8 +38,13 @@ router.post('/', async (req, res) => {
                     para_llevar BOOLEAN DEFAULT FALSE
                 ) ENGINE=InnoDB
             `);
-            console.log('Cantidad de mesas a asegurar:', cantidad);
-            console.log('Creando (o asegurando) mesa', i);
+
+            // Insertar la fila en tabla 'mesas' si no existe (basado en 'numero')
+            await pool.query(`
+                INSERT IGNORE INTO mesas (numero, disponible, ordenNum)
+                VALUES (?, 1, NULL)
+            `, [i]);
+
             mesasCreadas.push(`mesa${i}`);
         }
 
