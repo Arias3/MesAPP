@@ -44,15 +44,17 @@ function Mesas() {
         await fetch(`http://${API_HOST}:${API_PORT}/api/mesas`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cantidad: nueva - actual }),
+          body: JSON.stringify({ cantidad: nueva }),
         });
-        setMensaje(`Se agregaron ${nueva - actual} mesas.`);
+        setMensaje(`Se agregaran ${nueva} mesas.`);
+
+
       } else if (nueva < actual) {
         // Eliminar mesas
         await fetch(`http://${API_HOST}:${API_PORT}/api/mesas`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cantidad: actual - nueva }),
+          body: JSON.stringify({ count: actual, cantidad: nueva }),
         });
         setMensaje(`Se eliminaron ${actual - nueva} mesas.`);
       } else {

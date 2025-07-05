@@ -74,17 +74,26 @@ const TABLES = {
       total DECIMAL(10,2) NOT NULL,
       type ENUM('Efectivo', 'Transferencia', 'Tarjeta') NOT NULL,
       seller VARCHAR(100) NOT NULL,
-      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE'
-      NumOrden INT NOT NULL,
+      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE',
+      NumOrden INT NOT NULL
     ) ENGINE=InnoDB
   `,
   mesas: `
     CREATE TABLE IF NOT EXISTS mesas (
       id INT AUTO_INCREMENT PRIMARY KEY,
       numero INT NOT NULL UNIQUE,
-      disponible BOOLEAN DEFAULT TRUE,
+      disponible BOOLEAN DEFAULT TRUE
     ) ENGINE=InnoDB
   `,
+  mesa0: `
+    CREATE TABLE IF NOT EXISTS mesa0 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigoProd VARCHAR(50),
+    nombre VARCHAR(100),
+    precio DECIMAL(10,2),
+    para_llevar BOOLEAN DEFAULT FALSE
+    ) ENGINE=InnoDB
+`,
   categories: `
     CREATE TABLE IF NOT EXISTS categories (
       id INT AUTO_INCREMENT PRIMARY KEY,

@@ -2,79 +2,90 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 
-// GET: cantidad de mesas (cuenta las tablas mesa1, mesa2, ...)
+// GET: cantidad de mesas (cuenta solo mesa1, mesa2, ...; excluye mesa0 y 'mesas')
 router.get('/count', async (req, res) => {
     try {
         const [rows] = await pool.query(
-            "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name LIKE 'mesa%'"
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name REGEXP '^mesa[1-9][0-9]*$'"
         );
         res.json({ count: rows.length });
     } catch (err) {
-        console.error('Error al contar las mesas:', err); // <-- Agrega este log para ver el error en consola
+        console.error('Error al contar las mesas:', err);
         res.status(500).json({ error: 'Error al contar las mesas' });
     }
 });
 
-// POST: agregar mesas (crea nuevas tablas mesaN)
+// POST: asegurar que existen mesa1 ... mesaN según cantidad
 router.post('/', async (req, res) => {
     const { cantidad } = req.body;
-    if (!cantidad || cantidad < 1) return res.status(400).json({ error: 'Cantidad inválida' });
 
+    if (!Number.isInteger(cantidad) || cantidad < 1) {
+        return res.status(400).json({ error: 'Cantidad inválida. Debe ser un número entero mayor que 0.' });
+    }
+    
     try {
-        const [rows] = await pool.query(
-            "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name LIKE 'mesa%'"
-        );
-        const existentes = rows.length;
-        let creadas = 0;
-        for (let i = existentes + 1; i <= existentes + cantidad; i++) {
-            await pool.query(
-                `CREATE TABLE IF NOT EXISTS mesa${i} (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      codigoProd VARCHAR(50),
-      nombre VARCHAR(100),
-      precio DECIMAL(10,2),
-      para_llevar BOOLEAN DEFAULT FALSE
-        )`
-            );
-            creadas++;
+        const mesasCreadas = [];
+
+        for (let i = 1; i <= cantidad; i++) {
+            
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS mesa${i} (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    codigoProd VARCHAR(50),
+                    nombre VARCHAR(100),
+                    precio DECIMAL(10,2),
+                    para_llevar BOOLEAN DEFAULT FALSE
+                ) ENGINE=InnoDB
+            `);
+            console.log('Cantidad de mesas a asegurar:', cantidad);
+            console.log('Creando (o asegurando) mesa', i);
+            mesasCreadas.push(`mesa${i}`);
         }
-        res.json({ message: `Se crearon ${creadas} mesas nuevas.` });
+
+        res.json({
+            message: `Se aseguraron las mesas: ${mesasCreadas.join(', ')}`
+        });
     } catch (err) {
-        res.status(500).json({ error: 'Error al crear mesas' });
+        console.error('Error al crear mesas:', err.message);
+        res.status(500).json({ error: 'Error al crear mesas', detalle: err.message });
     }
 });
 
-// DELETE: eliminar mesas (elimina las últimas N tablas mesaN)
+
+// DELETE: eliminar mesas (elimina las mesas sobrantes, de mayor número hacia cantidad+1)
 router.delete('/', async (req, res) => {
-    const { cantidad } = req.body;
-    if (!cantidad || cantidad < 1) return res.status(400).json({ error: 'Cantidad inválida' });
+    const { count, cantidad } = req.body;
+    if (
+        typeof count !== 'number' ||
+        typeof cantidad !== 'number' ||
+        cantidad < 0 ||
+        count < 0 ||
+        cantidad > count
+    ) {
+        return res.status(400).json({ error: 'Datos inválidos' });
+    }
 
     try {
-        const [rows] = await pool.query(
-            "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name LIKE 'mesa%' ORDER BY LENGTH(table_name), table_name"
-        );
-        const existentes = rows.length;
-        if (cantidad > existentes) return res.status(400).json({ error: 'No hay tantas mesas para eliminar' });
-
-        let eliminadas = 0;
-        for (let i = existentes; i > existentes - cantidad; i--) {
+        let mesasEliminadas = [];
+        for (let i = cantidad + 1; i <= count; i++) {
             await pool.query(`DROP TABLE IF EXISTS mesa${i}`);
-            eliminadas++;
+            mesasEliminadas.push(i);
         }
-        res.json({ message: `Se eliminaron ${eliminadas} mesas.` });
+        res.json({ message: `Se eliminaron las mesas: ${mesasEliminadas.join(', ')}` });
     } catch (err) {
+        console.error('Error al eliminar mesas:', err);
         res.status(500).json({ error: 'Error al eliminar mesas' });
     }
 });
 
 router.get('/productos/:mesa', async (req, res) => {
-  const mesa = req.params.mesa;
-  try {
-    const [rows] = await pool.query(`SELECT * FROM mesa${mesa}`);
-    res.json({ productos: rows });
-  } catch (err) {
-    res.status(500).json({ productos: [] });
-  }
+    const mesa = req.params.mesa;
+    try {
+        const [rows] = await pool.query(`SELECT * FROM mesa${mesa}`);
+        res.json({ productos: rows });
+    } catch (err) {
+        res.status(500).json({ productos: [] });
+    }
 });
 
 module.exports = router;
