@@ -72,9 +72,8 @@ const TABLES = {
       time TIME NOT NULL,
       description TEXT,
       total DECIMAL(10,2) NOT NULL,
-      type ENUM('Efectivo', 'Transferencia', 'Tarjeta') NOT NULL,
+      type VARCHAR(50) NOT NULL,
       seller VARCHAR(100) NOT NULL,
-      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE',
       NumOrden INT NOT NULL
     ) ENGINE=InnoDB
   `,
