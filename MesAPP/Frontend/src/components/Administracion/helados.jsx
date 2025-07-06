@@ -97,9 +97,6 @@ function DisponibilidadHelados() {
                     min-width: 220px;
                     flex-wrap: wrap;
                     margin-top: 32px;
-                    overflow-y: auto;   
-                    scroll
-                    max-height: 70vh;         /* Ajusta la altura máxima según tu preferencia */
                 }
                 .helados-label {
                     font-size: clamp(1.5rem, 2vw, 2.5rem);
@@ -142,12 +139,19 @@ function DisponibilidadHelados() {
                     border-bottom-left-radius: 18px;
                 }
                 .helados-table tr:last-child td:last-child {
-                
+                }
+                .helados-table-container {
+                    max-height: 400px; /* o la altura que necesites */
+                    overflow-y: auto;
+                    border-radius: 18px;
+                }
+                .helados-table-container::-webkit-scrollbar {
+                display: none;
+                }
                 `}
             </style>
-            <MenuButton />
             <div className="helados-container">
-                <div style={{ width: "100%", marginTop: 16 }}>
+                <div className="helados-table-container">
                     <table
                         className="helados-table"
                         style={{
@@ -200,23 +204,23 @@ function DisponibilidadHelados() {
                             ))}
                         </tbody>
                     </table>
-                    <button
-                        style={{
-                            marginTop: 18,
-                            padding: "8px 18px",
-                            borderRadius: 8,
-                            background: "#1f484e",
-                            color: "#fff",
-                            fontWeight: "bold",
-                            border: "none",
-                            fontSize: 16,
-                            cursor: "pointer",
-                        }}
-                        onClick={() => setDialogOpen(true)}
-                    >
-                        Agregar nuevo sabor
-                    </button>
                 </div>
+                <button
+                    style={{
+                        marginTop: 18,
+                        padding: "8px 18px",
+                        borderRadius: 8,
+                        background: "#1f484e",
+                        color: "#fff",
+                        fontWeight: "bold",
+                        border: "none",
+                        fontSize: 16,
+                        cursor: "pointer",
+                    }}
+                    onClick={() => setDialogOpen(true)}
+                >
+                    Agregar nuevo sabor
+                </button>
             </div>
             {/* Dialogo para agregar sabor */}
             {dialogOpen && (
@@ -391,9 +395,9 @@ function DisponibilidadHelados() {
                         </div>
                     </div>
                 </div>
-                        )}
-                    </div>
-                );
-            }
-            
-            export default DisponibilidadHelados;
+            )}
+        </div>
+    );
+}
+
+export default DisponibilidadHelados;

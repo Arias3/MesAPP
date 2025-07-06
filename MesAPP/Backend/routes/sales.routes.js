@@ -4,9 +4,17 @@ const pool = require('../db/pool');
 
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await pool.execute(
-      'SELECT id, table_number, date, time, description, total, type, seller, NumOrden FROM sales'
-    );
+    const { date } = req.query;
+
+    let query = 'SELECT id, table_number, date, time, description, total, type, seller, NumOrden FROM sales';
+    let params = [];
+
+    if (date) {
+      query += ' WHERE date = ?';
+      params.push(date);
+    }
+
+    const [rows] = await pool.execute(query, params);
     res.json(rows);
   } catch (error) {
     console.error('Error al obtener ventas:', error);

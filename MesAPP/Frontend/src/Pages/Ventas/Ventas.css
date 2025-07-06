@@ -5,7 +5,7 @@
     max-width: 900px;
     margin: 32px auto 0 auto;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    height: 520px;
+    height: 450px;
     /* Ajusta este valor según tu preferencia */
     display: flex;
     flex-direction: column;
@@ -134,39 +134,43 @@
 
 /* Footer fijo con totales */
 .ventas-footer {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #d9d9d9;
-    color: #1f484e;
-    font-size: 1.15rem;
-    font-weight: bold;
-    text-align: center;
-    padding: 16px 0 12px 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-    z-index: 100;
-    letter-spacing: 1px;
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-    display: flex;
-    justify-content: center;
-    gap: 32px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #d9d9d9;
+  color: #1f484e;
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  font-weight: bold;
+  text-align: center;
+  padding: 16px 0 12px 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  letter-spacing: 1px;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(12px, 4vw, 32px);
+  flex-wrap: wrap; /* ✅ permite que se acomoden en columnas en pantallas pequeñas */
+}
+
+.ventas-footer > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
 }
 
 .ventas-footer-label {
-    color: #111;
-    font-size: 0.95rem;
-    font-weight: 500;
+  display: block;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 .ventas-footer-total {
-    color: #145055;
-    font-size: 1.35rem;
-    font-weight: bold;
-    margin-left: 6px;
-}
-
-.ventas-footer>div {
-    margin-bottom: 2px;
+  display: block;
+  margin-top: 4px;
+  font-size: clamp(1rem, 3vw, 1.2rem);
 }
