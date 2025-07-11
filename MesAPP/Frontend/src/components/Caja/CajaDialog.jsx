@@ -27,6 +27,7 @@ function CajaDialog({ mesa, onClose, onUpdate }) {
     const [pagoDividido, setPagoDividido] = useState(false);
     const [showPayDialog, setShowPayDialog] = useState(false);
     const [dividido, setDividido] = useState(null); // guarda { tarjeta, transferencia, efectivo }
+    const [metodosDivididos, setMetodosDivididos] = useState(""); // Nuevo estado
 
 
     const dialogRef = useRef(null);
@@ -77,54 +78,74 @@ function CajaDialog({ mesa, onClose, onUpdate }) {
         onUpdate && onUpdate();
     };
 
-    const handleCobrar = async () => {
-
-        if (!metodo) {
+        const handleCobrar = async () => {
+        if (!metodo && !pagoDividido) {
             alert("Debes seleccionar un método de pago antes de cobrar.");
             return;
         }
-
+    
         const finalProductos = productosConDesechable();
         const descripcion = finalProductos.map(p => p.name).filter(Boolean).join(',');
         const total = finalProductos.reduce((acc, prod) => acc + Number(prod.price), 0);
-
-        const metodoPago = metodo === "Dividido" ? dividido : { [metodo]: total };
-
-        // Liberrar la mesa
+    
+        const now = new Date();
+        const date = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0');
+        const time = now.toTimeString().slice(0, 8);
+        const seller = localStorage.getItem("username") || "Desconocido";
+    
+        if (pagoDividido && dividido) {
+            // Recorre cada método y registra una venta por cada uno
+            const pagos = [
+                { key: "Tarjeta", monto: dividido.tarjeta },
+                { key: "Transferencia", monto: dividido.transferencia },
+                { key: "Efectivo", monto: dividido.efectivo }
+            ].filter(p => p.monto > 0);
+    
+            for (let i = 0; i < pagos.length; i++) {
+                const pago = pagos[i];
+                await fetch(`http://${API_HOST}:${API_PORT}/api/ventas/sales`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        table_number: mesa,
+                        date,
+                        time,
+                        description: `${descripcion} - PAGO ${i + 1}`,
+                        total: pago.monto,
+                        type: pago.key,
+                        seller,
+                        NumOrden: orden.ordenNum
+                    })
+                });
+            }
+        } else {
+            // Pago normal
+            await fetch(`http://${API_HOST}:${API_PORT}/api/ventas/sales`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    table_number: mesa,
+                    date,
+                    time,
+                    description,
+                    total,
+                    type: metodo,
+                    seller,
+                    NumOrden: orden.ordenNum
+                })
+            });
+        }
+    
+        // Libera la mesa y actualiza
         await fetch(`http://${API_HOST}:${API_PORT}/api/ventas/${mesa}/disponible`, {
             method: "PUT"
         });
-
-        // Datos para la venta
-        const now = new Date();
-        const date = now.toISOString().slice(0, 10); // YYYY-MM-DD
-        const time = now.toTimeString().slice(0, 8); // HH:mm:ss
-        const seller = localStorage.getItem("username") || "Desconocido";
-        const table_number = mesa;
-
-
-        // Registrar venta
-        await fetch(`http://${API_HOST}:${API_PORT}/api/ventas/sales`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                table_number: mesa,
-                date,
-                time,
-                description: descripcion,
-                total,
-                type: metodo,
-                seller,
-                NumOrden: orden.ordenNum
-            })
-        });
-
         await fetch(`http://${API_HOST}:${API_PORT}/api/ventas/${mesa}/borrar`, {
             method: "DELETE"
         });
-
-        
-
+    
         onClose && onClose();
         onUpdate && onUpdate();
     };
@@ -211,7 +232,8 @@ function CajaDialog({ mesa, onClose, onUpdate }) {
                         onClose={() => setShowPayDialog(false)}
                         onSave={(data) => {
                             setDividido(data);
-                            setMetodo("Dividido");
+                            setMetodo(data.metodos); // Guarda el string de métodos, ej: "Transferencia-Efectivo"
+                            setMetodosDivididos(data.metodos); // Guarda para mostrarlo si quieres
                             setShowPayDialog(false);
                         }}
                     />

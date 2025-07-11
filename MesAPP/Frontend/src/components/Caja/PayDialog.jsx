@@ -1,27 +1,36 @@
 import React, { useState } from 'react';
-import './AddProduct.css'; // Asegúrate de que estas clases estén definidas ahí
+import './AddProduct.css';
 
 function PayDialog({ total, onClose, onSave }) {
     const [submitted, setSubmitted] = useState(false);
-    const [tarjeta, setTarjeta] = useState(0);
-    const [transferencia, setTransferencia] = useState(0);
-    const [efectivo, setEfectivo] = useState(0);
+    const [tarjeta, setTarjeta] = useState("");
+    const [transferencia, setTransferencia] = useState("");
+    const [efectivo, setEfectivo] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setSubmitted(true);
 
-        const totalPago = tarjeta + transferencia + efectivo;
+        const t = Number(tarjeta) || 0;
+        const tr = Number(transferencia) || 0;
+        const ef = Number(efectivo) || 0;
+        const totalPago = t + tr + ef;
         if (totalPago !== total) return;
 
-        // Enviar al padre un objeto detallado con los métodos y montos
+        // Detectar métodos usados
+        const metodos = [];
+        if (t > 0) metodos.push("Tarjeta");
+        if (tr > 0) metodos.push("Transferencia");
+        if (ef > 0) metodos.push("Efectivo");
+        const metodosStr = metodos.join("-");
+
         onSave({
-            tarjeta: tarjeta || 0,
-            transferencia: transferencia || 0,
-            efectivo: efectivo || 0
+            tarjeta: t,
+            transferencia: tr,
+            efectivo: ef,
+            metodos: metodosStr
         });
     };
-
 
     return (
         <div className="add-producto-backdrop">
@@ -32,7 +41,7 @@ function PayDialog({ total, onClose, onSave }) {
                         <input
                             type="number"
                             value={tarjeta}
-                            onChange={(e) => setTarjeta(Number(e.target.value))}
+                            onChange={(e) => setTarjeta(e.target.value)}
                             min="0"
                         />
                     </div>
@@ -42,7 +51,7 @@ function PayDialog({ total, onClose, onSave }) {
                         <input
                             type="number"
                             value={transferencia}
-                            onChange={(e) => setTransferencia(Number(e.target.value))}
+                            onChange={(e) => setTransferencia(e.target.value)}
                             min="0"
                         />
                     </div>
@@ -52,12 +61,12 @@ function PayDialog({ total, onClose, onSave }) {
                         <input
                             type="number"
                             value={efectivo}
-                            onChange={(e) => setEfectivo(Number(e.target.value))}
+                            onChange={(e) => setEfectivo(e.target.value)}
                             min="0"
                         />
                     </div>
 
-                    {submitted && (tarjeta + transferencia + efectivo !== total) && (
+                    {submitted && ((Number(tarjeta) || 0) + (Number(transferencia) || 0) + (Number(efectivo) || 0) !== total) && (
                         <div className="add-producto-field" style={{ marginTop: '-8px' }}>
                             <span style={{ color: 'red', fontSize: '0.9rem' }}>
                                 La suma ingresada no coincide con el total a pagar.
