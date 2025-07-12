@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 
 // Rutas existentes
+// Importación de rutas
 const productosRoutes = require('./routes/productos.routes');
 const movimientosRoutes = require('./routes/movimientos.routes');
 const loginRoutes = require('./routes/login.routes');
@@ -13,12 +14,15 @@ const heladosRoutes = require('./routes/helados.routes');
 const staffRoutes = require('./routes/staff.routes'); 
 const salesRoutes = require('./routes/sales.routes');
 const cajaRoutes = require('./routes/caja.routes');
+const mesasRoutes = require('./routes/mesas.routes');
 const app = express();
 
 // === CONFIGURACIÓN DE MIDDLEWARES ===
 
 // CORS
 app.use(cors());
+
+// Parsing de JSON
 app.use(express.json());
 
 // Parsing de URL-encoded data (para formularios)
@@ -34,7 +38,7 @@ app.use((req, res, next) => {
 
 // === RUTAS DE LA APLICACIÓN ===
 
-// Rutas existentes
+// Endpoints existentes
 app.use('/api/productos', productosRoutes);
 app.use('/api/movimientos', movimientosRoutes);
 app.use('/api/estadisticas', estadisticasRoutes);
@@ -44,11 +48,17 @@ app.use('/api/ordenar', ordenarRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/ventas', salesRoutes);
 app.use('/api/caja', cajaRoutes);
+app.use('/api/mesas', mesasRoutes);
+// Ruta de login (debe ir después de las rutas de API)
 app.use('/', loginRoutes);
 
 
 // === CONFIGURACIÓN DE CIERRE ELEGANTE ===
 
 
+// Ruta de prueba
+app.get('/ping', (req, res) => {
+  res.json({ success: true, message: 'Servidor activo' });
+});
 
 module.exports = app;

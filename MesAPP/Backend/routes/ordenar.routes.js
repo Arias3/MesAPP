@@ -24,40 +24,97 @@ router.get('/productos', async (req, res) => {
   }
 });
 
-router.post('/sales', async (req, res) => {
+// GET: Obtener un nuevo número de orden único para la jornada actual
+router.get('/lastId', async (req, res) => {
   try {
-    const { table_number, date, time, description, total, type, seller, status, NumOrden } = req.body;
-    await pool.execute(
-      'INSERT INTO sales (table_number, date, time, description, total, type, seller, status, NumOrden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [table_number, date, time, description, total, type, seller, status, NumOrden]
+    const hoy = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+
+    // Verifica si ya existe un registro para hoy
+    const [rows] = await pool.query(
+      'SELECT ultimo_numero FROM control WHERE fecha = ?',
+      [hoy]
     );
-    res.json({ success: true });
+
+    let nuevoNumero;
+
+    if (rows.length > 0) {
+      nuevoNumero = rows[0].ultimo_numero + 1;
+      await pool.query(
+        'UPDATE control SET ultimo_numero = ? WHERE fecha = ?',
+        [nuevoNumero, hoy]
+      );
+    } else {
+      nuevoNumero = 1;
+      await pool.query(
+        'INSERT INTO control (fecha, ultimo_numero) VALUES (?, ?)',
+        [hoy, nuevoNumero]
+      );
+    }
+
+    res.json({ numero: nuevoNumero });
   } catch (error) {
-    console.error('Error al agregar orden:', error);
+    console.error('Error al generar número de orden:', error);
     res.status(500).json({ success: false, message: 'Error interno' });
   }
 });
 
-router.get('/sales/last-id', async (req, res) => {
-  try {
-    const [rows] = await pool.execute('SELECT MAX(id) as lastId FROM sales');
-    res.json({ lastId: rows[0].lastId || 0 });
-  } catch (error) {
-    console.error('Error al obtener el último id:', error);
-    res.status(500).json({ success: false, message: 'Error interno' });
-  }
-});
 
-router.get('/sales/pending-tables', async (req, res) => {
+router.post('/mesa/:mesa', async (req, res) => {
+  const mesa = parseInt(req.params.mesa, 10);
+  const { productos, ordenNum } = req.body;
+
+  if (!Number.isInteger(mesa) || mesa < 1) {
+    return res.status(400).json({ error: 'Número de mesa inválido' });
+  }
+
+  if (!Array.isArray(productos) || productos.length === 0) {
+    return res.status(400).json({ error: 'No hay productos para agregar' });
+  }
+
   try {
-    const [rows] = await pool.execute(
-      "SELECT table_number FROM sales WHERE status = 'PENDIENTE'"
+    // 1. Vaciar mesa existente
+    await pool.query(`DELETE FROM mesa${mesa}`);
+
+    let subtotal = 0;
+
+    // 2. Insertar nuevos productos en la mesa
+    for (const prod of productos) {
+      const [rows] = await pool.query(
+        `SELECT code, price FROM products WHERE name = ? LIMIT 1`,
+        [prod.name]
+      );
+      if (rows.length === 0) continue;
+
+      const precio = Number(rows[0].price) || 0;
+      const llevar = prod.llevar === 1 ? 1000 : 0;
+
+      subtotal += precio + llevar;
+
+      const saboresStr = Array.isArray(prod.sabores)
+        ? prod.sabores.join(',')
+        : (typeof prod.sabores === 'string' ? prod.sabores : '');
+
+      await pool.query(
+        `INSERT INTO mesa${mesa} (codigoProd, nombre, precio, sabores, para_llevar)
+         VALUES (?, ?, ?, ?, ?)`,
+        [rows[0].code, prod.name, precio, saboresStr, prod.llevar || 0]
+      );
+    }
+
+    // 3. Actualizar el estado de la mesa
+    await pool.query(
+      `UPDATE mesas SET disponible = 0, ordenNum = ?, subtotal = ? WHERE numero = ?`,
+      [ordenNum, subtotal, mesa]
     );
-    const mesasOcupadas = rows.map(r => r.table_number);
-    res.json({ mesasOcupadas });
-  } catch (error) {
-    console.error('Error al obtener mesas ocupadas:', error);
-    res.status(500).json({ success: false, message: 'Error interno' });
+
+    res.json({
+      message: 'Productos agregados y número de orden registrado correctamente',
+      subtotal
+    });
+
+  } catch (err) {
+    console.error('Error al agregar productos a la mesa:', err);
+    res.status(500).json({ error: 'Error al agregar productos a la mesa' });
   }
 });
 

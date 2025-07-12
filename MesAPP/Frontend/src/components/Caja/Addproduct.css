@@ -1,0 +1,79 @@
+.add-producto-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.add-producto {
+  background: #fff;
+  border-radius: 1em;
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+}
+
+.add-producto h2 {
+  margin-top: 0;
+  color: #1f484e;
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+}
+
+.add-producto-field {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-producto-field label {
+  font-weight: 600;
+  color: #1f484e;
+  margin-bottom: 4px;
+}
+
+.add-producto-field input[type="text"],
+.add-producto-field select {
+  padding: 8px;
+  border-radius: 0.4em;
+  border: 1px solid #b0b0b0;
+  font-size: 1rem;
+}
+
+.add-producto-field input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.add-producto-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.add-producto-actions button {
+  padding: 8px 18px;
+  border-radius: 0.4em;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #1f484e;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.add-producto-actions button[type="button"] {
+  background: #b0b0b0;
+  color: #222;
+}
+
+.add-producto-actions button[type="button"]:hover {
+  background: #999;
+}
+
+.add-producto-actions button[type="submit"]:hover {
+  background: #145055;
+}

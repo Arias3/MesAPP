@@ -1,31 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
-const opciones = [
-  { value: null, label: '' },
-  { value: 0, label: 'Mostrador' },
-  ...Array.from({ length: 13 }, (_, i) => ({
-    value: i + 1,
-    label: (i + 1).toString()
-  }))
-];
+function TableSelector({ mesa, setMesa }) {
+  const [cantidadMesas, setCantidadMesas] = useState(0);
 
-function TableSelector({ mesa, setMesa, mesasOcupadas = [] }) {
-  // Marca como deshabilitadas las mesas ocupadas
-  const opcionesFiltradas = opciones.map(opt => ({
-    ...opt,
-    isDisabled:
-      opt.value !== null &&
-      opt.label !== "Mostrador" && // No bloquear "Mostrador"
-      mesasOcupadas.includes(opt.value)
-  }));
+  useEffect(() => {
+    const API_HOST = import.meta.env.VITE_API_HOST;
+    const API_PORT = import.meta.env.VITE_API_PORT || 5000;
+    fetch(`http://${API_HOST}:${API_PORT}/api/mesas/count`)
+      .then(res => res.json())
+      .then(data => setCantidadMesas(data.count || 0))
+      .catch(() => setCantidadMesas(0));
+  }, []);
+
+  const opciones = [
+    { value: null, label: '' },
+    { value: 0, label: 'Mostrador' },
+    ...Array.from({ length: cantidadMesas }, (_, i) => ({
+      value: i + 1,
+      label: (i + 1).toString()
+    }))
+  ];
+
   return (
     <Select
-      options={opcionesFiltradas}
-      value={opcionesFiltradas.find(o => o.value === mesa) || opcionesFiltradas[0]}
+      options={opciones}
+      value={opciones.find(o => o.value === mesa) || opciones[0]}
       onChange={option => setMesa(option.value)}
       placeholder="Selecciona mesa"
-      isOptionDisabled={option => option.isDisabled}
       styles={{
         control: (base) => ({
           ...base,

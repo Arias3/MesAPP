@@ -81,10 +81,34 @@ const TABLES = {
       time TIME NOT NULL,
       description TEXT,
       total DECIMAL(10,2) NOT NULL,
-      type ENUM('Efectivo', 'Transferencia', 'Tarjeta') NOT NULL,
+      type VARCHAR(50) NOT NULL,
       seller VARCHAR(100) NOT NULL,
-      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE',
       NumOrden INT NOT NULL
+    ) ENGINE=InnoDB
+  `,
+  mesas: `
+    CREATE TABLE IF NOT EXISTS mesas (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      numero INT NOT NULL UNIQUE,
+      disponible BOOLEAN DEFAULT TRUE,
+      ordenNum INT,
+      subtotal INT DEFAULT 0
+    ) ENGINE=InnoDB
+  `,
+  control: `
+    CREATE TABLE IF NOT EXISTS control (
+    fecha DATE PRIMARY KEY,
+    ultimo_numero INT NOT NULL DEFAULT 0
+  ) ENGINE=InnoDB
+  `,
+  mesa0: `
+    CREATE TABLE IF NOT EXISTS mesa0 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigoProd VARCHAR(50),
+    nombre VARCHAR(100),
+    precio DECIMAL(10,2),
+    sabores VARCHAR(100),
+    para_llevar BOOLEAN DEFAULT FALSE
     ) ENGINE=InnoDB
   `,
   categories: `
@@ -96,7 +120,7 @@ const TABLES = {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB
-`
+  `
 };
 
 // Función que crea base de datos y tablas

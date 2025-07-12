@@ -20,26 +20,29 @@ function Ordenes() {
   ]);
 
   useEffect(() => {
-    const fetchMesasOcupadas = async () => {
-      const API_HOST = import.meta.env.VITE_API_HOST;
-      const API_PORT = import.meta.env.VITE_API_PORT || 5000;
-      try {
-        const res = await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales/pending-tables`);
-        const data = await res.json();
-        // Si la API devuelve strings, convierte a número:
-        const mesas = (data.mesasOcupadas || []).map(Number);
-        setMesasOcupadas(mesas);
-      } catch (e) {
-        setMesasOcupadas([]);
-      }
-    };
-    fetchMesasOcupadas();
-  }, []);
-
-  // Calcula el subtotal sumando los precios de las cards
-  const subtotal = cards.reduce((acc, card) =>
-    acc + (Number(card.price) || 0), 0);
-
+    const API_HOST = import.meta.env.VITE_API_HOST;
+    const API_PORT = import.meta.env.VITE_API_PORT || 5000;
+    if (mesa && mesa > 0) {
+      fetch(`http://${API_HOST}:${API_PORT}/api/mesas/productos/${mesa}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data.productos) && data.productos.length > 0) {
+            setCards(data.productos.map(prod => ({
+              name: prod.nombre || prod.name || "",
+              notas: prod.notas || "",
+              llevar: prod.para_llevar ?? prod.llevar ?? 0,
+              sabores: prod.sabores || "",
+              price: Number(prod.precio ?? prod.price ?? 0)
+            })));
+          } else {
+            setCards([]);
+          }
+        })
+        .catch(() => setCards([]));
+    } else {
+      setCards([]);
+    }
+  }, [mesa]);
 
   const handleCardClick = (idx) => {
     setEditIndex(idx);
@@ -65,78 +68,94 @@ function Ordenes() {
     setEditIndex(null);
   };
 
-  const agregarOrdenDB = async (pedido, total, type) => {
+  const subtotal = cards.reduce(
+    (acc, card) =>
+      acc +
+      (Number(card.price) || 0) +
+      (card.llevar === 1 ? 1000 : 0),
+    0
+  );
+
+  const agregarOrdenDB = async (mesa, productos, ordenNum, subtotal) => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const API_PORT = import.meta.env.VITE_API_PORT || 5000;
-    const descripcion = pedido.items.map(item => item.nombre).join(',');
-    const seller = localStorage.getItem('username') || "App";
 
-    const body = {
-      table_number: mesa,
-      date: pedido.fecha,
-      time: pedido.hora,
-      description: descripcion,
-      total: total,
-      type: type,
-      seller: seller,
-      status: "PENDIENTE",
-      NumOrden: pedido.numero
-    };
-    await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales`, {
+    // Enviamos todos los productos de la mesa
+    await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/mesa/${mesa}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({ productos, ordenNum, subtotal })
     });
   };
 
   const obtenerNuevoNumeroOrden = async () => {
     const API_HOST = import.meta.env.VITE_API_HOST;
     const API_PORT = import.meta.env.VITE_API_PORT || 5000;
-    const res = await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/sales/last-id`);
+    const res = await fetch(`http://${API_HOST}:${API_PORT}/api/ordenar/lastId`);
     const data = await res.json();
-    return (data.lastId || 0) + 1;
+    return data.numero;
   };
 
   const enviarPedido = async () => {
+    const numero = await obtenerNuevoNumeroOrden();
+
     if (mesa === null) {
       setConfirmMsg("Por favor, seleccionar una Mesa");
       setShowConfirm(true);
       return;
     }
     const API_HOST = import.meta.env.VITE_API_HOST;
-    const type = null;
-    const total = cards.reduce((acc, card) =>
-      acc + (Number(card.price) || 0) + (card.takeaway ? 1000 : 0), 0);
 
-    // Obtén el nuevo número de orden antes de crear el pedido
-    const numero = await obtenerNuevoNumeroOrden();
+    // Prepara los productos con los campos requeridos
+    const productos = cards.map(card => ({
+      name: card.name,
+      notas: card.notas || "",
+      sabores: Array.isArray(card.sabores) ? card.sabores : (card.sabores ? card.sabores.split(',') : []),
+      llevar: card.llevar || 0,
+      price: Number(card.price) || 0
+    }));
 
-    // Crea el objeto pedido aquí, usando el número generado
-    const pedido = {
-      numero: numero.toString().padStart(6, "0"),
-      fecha: new Date().toISOString().slice(0, 10),
-      hora: new Date().toTimeString().slice(0, 8), // "HH:MM:SS"
-      Mesa: mesa === 0 ? "Mesa: Mostrador" : `Mesa ${mesa}`,
+    // Calcular total con recargo para llevar
+    const subtotal = cards.reduce(
+      (acc, card) =>
+        acc +
+        (Number(card.price) || 0) +
+        (card.llevar === 1 ? 1000 : 0),
+      0
+    );
+
+    await agregarOrdenDB(mesa, productos, numero, subtotal);
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString();
+    const hora = ahora.toLocaleTimeString();
+
+    const items = cards.map(card => ({
+      nombre: card.name,
+      sabores: card.sabores || "",
+      notas: card.notas || "",
+      precio: Number(card.price) || 0,
+      llevar: card.llevar || 0
+    }));
+
+    const datosImpresion = {
+      numero,
+      fecha,
+      hora,
+      items,
       total: subtotal,
-      items: cards.map(card => ({
-        nombre: card.name,
-        sabores: card.sabores,
-        notas: card.notas || "",
-      }))
+      Mesa: `Mesa ${mesa}`
     };
 
     if (imprimirFactura) {
       const ws = new WebSocket(`ws://${API_HOST}:3000`);
       ws.onopen = () => {
-        ws.send(JSON.stringify(pedido));
+        ws.send(JSON.stringify(datosImpresion));
         ws.close();
       };
       setConfirmMsg("¡Pedido enviado e impresión solicitada!");
     } else {
       setConfirmMsg("¡Pedido enviado correctamente!");
     }
-
-    await agregarOrdenDB(pedido, total, type);
     setShowConfirm(true);
   };
 
@@ -231,7 +250,12 @@ function Ordenes() {
                 &#10005;
               </button>
             </div>
-            <div className="ordenes-card-sabores">{card.sabores}</div>
+            {/* Mostrar sabores si existen */}
+            {card.sabores && (
+              <div className="ordenes-card-sabores">
+                {card.sabores.split(',').join(', ')}
+              </div>
+            )}
             <div className="ordenes-card-notas">{card.notas}</div>
           </div>
         ))}
