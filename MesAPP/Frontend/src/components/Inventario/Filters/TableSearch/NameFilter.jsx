@@ -1,6 +1,6 @@
 import React from 'react';
-import { Search } from 'lucide-react';
-import './ProductFilters.module.css';
+import { Search, X } from 'lucide-react';
+import styles from './ProductFilters.module.css';
 
 const NameFilter = ({ 
   value = '', 
@@ -23,41 +23,35 @@ const NameFilter = ({
   };
 
   return (
-    <div className={`name-filter ${className}`}>
-      <label className="filter-label">
+    <div className={`${styles['name-filter']} ${className}`}>
+      <label className={styles['filter-label']}>
         Nombre del Producto
       </label>
       
-      <div className="filter-input-container">
-        <div className="input-wrapper">
-          <Search className="input-icon" />
+      <div className={styles['filter-input-container']}>
+        <div className={styles['input-wrapper']}>
+          <Search className={`${styles['input-icon']} ${styles['name-icon']}`} />
           <input
             type="text"
             value={value}
             onChange={handleInputChange}
             placeholder={placeholder}
-            className="filter-input"
+            className={styles['filter-input']}
             disabled={disabled}
           />
           {value && (
             <button
               type="button"
               onClick={handleClear}
-              className="clear-button"
-              title="Limpiar búsqueda"
+              className={styles['clear-button']}
               disabled={disabled}
+              title="Limpiar filtro de nombre"
             >
-              ×
+              <X size={14} />
             </button>
           )}
         </div>
       </div>
-      
-      {value && (
-        <div className="filter-info">
-          Buscando: "<strong>{value}</strong>"
-        </div>
-      )}
     </div>
   );
 };

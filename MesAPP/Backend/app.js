@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
-// Rutas
+// Rutas existentes
 const productosRoutes = require('./routes/productos.routes');
 const movimientosRoutes = require('./routes/movimientos.routes');
 const loginRoutes = require('./routes/login.routes');
@@ -14,11 +15,26 @@ const salesRoutes = require('./routes/sales.routes');
 const cajaRoutes = require('./routes/caja.routes');
 const app = express();
 
-// Middlewares
+// === CONFIGURACIÓN DE MIDDLEWARES ===
+
+// CORS
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+// Parsing de URL-encoded data (para formularios)
+app.use(express.urlencoded({ extended: true }));
+
+
+// Middleware de logging básico
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.originalUrl} - ${req.ip}`);
+  next();
+});
+
+// === RUTAS DE LA APLICACIÓN ===
+
+// Rutas existentes
 app.use('/api/productos', productosRoutes);
 app.use('/api/movimientos', movimientosRoutes);
 app.use('/api/estadisticas', estadisticasRoutes);
@@ -30,9 +46,9 @@ app.use('/api/ventas', salesRoutes);
 app.use('/api/caja', cajaRoutes);
 app.use('/', loginRoutes);
 
-// Ruta opcional para probar si el servidor responde
-app.get('/ping', (req, res) => {
-  res.json({ success: true, message: 'Servidor activo' });
-});
+
+// === CONFIGURACIÓN DE CIERRE ELEGANTE ===
+
+
 
 module.exports = app;

@@ -1,47 +1,39 @@
 import React from 'react';
-import { Package, AlertTriangle, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
-import './ProductFilters.module.css';
+import { Package, AlertTriangle, CheckCircle, XCircle, X } from 'lucide-react';
+import styles from './ProductFilters.module.css';
 
 const StockStatusFilter = ({ 
   value = 'all', 
   onChange, 
-  stockStates = [], // ← RECIBE ESTADOS DEL PADRE
+  stockStates = [], 
   className = '',
   disabled = false 
 }) => {
   const handleSelectChange = (e) => {
-    const newValue = e.target.value;
-    if (onChange) {
-      onChange(newValue);
-    }
+    if (onChange) onChange(e.target.value);
   };
 
   const handleClear = () => {
-    if (onChange) {
-      onChange('all');
-    }
+    if (onChange) onChange('all');
   };
 
-  // Mapeo de iconos y colores por estado
   const stateIconMap = {
     'Sin Stock': { icon: XCircle, color: 'text-red-600' },
     'Bajo Stock': { icon: AlertTriangle, color: 'text-yellow-600' },
     'Normal': { icon: CheckCircle, color: 'text-green-600' }
   };
 
-  // Procesar estados únicos recibidos del padre
   const uniqueStockStates = [...new Set(stockStates)].sort();
 
-  // Crear opciones dinámicamente basadas en lo que existe
   const stockOptions = [
-    { 
-      value: 'all', 
-      label: 'Todos los estados', 
-      icon: Package, 
+    {
+      value: 'all',
+      label: 'Todos los estados',
+      icon: Package,
       color: 'text-gray-600'
     },
     ...uniqueStockStates.map(state => ({
-      value: state.toLowerCase().replace(' ', '_'), // "Bajo Stock" -> "bajo_stock"
+      value: state.toLowerCase().replace(/ /g, '_'),
       label: state,
       icon: stateIconMap[state]?.icon || Package,
       color: stateIconMap[state]?.color || 'text-gray-600'
@@ -50,20 +42,19 @@ const StockStatusFilter = ({
 
   const selectedOption = stockOptions.find(opt => opt.value === value) || stockOptions[0];
   const SelectedIcon = selectedOption.icon;
+  const showClear = value !== 'all';
 
   return (
-    <div className={`stock-status-filter ${className}`}>
-      <label className="filter-label">
-        Estado de Stock
-      </label>
-      
-      <div className="filter-input-container">
-        <div className="select-wrapper">
-          <SelectedIcon className={`input-icon ${selectedOption.color}`} />
+    <div className={`${styles['stock-status-filter']} ${className}`}>
+      <label className={styles['filter-label']}>Estado de Stock</label>
+
+      <div className={styles['filter-input-container']}>
+        <div className={styles['select-wrapper']}>
+          <SelectedIcon className={`${styles['input-icon']} ${styles['stock-icon']} ${selectedOption.color}`} />
           <select
+            className={styles['filter-select']}
             value={value}
             onChange={handleSelectChange}
-            className="filter-select"
             disabled={disabled}
           >
             {stockOptions.map((option) => (
@@ -72,29 +63,20 @@ const StockStatusFilter = ({
               </option>
             ))}
           </select>
-          <ChevronDown className="select-arrow" />
-          
-          {value !== 'all' && (
+
+          {showClear && (
             <button
               type="button"
+              className={styles['clear-button']}
               onClick={handleClear}
-              className="clear-button"
-              title="Limpiar filtro"
               disabled={disabled}
+              title="Limpiar filtro"
             >
-              ×
+              <X size={14} />
             </button>
           )}
         </div>
       </div>
-      
-      {value !== 'all' && (
-        <div className="filter-info">
-          <span className={selectedOption.color}>
-            Filtrando por: "<strong>{selectedOption.label}</strong>"
-          </span>
-        </div>
-      )}
     </div>
   );
 };

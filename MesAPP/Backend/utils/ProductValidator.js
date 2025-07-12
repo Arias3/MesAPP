@@ -118,7 +118,6 @@ class ProductValidator {
             stock: product.stock.toString().trim(),
             barcode: product.barcode.toString().trim(),
             unit: product.unit.toString().trim(),
-            image_url: product.image_url.toString().trim(),
             flavor_count: flavorCount,
             description: product.description.toString().trim()
           };

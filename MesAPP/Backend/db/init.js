@@ -27,7 +27,6 @@ const TABLES = {
       stock VARCHAR(50),
       barcode VARCHAR(50),
       unit VARCHAR(20),
-      image_url VARCHAR(255),
       flavor_count INT,
       description TEXT
     ) ENGINE=InnoDB
@@ -36,7 +35,17 @@ const TABLES = {
     CREATE TABLE IF NOT EXISTS flavors (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(50) NOT NULL,
-      status ENUM('Disponible', 'No Disponible') DEFAULT 'Disponible'
+      status TINYINT(1) DEFAULT 1
+    ) ENGINE=InnoDB
+  `,
+  flavor_categories: `
+    CREATE TABLE IF NOT EXISTS flavor_categories (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      flavor_id INT NOT NULL,
+      category_id INT NOT NULL,
+      FOREIGN KEY (flavor_id) REFERENCES flavors(id) ON DELETE CASCADE,
+      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+      UNIQUE KEY unique_flavor_category (flavor_id, category_id)
     ) ENGINE=InnoDB
   `,
   tables: `
@@ -74,8 +83,8 @@ const TABLES = {
       total DECIMAL(10,2) NOT NULL,
       type ENUM('Efectivo', 'Transferencia', 'Tarjeta') NOT NULL,
       seller VARCHAR(100) NOT NULL,
-      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE'
-      NumOrden INT NOT NULL,
+      status ENUM('PAGO', 'PENDIENTE') DEFAULT 'PENDIENTE',
+      NumOrden INT NOT NULL
     ) ENGINE=InnoDB
   `,
   categories: `
@@ -83,6 +92,7 @@ const TABLES = {
       id INT AUTO_INCREMENT PRIMARY KEY,
       categoria VARCHAR(50) NOT NULL UNIQUE,
       activo BOOLEAN DEFAULT TRUE,
+      low_stock INT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB

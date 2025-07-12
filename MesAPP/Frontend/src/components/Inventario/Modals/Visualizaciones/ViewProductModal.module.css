@@ -54,7 +54,7 @@
   align-items: center;
   padding: 20px 24px 16px 24px;
   border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  background:  linear-gradient(135deg, #1a5a62 0%, #1f484e 50%, #2a6b6e 100%);
 }
 
 .headerTitleSection {
@@ -66,23 +66,23 @@
 .headerIcon {
   width: 24px;
   height: 24px;
-  color: #3b82f6;
+  color: white;
 }
 
 .modalTitle {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: white;
 }
 
 .closeButton {
-  background: #f3f4f6;
+  background: none;
   border: none;
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 6px;
+  padding: 6px;
   cursor: pointer;
-  color: #6b7280;
+  color: white;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -92,7 +92,11 @@
 .closeButton:hover {
   background: #e5e7eb;
   color: #374151;
-  transform: scale(1.05);
+}
+
+.closeButton:active {
+  background: #e2e8f0;
+  transform: scale(0.95);
 }
 
 .closeIcon {
@@ -258,9 +262,9 @@
 }
 
 .closeFooterButton {
-  background: #6b7280;
+  background:  linear-gradient(135deg, #1a5a62 0%, #1f484e 50%, #2a6b6e 100%);
   color: white;
-  border: none;
+  border: linear-gradient(135deg, #1a5a62 0%, #1f484e 50%, #2a6b6e 100%) 1px solid;
   border-radius: 8px;
   padding: 10px 24px;
   cursor: pointer;

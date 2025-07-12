@@ -1,30 +1,40 @@
-/* ProductFilters.module.css - Estilos compartidos para todos los filtros */
+/* ProductFilters.module.css - COMPLETO Y ADAPTABLE CON MEJORAS DE PROPORCIÓN */
 
-/* ===== BASE DE FILTROS ===== */
+/* ===== CONTENEDOR BASE DE CADA FILTRO ===== */
 .name-filter,
+.code-filter,
 .category-filter,
 .stock-status-filter,
-.margin-filter {
+.margin-filter,
+.price-filter {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 200px;
-  max-width: 280px;
+  gap: 0.5rem;
+  width: 100%;
+  /* ✅ MEJORADO: Altura más compacta */
+  height: 3.75rem;
+  max-height: 3.75rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-/* ===== ETIQUETAS ===== */
+/* ===== ETIQUETA DE FILTRO ===== */
 .filter-label {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #1a5a62;
   margin: 0;
   white-space: nowrap;
+  height: 1.25rem;
+  line-height: 1.25rem;
 }
 
-/* ===== CONTENEDORES DE INPUT ===== */
+/* ===== CONTENEDOR INPUT/SELECT ===== */
 .filter-input-container {
   position: relative;
   width: 100%;
+  /* ✅ MEJORADO: Altura más proporcionada */
+  height: 2.5rem;
+  max-height: 2.5rem;
 }
 
 .input-wrapper,
@@ -32,236 +42,304 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  /* ✅ MEJORADO: Altura más proporcionada */
+  height: 2.5rem;
+  max-height: 2.5rem;
+  background: transparent;
+  border: 1px solid rgba(31, 72, 78, 0.15);
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .input-wrapper:hover,
 .select-wrapper:hover {
-  border-color: #9ca3af;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-color: rgba(31, 72, 78, 0.25);
+  box-shadow: 0 2px 8px rgba(31, 72, 78, 0.12), inset 0 1px 3px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 .input-wrapper:focus-within,
 .select-wrapper:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #1a5a62;
+  box-shadow: 0 0 0 3px rgba(26, 90, 98, 0.1), inset 0 1px 3px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
 }
 
-/* ===== ICONOS ===== */
+/* ===== ICONOS DE ENTRADA ===== */
 .input-icon {
   position: absolute;
-  left: 12px;
-  width: 16px;
-  height: 16px;
-  color: #6b7280;
-  z-index: 1;
+  left: 0.75rem;
+  width: 1rem;
+  height: 1rem;
+  color: #1a5a62;
+  z-index: 2;
   pointer-events: none;
+  background: rgba(26, 90, 98, 0.08);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  box-sizing: content-box;
+  transition: all 0.3s ease;
 }
 
-.select-arrow {
-  position: absolute;
-  right: 36px;
-  width: 16px;
-  height: 16px;
-  color: #6b7280;
-  pointer-events: none;
-  z-index: 1;
+/* ===== ESTILOS DE ICONOS POR FILTRO ===== */
+.name-icon {
+  color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.12) !important;
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+}
+.input-wrapper:hover .name-icon {
+  color: #2563eb !important;
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  transform: scale(1.05);
 }
 
-/* ===== INPUTS Y SELECTS ===== */
-.filter-input {
-  width: 100%;
-  padding: 10px 40px 10px 40px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-  color: #111827;
-  background: transparent;
+.code-icon {
+  color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+.input-wrapper:hover .code-icon {
+  color: #d97706 !important;
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  transform: scale(1.05);
 }
 
-.filter-input::placeholder {
-  color: #9ca3af;
+.category-icon {
+  color: #8b5cf6 !important;
+  background: rgba(139, 92, 246, 0.12) !important;
+  border: 1px solid rgba(139, 92, 246, 0.25) !important;
+}
+.select-wrapper:hover .category-icon {
+  color: #7c3aed !important;
+  background: rgba(139, 92, 246, 0.2) !important;
+  border-color: rgba(139, 92, 246, 0.4) !important;
+  transform: scale(1.05);
 }
 
-.filter-input:disabled {
-  background-color: #f9fafb;
-  color: #6b7280;
-  cursor: not-allowed;
+/* Ícono de precio - VERDE */
+.price-icon {
+  color: #22c55e !important;
+  background: rgba(34, 197, 94, 0.12) !important;
+  border: 1px solid rgba(34, 197, 94, 0.25) !important;
 }
 
+.input-wrapper:hover .price-icon,
+.select-wrapper:hover .price-icon {
+  color: #16a34a !important;
+  background: rgba(34, 197, 94, 0.2) !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+  transform: scale(1.05);
+}
+
+/* ===== ICONOS DE STOCK Y MARGEN ===== */
+.stock-icon,
+.margin-icon {
+  background: rgba(26, 90, 98, 0.08) !important;
+  border: 1px solid rgba(26, 90, 98, 0.15) !important;
+}
+
+/* ===== COLORES DINÁMICOS ===== */
+.text-red-600    { color: #dc2626 !important; }
+.text-yellow-600 { color: #ca8a04 !important; }
+.text-green-600  { color: #16a34a !important; }
+.text-gray-600   { color: #0f3239 !important; }
+
+.stock-icon.text-red-600,
+.margin-icon.text-red-600 {
+  background: rgba(220, 38, 38, 0.12) !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
+}
+.stock-icon.text-yellow-600 {
+  background: rgba(202, 138, 4, 0.12) !important;
+  border-color: rgba(202, 138, 4, 0.2) !important;
+}
+.stock-icon.text-green-600,
+.margin-icon.text-green-600 {
+  background: rgba(22, 163, 74, 0.12) !important;
+  border-color: rgba(22, 163, 74, 0.2) !important;
+}
+.stock-icon.text-gray-600,
+.margin-icon.text-gray-600 {
+  background: rgba(15, 50, 57, 0.12) !important;
+  border-color: rgba(15, 50, 57, 0.2) !important;
+}
+
+/* ===== EFECTO HOVER ===== */
+.select-wrapper:hover .stock-icon.text-red-600,
+.select-wrapper:hover .margin-icon.text-red-600 {
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+  transform: scale(1.05);
+}
+.select-wrapper:hover .stock-icon.text-yellow-600 {
+  background: rgba(202, 138, 4, 0.15) !important;
+  border-color: rgba(202, 138, 4, 0.3) !important;
+  transform: scale(1.05);
+}
+.select-wrapper:hover .stock-icon.text-green-600,
+.select-wrapper:hover .margin-icon.text-green-600 {
+  background: rgba(22, 163, 74, 0.15) !important;
+  border-color: rgba(22, 163, 74, 0.3) !important;
+  transform: scale(1.05);
+}
+.select-wrapper:hover .stock-icon.text-gray-600,
+.select-wrapper:hover .margin-icon.text-gray-600 {
+  background: rgba(15, 50, 57, 0.15) !important;
+  border-color: rgba(15, 50, 57, 0.3) !important;
+  transform: scale(1.05);
+}
+
+/* ===== CAMPOS DE ENTRADA MEJORADOS ===== */
+.filter-input,
 .filter-select {
   width: 100%;
-  padding: 10px 40px 10px 40px;
+  padding: 0.625rem 2.5rem 0.625rem 2.75rem;
   border: none;
   outline: none;
-  font-size: 14px;
-  color: #111827;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1.2;
   background: transparent;
-  cursor: pointer;
+  color: #1a5a62;
+  /* ✅ MEJORADO: Altura mínima más proporcionada */
+  min-height: 2.25rem;
+  /* ✅ NUEVO: Mejor espaciado vertical */
+  display: flex;
+  align-items: center;
+}
+
+/* ===== SELECT ESPECÍFICO CON MEJOR PROPORCIÓN ===== */
+.filter-select {
+  /* ✅ MEJORADO: Eliminar apariencia nativa del select */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  cursor: pointer;
+  /* ✅ NUEVO: Espaciado más compacto para select */
+  padding: 0.5rem 2.5rem 0.5rem 2.75rem;
+  /* ✅ NUEVO: Altura fija más proporcionada */
+  height: 2.25rem;
+  /* ✅ NUEVO: Eliminar altura automática */
+  max-height: 2.25rem;
 }
 
+.filter-input::placeholder {
+  color: rgba(26, 90, 98, 0.5);
+  font-weight: 400;
+}
+.filter-input:disabled,
 .filter-select:disabled {
-  background-color: #f9fafb;
-  color: #6b7280;
+  background-color: rgba(227, 236, 238, 0.5);
+  color: rgba(26, 90, 98, 0.5);
   cursor: not-allowed;
 }
 
 .filter-select option {
-  padding: 8px 12px;
-  color: #111827;
-  background: white;
+  padding: 0.375rem 0.75rem;
+  background: #f7fafb;
+  color: #1a5a62;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  /* ✅ NUEVO: Altura más compacta */
+  min-height: 1.75rem;
+}
+
+/* ===== FLECHA PERSONALIZADA PARA SELECT ===== */
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 0.25rem solid transparent;
+  border-right: 0.25rem solid transparent;
+  border-top: 0.375rem solid #1a5a62;
+  pointer-events: none;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.select-wrapper:hover::after {
+  border-top-color: #145055;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.select-arrow {
+  display: none;
 }
 
 /* ===== BOTÓN DE LIMPIAR ===== */
 .clear-button {
   position: absolute;
-  right: 8px;
+  right: 0.5rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+  /* ✅ MEJORADO: Tamaño más proporcionado */
+  width: 1.375rem;
+  height: 1.375rem;
   border: none;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  font-size: 16px;
-  font-weight: bold;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  z-index: 2;
+  z-index: 3;
 }
-
 .clear-button:hover {
-  background: #dc2626;
+  background: rgba(239, 68, 68, 0.2);
   transform: translateY(-50%) scale(1.1);
 }
-
-.clear-button:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
 .clear-button:disabled {
-  background: #d1d5db;
+  background: rgba(194, 209, 211, 0.3);
   cursor: not-allowed;
-  transform: translateY(-50%) scale(1);
+  transform: translateY(-50%);
 }
 
-/* ===== INFORMACIÓN DE FILTRO ===== */
-.filter-info {
-  font-size: 12px;
-  color: #6b7280;
-  padding: 4px 8px;
-  background: #f9fafb;
-  border-radius: 6px;
-  border-left: 3px solid #3b82f6;
-}
-
-.filter-info strong {
-  color: #111827;
-}
-
-/* ===== TEXTO DE AYUDA ===== */
-.filter-help {
-  margin-top: 4px;
-}
-
-.help-text {
-  font-size: 11px;
-  color: #9ca3af;
-  font-style: italic;
-}
-
-/* ===== RESUMEN DE STOCK (solo para StockStatusFilter) ===== */
-.stock-summary {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  padding: 8px;
-  background: #f8fafc;
-  border-radius: 6px;
-  flex-wrap: wrap;
-}
-
-.summary-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.summary-icon {
-  width: 12px;
-  height: 12px;
-}
-
-.summary-text {
-  font-size: 11px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* ===== ESTADOS ESPECIALES ===== */
-.name-filter .filter-info {
-  border-left-color: #10b981;
-}
-
-.category-filter .filter-info {
-  border-left-color: #8b5cf6;
-}
-
-.stock-status-filter .filter-info {
-  border-left-color: #f59e0b;
-}
-
-.margin-filter .filter-info {
-  border-left-color: #06b6d4;
-}
-
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSIVE MEJORADO ===== */
 @media (max-width: 768px) {
   .name-filter,
+  .code-filter,
   .category-filter,
   .stock-status-filter,
-  .margin-filter {
-    min-width: 100%;
-    max-width: 100%;
+  .margin-filter,
+  .price-filter {
+    height: 3.5rem;
+    max-height: 3.5rem;
   }
   
-  .stock-summary {
-    justify-content: center;
+  .filter-input-container {
+    height: 2.25rem;
+    max-height: 2.25rem;
+  }
+  
+  .input-wrapper,
+  .select-wrapper {
+    height: 2.25rem;
+    max-height: 2.25rem;
   }
   
   .filter-input,
   .filter-select {
-    padding: 12px 40px 12px 40px;
-    font-size: 16px; /* Evita zoom en iOS */
+    font-size: 0.8125rem;
+    padding: 0.5rem 2.25rem 0.5rem 2.5rem;
+    min-height: 2.125rem;
   }
-}
-
-@media (max-width: 480px) {
-  .filter-input,
+  
   .filter-select {
-    padding: 14px 40px 14px 40px;
-  }
-  
-  .clear-button {
-    width: 28px;
-    height: 28px;
-    right: 6px;
-  }
-  
-  .stock-summary {
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    height: 2.125rem;
+    max-height: 2.125rem;
   }
 }

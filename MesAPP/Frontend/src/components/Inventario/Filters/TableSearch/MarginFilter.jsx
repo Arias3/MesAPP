@@ -1,12 +1,12 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, BarChart3, ChevronDown } from 'lucide-react';
-import './ProductFilters.module.css';
+import { TrendingUp, TrendingDown, BarChart3, X } from 'lucide-react';
+import styles from './ProductFilters.module.css';
 
-const MarginFilter = ({ 
-  value = 'all', 
-  onChange, 
+const MarginFilter = ({
+  value = 'all',
+  onChange,
   className = '',
-  disabled = false 
+  disabled = false
 }) => {
   const handleSelectChange = (e) => {
     const newValue = e.target.value;
@@ -21,83 +21,63 @@ const MarginFilter = ({
     }
   };
 
-  // Opciones fijas de filtro por margen
   const marginOptions = [
-    { 
-      value: 'all', 
-      label: 'Todos los márgenes', 
-      icon: BarChart3, 
-      color: 'text-gray-600'
+    {
+      value: 'all',
+      label: 'Todos los márgenes',
+      icon: BarChart3,
+      color: styles['text-gray-600']
     },
-    { 
-      value: 'high', 
-      label: 'Mayor Margen', 
-      icon: TrendingUp, 
-      color: 'text-green-600'
+    {
+      value: 'high',
+      label: 'Mayor Margen',
+      icon: TrendingUp,
+      color: styles['text-green-600']
     },
-    { 
-      value: 'low', 
-      label: 'Menor Margen', 
-      icon: TrendingDown, 
-      color: 'text-red-600'
+    {
+      value: 'low',
+      label: 'Menor Margen',
+      icon: TrendingDown,
+      color: styles['text-red-600']
     }
   ];
 
   const selectedOption = marginOptions.find(opt => opt.value === value) || marginOptions[0];
   const SelectedIcon = selectedOption.icon;
+  const showClearButton = value !== 'all';
 
   return (
-    <div className={`margin-filter ${className}`}>
-      <label className="filter-label">
-        Nivel de Margen
-      </label>
-      
-      <div className="filter-input-container">
-        <div className="select-wrapper">
-          <SelectedIcon className={`input-icon ${selectedOption.color}`} />
+    <div className={`${styles['margin-filter']} ${className}`}>
+      <label className={styles['filter-label']}>Nivel de Margen</label>
+
+      <div className={styles['filter-input-container']}>
+        <div className={styles['select-wrapper']}>
+          <SelectedIcon className={`${styles['input-icon']} ${styles['margin-icon']} ${selectedOption.color}`} />
           <select
             value={value}
             onChange={handleSelectChange}
-            className="filter-select"
+            className={styles['filter-select']}
             disabled={disabled}
           >
-            {marginOptions.map((option) => (
+            {marginOptions.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
-          <ChevronDown className="select-arrow" />
-          
-          {value !== 'all' && (
+
+          {showClearButton && (
             <button
               type="button"
               onClick={handleClear}
-              className="clear-button"
-              title="Limpiar filtro"
+              className={styles['clear-button']}
               disabled={disabled}
+              title="Limpiar filtro de margen"
             >
-              ×
+              <X size={14} />
             </button>
           )}
         </div>
-      </div>
-      
-      {value !== 'all' && (
-        <div className="filter-info">
-          <span className={selectedOption.color}>
-            Filtrando por: "<strong>{selectedOption.label}</strong>"
-          </span>
-        </div>
-      )}
-
-      {/* Información adicional sobre los criterios */}
-      <div className="filter-help">
-        <small className="help-text">
-          {value === 'high' && 'Productos con margen superior al promedio'}
-          {value === 'low' && 'Productos con margen inferior al promedio'}
-          {value === 'all' && 'Mostrando productos con cualquier margen'}
-        </small>
       </div>
     </div>
   );

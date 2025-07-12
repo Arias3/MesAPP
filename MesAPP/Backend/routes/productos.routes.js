@@ -62,7 +62,62 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Obtener un producto específico por código
+// ✅ NUEVA RUTA: Búsqueda específica por código (para UpsertProcessor)
+router.get('/search/by-code/:code', async (req, res) => {
+  try {
+    const { code } = req.params;
+    
+    console.log(`🔍 Buscando producto por código exacto: "${code}"`);
+    
+    // Buscar por el campo 'code' exacto
+    const [rows] = await pool.execute('SELECT * FROM products WHERE code = ?', [code]);
+    
+    if (rows.length === 0) {
+      console.log(`❌ Producto con código "${code}" no encontrado`);
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Producto no encontrado',
+        found: false,
+        data: null
+      });
+    }
+    
+    const row = rows[0];
+    const producto = {
+      id: row.id,
+      codigo: row.code,
+      category: row.category,
+      nombre: row.name,
+      costo: row.cost,
+      precio: row.price,
+      rentabilidad: `${parseFloat(row.profitability || 0).toFixed(2)}%`,
+      stock: row.stock,
+      barcode: row.barcode,
+      unit: row.unit,
+      flavor_count: row.flavor_count,
+      description: row.description
+    };
+    
+    console.log(`✅ Producto encontrado por código "${code}":`, producto.id);
+    
+    res.json({ 
+      success: true, 
+      found: true,
+      data: producto 
+    });
+    
+  } catch (error) {
+    console.error('❌ Error al buscar producto por código:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al buscar producto',
+      found: false,
+      data: null 
+    });
+  }
+});
+
+// Obtener un producto específico por ID (para operaciones CRUD desde FullInventory)
 router.get('/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
@@ -99,7 +154,10 @@ router.get('/:codigo', async (req, res) => {
 // Crear nuevo producto
 router.post('/', async (req, res) => {
   try {
-    const { nombre, costo, precio, stock, barcode, category, unit, image_url, flavor_count, description } = req.body;
+    const { nombre, costo, precio, stock, barcode, category, unit, flavor_count, description } = req.body;
+    
+    // ✅ IMPORTANTE: Aceptar tanto "codigo" como "code"
+    const productCode = req.body.codigo || req.body.code;
     
     // Validaciones básicas
     if (!nombre || costo < 0 || precio < 0 || stock < 0) {
@@ -109,16 +167,24 @@ router.post('/', async (req, res) => {
       });
     }
     
+    // ✅ VALIDAR QUE SE PROPORCIONE EL CÓDIGO
+    if (!productCode) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Se requiere proporcionar un código para el producto.' 
+      });
+    }
+    
     // Calcular rentabilidad
     const rentabilidad = calcularRentabilidad(costo, precio);
     
     const [result] = await pool.execute(
       `INSERT INTO products 
-       (category, code, name, cost, price, profitability, stock, barcode, unit, image_url, flavor_count, description) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (category, code, name, cost, price, profitability, stock, barcode, unit, flavor_count, description) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        category || 'Sin categoría',
-        `CODE_${Date.now()}`, // Generar código único
+        category,
+        productCode, // ✅ USAR EL CÓDIGO PROPORCIONADO
         nombre,
         costo,
         precio,
@@ -126,7 +192,6 @@ router.post('/', async (req, res) => {
         stock || '0',
         barcode || null,
         unit || 'unidad',
-        image_url || null,
         flavor_count || 0,
         description || null
       ]
@@ -147,7 +212,6 @@ router.post('/', async (req, res) => {
       stock: row.stock,
       barcode: row.barcode,
       unit: row.unit,
-      image_url: row.image_url,
       flavor_count: row.flavor_count,
       description: row.description
     };
@@ -156,18 +220,18 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error('Error al crear producto:', error);
     if (error.code === 'ER_DUP_ENTRY') {
-      res.status(400).json({ success: false, message: 'El código de barras ya existe' });
+      res.status(400).json({ success: false, message: 'El código de producto ya existe' });
     } else {
       res.status(500).json({ success: false, message: 'Error al crear producto' });
     }
   }
 });
 
-// Actualizar producto
+// Actualizar producto por ID
 router.put('/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
-    const { nombre, costo, precio, stock, barcode, category, unit, image_url, flavor_count, description } = req.body;
+    const { nombre, costo, precio, stock, barcode, category, unit, flavor_count, description } = req.body;
     
     // Verificar que el producto existe
     const [existing] = await pool.execute('SELECT * FROM products WHERE id = ?', [codigo]);
@@ -181,7 +245,7 @@ router.put('/:codigo', async (req, res) => {
     await pool.execute(
       `UPDATE products SET 
        category = ?, name = ?, cost = ?, price = ?, profitability = ?, 
-       stock = ?, barcode = ?, unit = ?, image_url = ?, flavor_count = ?, description = ? 
+       stock = ?, barcode = ?, unit = ?, flavor_count = ?, description = ? 
        WHERE id = ?`,
       [
         category || existing[0].category,
@@ -192,7 +256,6 @@ router.put('/:codigo', async (req, res) => {
         stock,
         barcode || null,
         unit || existing[0].unit,
-        image_url || existing[0].image_url,
         flavor_count || existing[0].flavor_count,
         description || existing[0].description,
         codigo
@@ -214,7 +277,6 @@ router.put('/:codigo', async (req, res) => {
       stock: row.stock,
       barcode: row.barcode,
       unit: row.unit,
-      image_url: row.image_url,
       flavor_count: row.flavor_count,
       description: row.description
     };
@@ -230,7 +292,7 @@ router.put('/:codigo', async (req, res) => {
   }
 });
 
-// Eliminar producto
+// Eliminar producto por ID
 router.delete('/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
@@ -302,8 +364,8 @@ router.post('/import', async (req, res) => {
         
         await pool.execute(
           `INSERT INTO products 
-           (category, code, name, cost, price, profitability, stock, barcode, unit, image_url, flavor_count, description) 
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           (category, code, name, cost, price, profitability, stock, barcode, unit, flavor_count, description) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             producto.category,
             producto.code,
@@ -314,7 +376,6 @@ router.post('/import', async (req, res) => {
             producto.stock,
             producto.barcode,
             producto.unit,
-            producto.image_url,
             producto.flavor_count,
             producto.description
           ]

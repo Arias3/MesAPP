@@ -195,5 +195,13 @@ export const confirmationPresets = {
     type: 'danger',
     confirmText: 'Sí, eliminar',
     cancelText: 'Cancelar'
+  },
+
+  duplicateProduct: {
+    title: 'Producto Duplicado',
+    message: 'Apreciado usuario este producto ya existe, o ingreso mal su código. Intentelo nuevamente.',
+    type: 'warning',
+    confirmText: 'Entendido',
+    showCancel: false
   }
 };

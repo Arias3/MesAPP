@@ -1,397 +1,398 @@
-/* Estilos base completamente relativos */
-.inventario-container {
-  width: 100%;
-  max-width: 100vw;
-  margin: 0 auto;
-  padding: 2vw;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  box-sizing: border-box;
-  min-height: 100vh;
-  background-color: #f8fafc;
+/* ===== CSS INVENTARIO PADRE - CONTENEDOR FIJO Y CENTRADO ===== */
+/* Optimizado específicamente para FullInventory */
+
+/* Variables para consistencia */
+:root {
+  --teal-primary: #1a5a62;
+  --teal-secondary: #1f484e;
+  --teal-light: #f7fafb;
+  --teal-border: #c2d1d3;
+  --teal-bg-gradient: linear-gradient(135deg, #f7fafb 0%, #e3ecee 100%);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
+/* ===== CONTENEDOR PRINCIPAL - TAMAÑO FIJO Y CENTRADO ===== */
+.inventario-container {
+  /* FIJO: Dimensiones específicas para beneficiar FullInventory */
+  width: clamp(75rem, 85vw, 90rem); /* Ancho fijo pero responsive: 1200px - 1440px */
+  max-width: 90vw; /* Límite para pantallas pequeñas */
+  
+  /* CENTRADO: Centrar perfectamente en la pantalla */
+  margin: clamp(0.5rem, 1vh, 1rem) auto; /* Centrado horizontal automático */
+  
+  /* PADDING: Interno compacto pero generoso */
+  padding: clamp(1rem, 1.5vw, 1.5rem);
+  
+  font-family: var(--font-main);
+  box-sizing: border-box;
+  min-height: calc(100vh - clamp(1rem, 2vh, 2rem)); /* Altura casi completa */
+  background-color: #d9d9d9;
+  border-radius: clamp(1rem, 1.2vw, 1.25rem);
+  box-shadow: 0 clamp(0.5rem, 1vw, 0.75rem) clamp(2rem, 3vw, 3rem) rgba(0, 0, 0, 0.15), 
+              0 clamp(0.25rem, 0.4vw, 0.375rem) clamp(1rem, 1.5vw, 1.25rem) rgba(0, 0, 0, 0.1);
+  position: relative;
+  
+  /* CENTRADO: Asegurar centrado perfecto */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrar contenido horizontalmente */
+}
+
+/* ===== PSEUDO-ELEMENTO PARA BACKGROUND ===== */
+.inventario-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 50%, #2a6b6e 100%);
+  z-index: -1;
+}
+
+/* ===== TÍTULO PRINCIPAL - CENTRADO Y PROPORCIONADO ===== */
 .inventario-container h1 {
-  color: #1f2937;
+  color: var(--teal-primary);
   text-align: center;
-  margin-bottom: 3vh;
-  font-size: clamp(3vw, 4vw, 5vw);
+  margin-bottom: clamp(1.25rem, 2vh, 1.75rem);
+  font-size: clamp(1.375rem, 2.5vw, 2rem); /* Tamaño fijo proporcionado */
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
+  width: 100%; /* Asegurar ancho completo */
 }
 
 /* Estilos para la barra de navegación */
 .tab-navigation {
   display: flex;
   justify-content: center;
-  margin-bottom: 3vh;
-  border-bottom: 0.2vh solid #e5e7eb;
-  background: white;
-  border-radius: 1.5vh 1.5vh 0 0;
-  padding: 1vh;
-  box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  background: var(--teal-bg-gradient);
+  border-radius: clamp(0.875rem, 1.2vw, 1rem);
+  padding: clamp(0.75rem, 1.2vh, 1rem) clamp(0.75rem, 1.2vh, 1rem);
+  box-shadow: 0 clamp(0.1875rem, 0.4vw, 0.3125rem) clamp(0.75rem, 1.2vw, 1rem) rgba(31, 72, 78, 0.08), 
+              0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.25rem, 0.4vw, 0.375rem) rgba(31, 72, 78, 0.05);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  border: 1px solid rgba(31, 72, 78, 0.08);
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+  gap: clamp(0.25rem, 0.4vw, 0.375rem);
+  
+  /* CENTRADO: Ancho completo del contenedor */
+  width: 100%;
+  max-width: 100%;
 }
 
+/* ===== BOTONES DE TAB - PROPORCIONES PERFECTAS ===== */
 .tab-button {
-  background: none;
-  border: none;
-  padding: 0.75rem 1.5rem;
+  background: rgba(247, 250, 251, 0.6);
+  border: 1px solid rgba(31, 72, 78, 0.12);
+  padding: clamp(0.625rem, 1.2vw, 0.875rem) clamp(1.25rem, 2vw, 1.75rem); /* Padding generoso */
   cursor: pointer;
-  font-size: clamp(0.875rem, 1.5vw, 1rem);
-  color: #6b7280;
-  border-bottom: 3px solid transparent;
-  transition: all 0.3s ease;
-  margin: 0 0.25rem;
-  border-radius: 0.5rem;
+  font-size: clamp(0.75rem, 1.1vw, 0.875rem); /* Tamaño de fuente legible */
+  color: var(--teal-primary);
+  border-radius: clamp(0.5rem, 0.8vw, 0.625rem);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 clamp(0.1875rem, 0.3vw, 0.3125rem);
   white-space: nowrap;
   min-width: fit-content;
   font-weight: 500;
+  letter-spacing: 0.025em;
+  position: relative;
+  backdrop-filter: blur(4px);
+  
+  /* PROPORCIONES: Distribución uniforme */
+  flex: 1;
+  min-width: clamp(6rem, 25vw, 10rem); /* Ancho mínimo generoso */
+  max-width: clamp(10rem, 30vw, 15rem); /* Ancho máximo controlado */
+  text-align: center;
 }
 
 .tab-button:hover {
-  color: #3b82f6;
-  background-color: #f3f4f6;
-  transform: translateY(-1px);
+  background: rgba(247, 250, 251, 0.9);
+  color: var(--teal-primary);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 clamp(0.1875rem, 0.4vw, 0.3125rem) clamp(0.5rem, 1vw, 0.875rem) rgba(31, 72, 78, 0.15),
+              0 clamp(0.0625rem, 0.2vw, 0.1875rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(31, 72, 78, 0.08);
+  border-color: rgba(31, 72, 78, 0.2);
 }
 
 .tab-button.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 100%);
+  color: var(--teal-light);
   font-weight: 600;
-  background-color: #eff6ff;
+  box-shadow: 0 clamp(0.3125rem, 0.6vw, 0.5rem) clamp(1rem, 1.8vw, 1.5rem) rgba(31, 72, 78, 0.25),
+              0 clamp(0.125rem, 0.2vw, 0.1875rem) clamp(0.375rem, 0.6vw, 0.625rem) rgba(31, 72, 78, 0.15);
+  border-color: transparent;
+  transform: translateY(-0.125rem);
 }
 
-/* Contenedor del contenido de los tabs */
+/* ===== CONTENEDOR DEL CONTENIDO - OPTIMIZADO PARA FULLINVENTORY ===== */
 .tab-content {
-  width: 100%;
-  min-height: calc(100vh - 25vh);
+  width: 100%; /* Ancho completo del contenedor padre */
+  max-width: 100%;
+  min-height: calc(100vh - clamp(12rem, 25vh, 18rem)); /* Altura optimizada */
   padding: 0;
-  background: white;
-  border-radius: 0 0 1.5vh 1.5vh;
-  box-shadow: 0 0.8vh 1.2vh -0.2vh rgba(0, 0, 0, 0.1);
+  background: var(--teal-bg-gradient);
+  border-radius: clamp(0.875rem, 1.2vw, 1rem);
   overflow: hidden;
-}
-
-/* Responsive breakpoints */
-
-/* Mobile First - Base (0px - 640px) */
-@media (max-width: 640px) {
-  .inventario-container {
-    padding: 1vw;
-  }
+  border: none !important;
   
-  .inventario-container h1 {
-    margin-bottom: 2vh;
-    font-size: clamp(4vw, 5vw, 6vw);
-  }
-  
-  .tab-navigation {
-    margin-bottom: 2vh;
-    padding: 0.5vh;
-    border-radius: 1vh 1vh 0 0;
-  }
-  
-  .tab-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-    margin: 0 0.125rem;
-  }
-  
-  .tab-content {
-    min-height: calc(100vh - 20vh);
-    border-radius: 0 0 1vh 1vh;
-  }
-}
-
-/* Small tablets (641px - 768px) */
-@media (min-width: 641px) and (max-width: 768px) {
-  .inventario-container {
-    max-width: 100%;
-    padding: 1.5vw;
-  }
-  
-  .inventario-container h1 {
-    font-size: clamp(3.5vw, 4.5vw, 5.5vw);
-  }
-  
-  .tab-button {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-  }
-}
-
-/* Medium tablets (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .inventario-container {
-    max-width: 95%;
-    padding: 2vw;
-  }
-  
-  .inventario-container h1 {
-    font-size: clamp(3vw, 4vw, 5vw);
-  }
-  
-  .tab-navigation {
-    padding: 1.2vh;
-  }
-  
-  .tab-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
-  }
-}
-
-/* Específico para aspect ratio de tablets portrait grandes (como 1024 x 1366) */
-@media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 4/5) {
-  .inventario-container {
-    max-width: 95%;
-    padding: 1.5vw;
-  }
-  
-  .inventario-container h1 {
-    font-size: 2.8vw;
-    margin-bottom: 2.5vh;
-  }
-  
-  .tab-navigation {
-    margin-bottom: 2.5vh;
-    padding: 1vh;
-  }
-  
-  .tab-button {
-    padding: 1.3vh 2.2vw;
-    font-size: 1.8vw;
-  }
-  
-  .tab-content {
-    min-height: calc(100vh - 20vh);
-  }
-  
-  .inventario-container .table th,
-  .inventario-container .table td {
-    padding: 1vh 1.2vw;
-    font-size: 1.3vw;
-  }
-  
-  .inventario-container .btn-primary {
-    padding: 1vh 2.5vw;
-    font-size: 1.6vw;
-  }
-}
-
-/* Large tablets and small desktops (1025px - 1200px) */
-@media (min-width: 1025px) and (max-width: 1200px) {
-  .inventario-container {
-    max-width: 95%;
-    padding: 2vw;
-  }
-}
-
-/* Large desktops (1201px and up) */
-@media (min-width: 1201px) {
-  .inventario-container {
-    max-width: 95%;
-    padding: 2vw;
-  }
-  
-  .inventario-container h1 {
-    font-size: clamp(2.5vw, 3vw, 3.5vw);
-    margin-bottom: 3vh;
-  }
-  
-  .tab-navigation {
-    margin-bottom: 3vh;
-  }
-}
-
-/* Ultra-wide screens (1400px and up) */
-@media (min-width: 1400px) {
-  .inventario-container {
-    max-width: 95%;
-  }
+  /* CENTRADO: Asegurar contenido centrado */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Estilos generales que se aplicarán a ambos componentes hijos */
 .inventario-container .form-group {
-  margin-bottom: 2vh;
+  margin-bottom: clamp(1rem, 1.8vh, 1.5rem);
 }
 
 .inventario-container .btn-primary {
-  background-color: #3b82f6;
-  color: white;
-  padding: 1.5vh 3vw;
+  background-color: var(--teal-secondary);
+  color: var(--teal-light);
+  padding: clamp(0.75rem, 1.4vh, 1rem) clamp(1.5rem, 2.8vw, 2rem);
   border: none;
-  border-radius: 1vh;
+  border-radius: clamp(0.5rem, 0.8vh, 0.75rem);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
-  font-size: clamp(1.5vw, 2vw, 2.5vw);
+  font-size: clamp(0.75rem, 1.3vw, 0.9375rem);
   display: inline-flex;
   align-items: center;
-  gap: 1vw;
+  gap: clamp(0.375rem, 0.8vw, 0.625rem);
 }
 
 .inventario-container .btn-primary:hover {
-  background-color: #2563eb;
-  transform: translateY(-0.1vh);
-  box-shadow: 0 0.8vh 2.4vh rgba(59, 130, 246, 0.15);
+  background-color: #145055;
+  transform: translateY(-0.125rem);
+  box-shadow: 0 clamp(0.375rem, 0.8vh, 0.625rem) clamp(1rem, 2vh, 1.75rem) rgba(31, 72, 78, 0.15);
 }
 
 .inventario-container .btn-primary:active {
   transform: translateY(0);
 }
 
+/* ===== TABLA - PROPORCIONES IDEALES ===== */
 .inventario-container .table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 2vh;
-  background: white;
-  border-radius: 1vh;
+  margin-top: clamp(1rem, 1.8vh, 1.5rem);
+  background: #d9d9d9;
+  border-radius: clamp(0.5rem, 0.8vh, 0.75rem);
   overflow: hidden;
-  box-shadow: 0 0.2vh 0.6vh rgba(0, 0, 0, 0.1);
+  box-shadow: 0 clamp(0.125rem, 0.2vh, 0.1875rem) clamp(0.375rem, 0.6vh, 0.5rem) rgba(0, 0, 0, 0.1);
 }
 
 .inventario-container .table th,
 .inventario-container .table td {
-  padding: 1.5vh 2vw;
+  padding: clamp(0.75rem, 1.2vh, 1rem) clamp(1rem, 1.8vw, 1.5rem);
   text-align: left;
-  border-bottom: 0.1vh solid #e5e7eb;
-  font-size: clamp(1.2vw, 1.5vw, 1.8vw);
+  border-bottom: 0.0625rem solid var(--teal-border);
+  font-size: clamp(0.75rem, 1.3vw, 0.9375rem);
+  color: var(--teal-primary);
 }
 
 .inventario-container .table th {
-  background-color: #f9fafb;
+  background-color: var(--teal-secondary);
   font-weight: 600;
-  color: #374151;
+  color: var(--teal-light);
   text-transform: uppercase;
-  font-size: clamp(1vw, 1.2vw, 1.5vw);
+  font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
   letter-spacing: 0.05em;
 }
 
-.inventario-container .table tr:hover {
-  background-color: #f9fafb;
+.inventario-container .table tr:nth-child(even) td {
+  background-color: #e3ecee;
+}
+
+.inventario-container .table tr:nth-child(odd) td {
+  background-color: var(--teal-light);
+}
+
+.inventario-container .table tr:hover td {
+  background-color: #e3ecee;
 }
 
 .inventario-container .input-field {
   width: 100%;
-  padding: 1.5vh 2vw;
-  border: 0.1vh solid #d1d5db;
-  border-radius: 1vh;
-  font-size: clamp(1.2vw, 1.5vw, 1.8vw);
+  padding: clamp(0.75rem, 1.4vh, 1rem) clamp(1rem, 1.8vw, 1.5rem);
+  border: 0.0625rem solid var(--teal-border);
+  border-radius: clamp(0.5rem, 0.8vh, 0.75rem);
+  font-size: clamp(0.75rem, 1.3vw, 0.9375rem);
   transition: all 0.3s ease;
   box-sizing: border-box;
+  background-color: var(--teal-light);
+  color: var(--teal-primary);
 }
 
 .inventario-container .input-field:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 0.3vh rgba(59, 130, 246, 0.1);
+  border-color: var(--teal-secondary);
+  box-shadow: 0 0 0 clamp(0.125rem, 0.25vh, 0.1875rem) rgba(31, 72, 78, 0.1);
   transform: scale(1.02);
 }
 
-/* Responsive table for mobile */
-@media (max-width: 768px) {
-  .inventario-container .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .inventario-container .table th,
-  .inventario-container .table td {
-    padding: 1vh 1.5vw;
-    font-size: clamp(1.5vw, 2vw, 2.5vw);
-  }
-  
-  .inventario-container .btn-primary {
-    padding: 1vh 2vw;
-    font-size: clamp(2vw, 2.5vw, 3vw);
-  }
-}
+/* ===== RESPONSIVE BREAKPOINTS - CENTRADO EN TODOS LOS TAMAÑOS ===== */
 
-/* Landscape orientation adjustments */
-@media (orientation: landscape) and (max-height: 500px) {
+/* Mobile Portrait (0px - 480px) */
+@media (max-width: 480px) {
   .inventario-container {
-    padding: 1vw;
+    width: clamp(20rem, 95vw, 30rem); /* Ancho fijo para móviles */
+    max-width: 95vw;
+    padding: clamp(0.75rem, 1.5vw, 1rem);
+    margin: clamp(0.5rem, 1vh, 0.75rem) auto;
   }
   
   .inventario-container h1 {
-    font-size: clamp(2vw, 2.5vw, 3vw);
-    margin-bottom: 1.5vh;
+    margin-bottom: clamp(1rem, 1.5vh, 1.25rem);
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
   }
   
   .tab-navigation {
-    margin-bottom: 1.5vh;
+    margin-bottom: clamp(0.5rem, 0.8vh, 0.75rem);
+    padding: clamp(0.5rem, 1vh, 0.75rem);
+    border-radius: clamp(0.625rem, 1vw, 0.75rem);
+    flex-direction: column;
+    gap: clamp(0.25rem, 0.5vh, 0.375rem);
+  }
+  
+  .tab-button {
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.25rem);
+    font-size: clamp(0.6875rem, 1.2vw, 0.8125rem);
+    margin: 0;
+    border-radius: clamp(0.375rem, 0.8vw, 0.5rem);
+    min-width: 100%;
+    max-width: 100%;
   }
   
   .tab-content {
-    min-height: calc(100vh - 15vh);
+    min-height: calc(100vh - clamp(8rem, 18vh, 12rem));
+    border-radius: clamp(0.625rem, 1vw, 0.75rem);
   }
 }
 
-/* Print styles */
-@media print {
+/* Mobile Landscape y Small Tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
   .inventario-container {
-    max-width: none;
-    padding: 0;
-    background: white;
-  }
-  
-  .tab-navigation {
-    display: none;
+    width: clamp(30rem, 90vw, 48rem); /* Ancho fijo para tablets pequeños */
+    max-width: 90vw;
+    padding: clamp(1rem, 1.5vw, 1.25rem);
   }
   
   .inventario-container h1 {
-    color: black;
-    font-size: 1.5rem;
+    font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  }
+  
+  .tab-navigation {
+    flex-wrap: wrap;
+    padding: clamp(0.75rem, 1.2vh, 1rem);
+    margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  }
+  
+  .tab-button {
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 1.8vw, 1.5rem);
+    font-size: clamp(0.6875rem, 1.2vw, 0.8125rem);
+    margin: clamp(0.125rem, 0.2vw, 0.1875rem);
+    flex: 1;
+    min-width: clamp(5rem, 25vw, 8rem);
+    max-width: clamp(8rem, 35vw, 12rem);
   }
 }
 
-/* Accessibility improvements */
+/* Medium Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .inventario-container {
+    width: clamp(48rem, 85vw, 64rem); /* Ancho fijo para tablets medianos */
+    max-width: 85vw;
+    padding: clamp(1.25rem, 1.8vw, 1.5rem);
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+  }
+  
+  .tab-navigation {
+    padding: clamp(0.875rem, 1.4vh, 1rem);
+    margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  }
+  
+  .tab-button {
+    padding: clamp(0.625rem, 1.2vw, 0.875rem) clamp(1.25rem, 2.2vw, 1.75rem);
+    font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+  }
+}
+
+/* Large Tablets y Small Desktop (1025px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .inventario-container {
+    width: clamp(64rem, 85vw, 85rem); /* Ancho fijo para desktop pequeño */
+    max-width: 85vw;
+    padding: clamp(1.25rem, 1.5vw, 1.5rem);
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(1.625rem, 2.2vw, 1.875rem);
+  }
+  
+  .tab-navigation {
+    margin-bottom: clamp(0.5rem, 1vh, 0.75rem); /* Nuevo - no estaba definido */
+  }
+  .tab-button {
+    padding: clamp(0.625rem, 1vw, 0.875rem) clamp(1.25rem, 1.8vw, 1.75rem);
+    font-size: clamp(0.75rem, 1.1vw, 0.875rem);
+  }
+}
+
+/* Large Desktop (1367px+) */
+@media (min-width: 1367px) {
+  .inventario-container {
+    width: clamp(75rem, 80vw, 90rem); /* Ancho fijo para desktop grande */
+    max-width: 80vw;
+    padding: clamp(1.25rem, 1.2vw, 1.5rem);
+  }
+  
+  .inventario-container h1 {
+    font-size: clamp(1.75rem, 2vw, 2rem);
+  }
+  
+  .tab-navigation {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+  
+  .tab-content {
+    background: #1f2937;
+  }
+}
+
+/* ===== PERFORMANCE Y OPTIMIZACIÓN ===== */
+.tab-button,
+.inventario-container .btn-primary {
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ===== ACCESIBILIDAD ===== */
 @media (prefers-reduced-motion: reduce) {
   .tab-button,
   .inventario-container .btn-primary,
   .inventario-container .input-field {
-    transition: none;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .inventario-container {
-    background-color: #111827;
-    color: #f9fafb;
+    transition: none !important;
   }
   
-  .inventario-container h1 {
-    color: #f9fafb;
-  }
-  
-  .tab-navigation {
-    background: #1f2937;
-    border-bottom-color: #374151;
-  }
-  
-  .tab-content {
-    background: #1f2937;
-  }
-  
-  .inventario-container .table {
-    background: #1f2937;
-  }
-  
-  .inventario-container .table th {
-    background-color: #374151;
-    color: #f9fafb;
-  }
-  
-  .inventario-container .table td {
-    border-bottom-color: #374151;
-  }
-  
-  .inventario-container .input-field {
-    background: #374151;
-    border-color: #4b5563;
-    color: #f9fafb;
+  .tab-button:hover,
+  .tab-button.active,
+  .inventario-container .btn-primary:hover {
+    transform: none !important;
   }
 }

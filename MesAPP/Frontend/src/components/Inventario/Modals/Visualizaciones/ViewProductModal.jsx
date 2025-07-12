@@ -108,7 +108,7 @@ function ViewProductModal({ product, onClose }) {
               
               {product.image_url && (
                 <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Nombre de imagen:</span>
+                  <span className={styles.detailLabel}>Imagen del producto:</span>
                   <span className={styles.detailValue}>
                     {product.image_url}
                   </span>

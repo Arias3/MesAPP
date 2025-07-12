@@ -14,7 +14,6 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
     stock: '',
     barcode: '',
     unity: '',
-    image_url: '',
     flavor_count: '',
     description: ''
   });
@@ -31,7 +30,6 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
         stock: product.stock?.toString() || '',
         barcode: product.barcode || '',
         unity: product.unity || '',
-        image_url: product.image_url || '',
         flavor_count: product.flavor_count?.toString() || '',
         description: product.description || ''
       });
@@ -43,6 +41,15 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
       ...prev,
       [field]: value
     }));
+  };
+
+  // Calcular margen para preview
+  const calculateMargin = () => {
+    const cost = parseFloat(formData.cost) || 0;
+    const price = parseFloat(formData.price) || 0;
+    if (cost === 0) return '0.0';
+    const margin = ((price - cost) / cost) * 100;
+    return margin.toFixed(1);
   };
 
   const handleSubmit = async (e) => {
@@ -67,7 +74,6 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
         stock: parseInt(formData.stock) || 0,
         barcode: formData.barcode,
         unity: formData.unity,
-        image_url: formData.image_url,
         flavor_count: parseInt(formData.flavor_count) || 0,
         description: formData.description
       };
@@ -89,7 +95,6 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
       }
       
       const result = await response.json();
-      
       
       // ✅ EMITIR EVENTO GLOBAL PARA ACTUALIZACIÓN DE PRODUCTO
       window.dispatchEvent(new CustomEvent('productUpdated', {
@@ -120,14 +125,6 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
 
   const handleCancel = () => {
     onClose();
-  };
-
-  // Calcular margen para preview
-  const calculateMargin = () => {
-    const cost = parseFloat(formData.cost) || 0;
-    const price = parseFloat(formData.price) || 0;
-    if (cost === 0) return 0;
-    return (((price - cost) / cost) * 100).toFixed(1);
   };
 
   if (!product) return null;
@@ -275,18 +272,6 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
               />
             </div>
 
-            {/* Fila 6: URL de Imagen */}
-            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-              <label className={styles.label}>URL de Imagen</label>
-              <input
-                type="url"
-                value={formData.image_url}
-                onChange={(e) => handleInputChange('image_url', e.target.value)}
-                className={styles.input}
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-            </div>
-
             {/* Fila 7: Descripción */}
             <div className={`${styles.formGroup} ${styles.fullWidth}`}>
               <label className={styles.label}>Descripción</label>
@@ -300,35 +285,48 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
             </div>
           </div>
 
-          {/* Preview del margen */}
-          {formData.cost && formData.price && (
-            <div className={styles.marginPreview}>
-              <span className={styles.marginLabel}>Margen calculado:</span>
-              <span className={styles.marginValue}>{calculateMargin()}%</span>
-              {parseFloat(formData.cost) > parseFloat(formData.price) && (
-                <span className={styles.marginWarning}>⚠️ El costo es mayor al precio</span>
+          {/* ✅ NUEVA SECCIÓN UNIFICADA DE MÉTRICAS EN 3 COLUMNAS */}
+          {((formData.cost && formData.price) || (product.cost && product.price)) && (
+            <div className={styles.productMetrics}>
+              
+              {/* Columna 1: Margen Calculado */}
+              {formData.cost && formData.price && (
+                <div className={`${styles.metricItem} ${styles.highlighted} ${
+                  parseFloat(formData.cost) > parseFloat(formData.price) ? styles.error : ''
+                }`}>
+                  <span className={styles.metricLabel}>Margen Calculado</span>
+                  <span className={styles.metricValue}>{calculateMargin()}%</span>
+                  {parseFloat(formData.cost) > parseFloat(formData.price) && (
+                    <span className={styles.metricWarning}>
+                      <span className={styles.warningIcon}>⚠️</span>
+                      Costo &gt; Precio
+                    </span>
+                  )}
+                </div>
               )}
+              
+              {/* Columna 2: Margen Actual */}
+              <div className={`${styles.metricItem} ${styles.marginCurrent}`}>
+                <span className={styles.metricLabel}>Margen Actual</span>
+                <span className={styles.metricValue}>
+                  {product.cost && product.price 
+                    ? `${(((product.price - product.cost) / product.cost) * 100).toFixed(1)}%`
+                    : 'N/A'
+                  }
+                </span>
+              </div>
+              
+              {/* Columna 3: Valor en Stock */}
+              <div className={`${styles.metricItem} ${styles.stockValue}`}>
+                <span className={styles.metricLabel}>Valor en Stock</span>
+                <span className={styles.metricValue}>
+                  ${(parseFloat(formData.price || product.price || 0) * 
+                    parseInt(formData.stock || product.stock || 0)).toFixed(2)}
+                </span>
+              </div>
+              
             </div>
           )}
-
-          {/* Información adicional del producto */}
-          <div className={styles.productInfo}>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Margen actual:</span>
-              <span className={styles.infoValue}>
-                {product.cost && product.price ? 
-                  `${(((product.price - product.cost) / product.cost) * 100).toFixed(1)}%` : 
-                  'N/A'
-                }
-              </span>
-            </div>
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Valor en stock:</span>
-              <span className={styles.infoValue}>
-                ${(parseFloat(formData.price) * parseInt(formData.stock) || 0).toFixed(2)}
-              </span>
-            </div>
-          </div>
 
           {/* Botones de acción */}
           <div className={styles.actionButtons}>

@@ -7,13 +7,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10000;
   padding: 20px;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 @keyframes fadeIn {
@@ -23,19 +24,23 @@
 
 /* Modal Container */
 .modalContainer {
-  background: white;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1);
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #e2e8f0;
 }
 
 @keyframes slideIn {
   from { 
-    transform: scale(0.9) translateY(-20px); 
+    transform: scale(0.95) translateY(-10px); 
     opacity: 0; 
   }
   to { 
@@ -49,46 +54,48 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px 24px 0 24px;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 24px;
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid  linear-gradient(135deg, #1a5a62 0%, #1f484e 50%, #2a6b6e 100%);
+  background:  linear-gradient(135deg, #1a5a62 0%, #1f484e 50%, #2a6b6e 100%);
 }
 
 .modalTitleSection {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 18px;
 }
 
 .modalIcon {
-  width: 24px;
-  height: 24px;
-  color: #f59e0b; /* Color dorado para diferenciarlo del nuevo producto */
+  width: 20px;
+  height: 20px;
+  color: #f59e0b;
   margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .modalTitle {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
-  color: #111827;
-  line-height: 1.2;
+  color: white;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
 }
 
 .modalSubtitle {
   margin: 4px 0 0 0;
-  font-size: 14px;
-  color: #6b7280;
+  font-size: 13px;
+  color: white;
   font-weight: 400;
 }
 
 .closeButton {
-  background: #f3f4f6;
+  background: none;
   border: none;
   border-radius: 6px;
-  padding: 8px;
+  padding: 6px;
   cursor: pointer;
-  color: #6b7280;
+  color: white;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -96,8 +103,13 @@
 }
 
 .closeButton:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.closeButton:active {
+  background: #e2e8f0;
+  transform: scale(0.95);
 }
 
 .closeIcon {
@@ -107,9 +119,11 @@
 
 /* Form */
 .form {
-  padding: 0 24px 24px 24px;
+  margin-top: 20px;
+  padding: 0 20px 20px 20px;
   max-height: calc(90vh - 120px);
   overflow-y: auto;
+  background: #ffffff;
 }
 
 .formGrid {
@@ -131,35 +145,38 @@
 .label {
   margin-bottom: 6px;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   color: #374151;
+  letter-spacing: -0.025em;
 }
 
 .input {
-  padding: 10px 12px;
+  padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.2s ease;
-  background: white;
+  background: #ffffff;
+  color: #1e293b;
 }
 
 .input:focus {
   outline: none;
-  border-color: #f59e0b; /* Color dorado para edición */
+  border-color: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
 }
 
 .textarea {
-  padding: 10px 12px;
+  padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.2s ease;
-  background: white;
+  background: #ffffff;
   resize: vertical;
   min-height: 80px;
   font-family: inherit;
+  color: #1e293b;
 }
 
 .textarea:focus {
@@ -168,134 +185,180 @@
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
 }
 
-/* Margin Preview */
-.marginPreview {
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 8px;
-  padding: 12px 16px;
+/* ✅ NUEVA SECCIÓN UNIFICADA - 3 COLUMNAS EN UNA FILA */
+.productMetrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
   margin-bottom: 20px;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.metricItem {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  text-align: center;
+  padding: 12px 8px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
 }
 
-.marginLabel {
-  font-size: 14px;
-  color: #0c4a6e;
+.metricItem:hover {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.metricLabel {
+  font-size: 12px;
+  color: #64748b;
   font-weight: 500;
+  margin-bottom: 4px;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
 }
 
-.marginValue {
+.metricValue {
   font-size: 16px;
   font-weight: 600;
-  color: #0369a1;
+  color: #1e293b;
+  margin-bottom: 2px;
 }
 
-.marginWarning {
-  font-size: 12px;
-  color: #dc2626;
-  font-weight: 500;
-  margin-left: auto;
+/* ✅ ESTILOS ESPECÍFICOS PARA CADA MÉTRICA */
+.metricItem.marginCalculated .metricValue {
+  color: #f59e0b;
 }
 
-/* Product Info */
-.productInfo {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.metricItem.marginCurrent .metricValue {
+  color: #64748b;
 }
 
-.infoItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.metricItem.stockValue .metricValue {
+  color: #64748b;
 }
 
-.infoLabel {
-  font-size: 14px;
-  color: #92400e;
-  font-weight: 500;
-}
-
-.infoValue {
-  font-size: 14px;
+/* ✅ WARNING PARA MARGEN NEGATIVO */
+.metricWarning {
+  font-size: 10px;
+  color: #ef4444;
   font-weight: 600;
-  color: #78350f;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.warningIcon {
+  font-size: 10px;
+}
+
+/* ✅ ESTADO DESTACADO PARA MARGEN CALCULADO */
+.metricItem.highlighted {
+  background: #fffbeb;
+  border-color: #fbbf24;
+}
+
+.metricItem.highlighted .metricLabel {
+  color: #92400e;
+}
+
+.metricItem.highlighted .metricValue {
+  color: #d97706;
+}
+
+/* ✅ ESTADO DE ERROR PARA MARGEN NEGATIVO */
+.metricItem.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.metricItem.error .metricValue {
+  color: #ef4444;
 }
 
 /* Action Buttons */
 .actionButtons {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
 }
 
 .cancelButton {
-  background: #6b7280;
-  color: white;
-  border: none;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #d1d5db;
   border-radius: 6px;
-  padding: 10px 20px;
-  cursor: pointer;
+  padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
+  letter-spacing: -0.025em;
 }
 
 .cancelButton:hover {
-  background: #4b5563;
-  transform: translateY(-1px);
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #475569;
+}
+
+.cancelButton:active {
+  transform: scale(0.98);
 }
 
 .submitButton {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: #f59e0b;
   color: white;
-  border: none;
+  border: 1px solid #f59e0b;
   border-radius: 6px;
-  padding: 10px 20px;
+  padding: 8px 16px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 140px;
+  min-width: 120px;
   justify-content: center;
+  letter-spacing: -0.025em;
 }
 
 .submitButton:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.submitButton:active {
+  transform: scale(0.98);
 }
 
 .submitButton:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
 .buttonIcon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 /* Loading Spinner */
 .spinner {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 2px solid transparent;
   border-top: 2px solid white;
   border-radius: 50%;
@@ -307,7 +370,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
+/* ✅ RESPONSIVE PARA LA NUEVA SECCIÓN */
 @media (max-width: 768px) {
   .modalContainer {
     max-width: 95vw;
@@ -316,7 +379,7 @@
   }
   
   .modalHeader {
-    padding: 16px 16px 0 16px;
+    padding: 16px 16px 12px 16px;
   }
   
   .form {
@@ -328,9 +391,19 @@
     gap: 12px;
   }
   
-  .productInfo {
+  /* ✅ MÉTRICAS EN COLUMNA EN MÓVIL */
+  .productMetrics {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .metricItem {
+    padding: 10px;
+  }
+  
+  .metricValue {
+    font-size: 18px;
   }
   
   .actionButtons {
@@ -342,6 +415,8 @@
   .submitButton {
     width: 100%;
     justify-content: center;
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }
 
@@ -352,7 +427,6 @@
   
   .modalHeader {
     padding: 12px;
-    margin-bottom: 16px;
   }
   
   .form {
@@ -360,10 +434,63 @@
   }
   
   .modalTitle {
-    font-size: 18px;
+    font-size: 15px;
   }
   
   .modalSubtitle {
     font-size: 12px;
   }
+  
+  .productMetrics {
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .metricLabel {
+    font-size: 11px;
+  }
+  
+  .metricValue {
+    font-size: 16px;
+  }
+}
+
+/* ✅ RESPONSIVE PARA TABLETS - MANTENER 3 COLUMNAS */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .productMetrics {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+  
+  .metricItem {
+    padding: 14px 10px;
+  }
+}
+
+/* ✅ MEJORAS ADICIONALES DE ACCESIBILIDAD */
+.metricItem:focus-within {
+  outline: 2px solid rgba(245, 158, 11, 0.5);
+  outline-offset: 2px;
+}
+
+/* ✅ ANIMACIÓN SUAVE PARA CAMBIOS DE VALOR */
+.metricValue {
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.metricItem.highlighted .metricValue {
+  animation: highlightPulse 2s ease-in-out;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ✅ ESTILOS PARA TIPOGRAFÍA MEJORADA */
+.metricLabel,
+.metricValue,
+.metricWarning {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
