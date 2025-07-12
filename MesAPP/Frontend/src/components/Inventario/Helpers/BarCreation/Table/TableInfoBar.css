@@ -1,0 +1,409 @@
+/* ✅ TABLEINFOBAR - NÚMEROS IZQUIERDA, BOTÓN DERECHA - SIEMPRE HORIZONTAL */
+
+/* Variables del sistema - Paleta minimalista */
+.table-info-bar {
+  --teal-primary: #1a5a62;
+  --teal-secondary: #1f484e;
+  --bg-subtle: #f8f9fa;
+  --border-light: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --shadow-minimal: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* ✅ CONTENEDOR PRINCIPAL - SIEMPRE HORIZONTAL CON JUSTIFY-CONTENT: SPACE-BETWEEN */
+.table-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* ✅ CLAVE: Números izquierda, botón derecha */
+  
+  /* ✅ SPACING OPTIMIZADO */
+  margin-top: 0.7rem;
+  padding: clamp(0.5rem, 1vh, 0.625rem) clamp(0.75rem, 1.5vw, 1rem);
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: clamp(0.5rem, 1vw, 0.625rem) !important;
+  box-shadow: var(--shadow-minimal) !important;
+  font-family: var(--font-main) !important;
+  
+  /* ✅ ALTURA COMPACTA PERO RESPONSIVA */
+  min-height: clamp(2.5rem, 4.5vh, 3rem);
+  transition: none !important;
+  
+  /* ✅ GAP DINÁMICO ENTRE NÚMEROS Y BOTÓN */
+  gap: clamp(0.75rem, 3vw, 2rem);
+}
+
+/* ✅ CONTENEDOR DE ESTADÍSTICAS - LADO IZQUIERDO */
+.info-stats {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  flex: 1; /* ✅ Ocupa espacio disponible */
+  min-width: 0; /* ✅ Permite contracción si es necesario */
+  flex-wrap: nowrap; /* ✅ SIEMPRE EN UNA LÍNEA */
+}
+
+/* ✅ ELEMENTOS DE ESTADÍSTICA - COMPACTOS */
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.25rem, 0.6vw, 0.375rem);
+  padding: clamp(0.25rem, 0.6vw, 0.375rem) clamp(0.5rem, 1.2vw, 0.75rem);
+  border-radius: clamp(0.25rem, 0.6vw, 0.375rem);
+  background: transparent;
+  border: none;
+  transition: none !important;
+  white-space: nowrap; /* ✅ Evita saltos de línea */
+  flex-shrink: 0; /* ✅ Mantiene tamaño mínimo */
+}
+
+/* ✅ ETIQUETAS - COMPACTAS Y LEGIBLES */
+.stat-label {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+  font-size: clamp(0.625rem, 1.2vw, 0.75rem) !important;
+  line-height: 1.2 !important;
+}
+
+/* ✅ VALORES - DESTACADOS */
+.stat-value {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem) !important;
+  line-height: 1.1 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ✅ BOTÓN EXPANDIR - LADO DERECHO, SIEMPRE VISIBLE */
+.expand-button {
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 100%) !important;
+  color: white !important;
+  padding: clamp(0.375rem, 0.8vw, 0.5rem) clamp(0.75rem, 1.5vw, 1.25rem) !important;
+  border-radius: clamp(0.375rem, 0.8vw, 0.5rem) !important;
+  border: none !important;
+  font-weight: 600 !important;
+  font-size: clamp(0.75rem, 1.3vw, 0.8125rem) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: clamp(0.25rem, 0.5vw, 0.375rem) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 3px rgba(26, 90, 98, 0.2) !important;
+  font-family: var(--font-main) !important;
+  white-space: nowrap !important;
+  
+  /* ✅ FLEX SHRINK 0 - NO SE COMPRIME */
+  flex-shrink: 0;
+  min-width: fit-content;
+  
+  /* ✅ ALTURA RESPONSIVA */
+  min-height: clamp(2rem, 3.5vh, 2.5rem);
+  max-height: clamp(2rem, 3.5vh, 2.5rem);
+}
+
+.expand-button:hover {
+  background: linear-gradient(135deg, #145055 0%, #1a3d42 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(26, 90, 98, 0.25) !important;
+}
+
+.expand-button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 1px 2px rgba(26, 90, 98, 0.2) !important;
+}
+
+.expand-button:focus {
+  outline: none !important;
+  box-shadow: 
+    0 1px 3px rgba(26, 90, 98, 0.2),
+    0 0 0 2px rgba(26, 90, 98, 0.3) !important;
+}
+
+.expand-button:disabled {
+  background: var(--text-muted) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 0.6 !important;
+}
+
+/* ✅ ICONO DEL BOTÓN */
+.expand-icon {
+  width: clamp(0.75rem, 1.2vw, 0.875rem) !important;
+  height: clamp(0.75rem, 1.2vw, 0.875rem) !important;
+  color: white !important;
+  flex-shrink: 0 !important;
+}
+
+/* ✅ TEXTO DEL BOTÓN */
+.expand-text {
+  font-size: inherit !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* ✅ RESPONSIVE DESIGN - SIEMPRE HORIZONTAL */
+
+/* Desktop Large (1200px+) */
+@media (min-width: 1200px) {
+  .table-info-bar {
+    padding: 0.625rem 1.5rem;
+    gap: 2rem;
+  }
+  
+  .info-stats {
+    gap: 1.5rem;
+  }
+  
+  .stat-item {
+    padding: 0.375rem 0.875rem;
+  }
+}
+
+/* Desktop (1025px - 1199px) */
+@media (min-width: 1025px) and (max-width: 1199px) {
+  .table-info-bar {
+    padding: 0.625rem 1.25rem;
+    gap: 1.5rem;
+  }
+  
+  .info-stats {
+    gap: 1.25rem;
+  }
+  
+  .stat-item {
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+/* Large Tablets (769px - 1024px) - MANTENER HORIZONTAL */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .table-info-bar {
+    /* ✅ MANTENER FLEX-DIRECTION: ROW */
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+  }
+  
+  .info-stats {
+    gap: 1rem;
+  }
+  
+  .stat-item {
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .expand-button {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+  
+  .expand-icon {
+    width: 0.75rem !important;
+    height: 0.75rem !important;
+  }
+}
+
+/* Standard Tablets (481px - 768px) - MANTENER HORIZONTAL */
+@media (min-width: 481px) and (max-width: 768px) {
+  .table-info-bar {
+    /* ✅ MANTENER HORIZONTAL */
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    gap: 0.75rem;
+  }
+  
+  .info-stats {
+    gap: 0.75rem;
+  }
+  
+  .stat-item {
+    padding: 0.1875rem 0.375rem;
+  }
+  
+  .stat-label {
+    font-size: 0.625rem !important;
+  }
+  
+  .stat-value {
+    font-size: 0.6875rem !important;
+  }
+  
+  .expand-button {
+    padding: 0.3125rem 0.625rem !important;
+    font-size: 0.6875rem !important;
+  }
+  
+  .expand-icon {
+    width: 0.6875rem !important;
+    height: 0.6875rem !important;
+  }
+}
+
+/* Mobile Large (361px - 480px) - HORIZONTAL COMPACTO */
+@media (min-width: 361px) and (max-width: 480px) {
+  .table-info-bar {
+    /* ✅ MANTENER HORIZONTAL PERO MUY COMPACTO */
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.375rem 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .info-stats {
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    padding: 0.125rem 0.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.5625rem !important;
+  }
+  
+  .stat-value {
+    font-size: 0.625rem !important;
+  }
+  
+  .expand-button {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.625rem !important;
+  }
+  
+  .expand-icon {
+    width: 0.625rem !important;
+    height: 0.625rem !important;
+  }
+  
+  /* ✅ En móviles, ocultar texto del botón si es necesario */
+  .expand-text {
+    display: none;
+  }
+}
+
+/* Mobile Small (0px - 360px) - ULTRA COMPACTO HORIZONTAL */
+@media (max-width: 360px) {
+  .table-info-bar {
+    /* ✅ MANTENER HORIZONTAL ULTRA COMPACTO */
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.25rem 0.375rem;
+    gap: 0.375rem;
+  }
+  
+  .info-stats {
+    gap: 0.375rem;
+    overflow: hidden; /* Por si acaso */
+  }
+  
+  .stat-item {
+    padding: 0.0625rem 0.125rem;
+  }
+  
+  /* ✅ OCULTAR ELEMENTO MENOS IMPORTANTE EN PANTALLAS MUY PEQUEÑAS */
+  .stat-item:last-child {
+    display: none; /* Oculta "Por página" en pantallas muy pequeñas */
+  }
+  
+  .stat-label {
+    font-size: 0.5rem !important;
+  }
+  
+  .stat-value {
+    font-size: 0.5625rem !important;
+  }
+  
+  .expand-button {
+    padding: 0.1875rem 0.375rem !important;
+    font-size: 0.5625rem !important;
+    min-width: auto;
+  }
+  
+  .expand-icon {
+    width: 0.5625rem !important;
+    height: 0.5625rem !important;
+  }
+  
+  /* ✅ Solo icono en pantallas muy pequeñas */
+  .expand-text {
+    display: none;
+  }
+}
+
+/* ✅ ESTADO EXPANDIDO - SIN BOTÓN */
+.table-info-bar.expanded {
+  justify-content: flex-start; /* ✅ Solo números a la izquierda */
+}
+
+.table-info-bar.expanded .expand-button {
+  display: none !important;
+}
+
+/* ✅ ESTADO DESHABILITADO */
+.table-info-bar.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ✅ PERFORMANCE OPTIMIZADA */
+.table-info-bar,
+.expand-button {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* ✅ ACCESIBILIDAD */
+@media (prefers-reduced-motion: reduce) {
+  .expand-button {
+    transition: none !important;
+  }
+  
+  .expand-button:hover {
+    transform: none !important;
+  }
+}
+
+/* ✅ ALTO CONTRASTE */
+@media (prefers-contrast: high) {
+  .table-info-bar {
+    border: 2px solid var(--text-primary) !important;
+    background: white !important;
+  }
+  
+  .stat-value {
+    color: var(--text-primary) !important;
+  }
+  
+  .expand-button {
+    background: var(--teal-primary) !important;
+    border: 2px solid var(--teal-secondary) !important;
+  }
+}
+
+/* ✅ PREVENCIÓN DE CONFLICTOS */
+.table-info-bar * {
+  box-sizing: border-box;
+}
+
+/* ✅ ASEGURAR QUE NO HAY OVERFLOW HORIZONTAL */
+.table-info-bar {
+  overflow: hidden;
+}
+
+.info-stats {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

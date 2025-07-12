@@ -1,0 +1,765 @@
+/* ===== CONFIGURACIONES CSS - COMPACTO Y DISCRETO ===== */
+/* Variables heredadas del diseño principal */
+:root {
+  --teal-primary: #1a5a62;
+  --teal-secondary: #1f484e;
+  --teal-light: #f7fafb;
+  --teal-border: #c2d1d3;
+  --teal-bg-gradient: linear-gradient(135deg, #f7fafb 0%, #e3ecee 100%);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --warning-color: #f59e0b;
+}
+
+/* ===== CONTENEDOR PRINCIPAL - ULTRA COMPACTO ===== */
+.configuraciones-container {
+  width: 100%;
+  max-width: 100%;
+  padding: clamp(0.5rem, 1vh, 0.75rem);
+  font-family: var(--font-main);
+  background: var(--teal-bg-gradient);
+  border-radius: clamp(0.5rem, 0.8vw, 0.75rem);
+  min-height: calc(100vh - 6rem);
+  box-sizing: border-box;
+}
+
+/* ===== HEADER - COMPACTO ===== */
+.configuraciones-header {
+  text-align: center;
+  margin-top:clamp(1.00rem, 2.0vh, 2rem);
+  margin-bottom: clamp(0.75rem, 1.5vh, 1rem);
+  padding-bottom: clamp(0.5rem, 1vh, 0.75rem);
+
+}
+
+.configuraciones-header h2 {
+  color: var(--teal-primary);
+  font-size: clamp(1rem, 2vw, 1.50rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+/* ===== NAVIGATION TABS - MANTENER PERFECTO ===== */
+.configuraciones-navigation {
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(0.75rem, 1.5vh, 1rem);
+  background: rgba(247, 250, 251, 0.6);
+  border-radius: clamp(0.625rem, 1vw, 0.75rem);
+  padding: clamp(0.4rem, 1vh, 0.60rem);
+  box-shadow: 
+    0 clamp(0.125rem, 0.3vw, 0.1875rem) clamp(0.5rem, 1vw, 0.75rem) rgba(26, 90, 98, 0.08), 
+    0 clamp(0.0625rem, 0.12vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(26, 90, 98, 0.05);
+  border: 1px solid rgba(26, 90, 98, 0.08);
+  backdrop-filter: blur(8px);
+  gap: clamp(0.375rem, 0.8vw, 0.5rem);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== TAB BUTTONS - MANTENER PERFECTO ===== */
+.configuraciones-tab {
+  background: rgba(247, 250, 251, 0.8);
+  border: 1px solid rgba(26, 90, 98, 0.12);
+  padding: clamp(0.60rem, 1.0vh, 1rem) clamp(1.125rem, 2.2vw, 1.5rem);
+  cursor: pointer;
+  border-radius: clamp(0.375rem, 0.8vw, 0.5rem);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  position: relative;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  gap: clamp(0.25rem, 0.6vw, 0.375rem);
+  
+  flex: 1;
+  min-width: clamp(6rem, 20vw, 9rem);
+  max-width: clamp(9rem, 25vw, 12rem);
+  justify-content: center;
+  
+  color: var(--teal-primary);
+  font-size: clamp(0.8125rem, 1.2vw, 0.9375rem);
+}
+
+.configuraciones-tab:hover {
+  background: rgba(247, 250, 251, 0.95);
+  transform: translateY(-0.0625rem);
+  box-shadow: 
+    0 clamp(0.125rem, 0.3vw, 0.1875rem) clamp(0.375rem, 0.8vw, 0.625rem) rgba(26, 90, 98, 0.15),
+    0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.125rem, 0.3vw, 0.1875rem) rgba(26, 90, 98, 0.08);
+  border-color: rgba(26, 90, 98, 0.2);
+}
+
+.configuraciones-tab.active {
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 100%);
+  color: var(--teal-light);
+  font-weight: 600;
+  box-shadow: 
+    0 clamp(0.1875rem, 0.4vw, 0.3125rem) clamp(0.625rem, 1.2vw, 1rem) rgba(26, 90, 98, 0.25),
+    0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.25rem, 0.5vw, 0.375rem) rgba(26, 90, 98, 0.15);
+  border-color: transparent;
+  transform: translateY(-0.0625rem);
+}
+
+.tab-icon {
+  font-size: clamp(0.875rem, 1.4vw, 1rem);
+  line-height: 1;
+}
+
+.tab-label {
+  font-size: clamp(0.8125rem, 1.2vw, 0.9375rem);
+  line-height: 1;
+}
+
+/* ===== CONTENT AREA - ULTRA COMPACTO ===== */
+.configuraciones-content {
+  width: 100%;
+  min-height: calc(100vh - 10rem);
+  background: var(--teal-bg-gradient);
+  border-radius: clamp(0.5rem, 0.8vw, 0.75rem);
+  padding: clamp(0.5rem, 1vh, 0.75rem);
+  box-shadow: 
+    0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(26, 90, 98, 0.08),
+    0 clamp(0.0625rem, 0.12vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(26, 90, 98, 0.05);
+  border: 1px solid rgba(26, 90, 98, 0.06);
+  overflow: hidden;
+}
+
+/* ===== CATEGORY MANAGER DENTRO DE CONFIGURACIONES - ULTRA COMPACTO ===== */
+.configuraciones-content .category-manager {
+  background: transparent;
+  border-radius: 0;
+  padding: clamp(0.5rem, 1vh, 0.75rem);
+  min-height: auto;
+}
+
+.configuraciones-content .category-manager__header {
+  text-align: center;
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  padding-bottom: clamp(0.375rem, 0.8vh, 0.5rem);
+  border-bottom: 1px solid rgba(26, 90, 98, 0.1);
+}
+
+.configuraciones-content .category-manager__title {
+  font-size: clamp(0.875rem, 1.6vw, 1.125rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ===== MENSAJES DE ESTADO - COMPACTOS ===== */
+.configuraciones-content .category-manager__message {
+  padding: clamp(0.375rem, 0.8vh, 0.5rem) clamp(0.5rem, 1.2vw, 0.75rem);
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+  border-radius: clamp(0.25rem, 0.6vw, 0.375rem);
+  font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+  font-weight: 500;
+  border: 1px solid;
+  backdrop-filter: blur(4px);
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+.configuraciones-content .category-manager__message--success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.configuraciones-content .category-manager__message--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ===== FORMULARIO DE CREACIÓN - ULTRA COMPACTO ===== */
+.configuraciones-content .category-manager__create-form {
+  background: rgba(247, 250, 251, 0.6);
+  border: 1px solid rgba(26, 90, 98, 0.08);
+  border-radius: clamp(0.375rem, 0.8vw, 0.5rem);
+  padding: clamp(0.5rem, 1vh, 0.75rem);
+  margin-bottom: clamp(0.75rem, 1.5vh, 1rem);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(26, 90, 98, 0.06);
+}
+
+.configuraciones-content .create-form__title {
+  font-size: clamp(0.75rem, 1.3vw, 0.9375rem);
+  font-weight: 600;
+  margin: 0 0 clamp(0.375rem, 0.8vh, 0.5rem) 0;
+  color: var(--teal-primary);
+}
+
+.configuraciones-content .create-form__field {
+  margin-bottom: clamp(0.375rem, 0.8vh, 0.5rem);
+}
+
+.configuraciones-content .field__label {
+  display: block;
+  color: var(--teal-primary);
+  font-size: clamp(0.625rem, 1vw, 0.75rem);
+  font-weight: 500;
+  margin-bottom: clamp(0.1875rem, 0.4vh, 0.25rem);
+  line-height: 1.3;
+}
+
+.configuraciones-content .field__input {
+  width: 100%;
+  padding: clamp(0.375rem, 0.8vh, 0.5rem) clamp(0.5rem, 1.2vw, 0.75rem);
+  border: 1px solid rgba(26, 90, 98, 0.15);
+  border-radius: clamp(0.25rem, 0.6vw, 0.375rem);
+  font-size: clamp(0.625rem, 1vw, 0.75rem);
+  font-family: var(--font-main);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  background: rgba(247, 250, 251, 0.8);
+  color: var(--teal-primary);
+  backdrop-filter: blur(2px);
+}
+
+.configuraciones-content .field__input--text {
+  max-width: clamp(12rem, 40vw, 18rem);
+}
+
+.configuraciones-content .field__input--number {
+  max-width: clamp(5rem, 15vw, 7rem);
+}
+
+.configuraciones-content .field__input:focus {
+  outline: none;
+  border-color: var(--teal-secondary);
+  box-shadow: 0 0 0 clamp(0.0625rem, 0.2vw, 0.125rem) rgba(26, 90, 98, 0.1);
+  background: rgba(247, 250, 251, 1);
+}
+
+.configuraciones-content .create-form__button {
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 100%);
+  color: var(--teal-light);
+  border: none;
+  border-radius: clamp(0.25rem, 0.6vw, 0.375rem);
+  padding: clamp(0.375rem, 0.8vh, 0.5rem) clamp(0.75rem, 1.8vw, 1.125rem);
+  font-size: clamp(0.625rem, 1vw, 0.75rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(26, 90, 98, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.1875rem, 0.4vw, 0.25rem);
+  min-width: clamp(6rem, 18vw, 9rem);
+  justify-content: center;
+}
+
+.configuraciones-content .create-form__button:hover:not(:disabled) {
+  transform: translateY(-0.0625rem);
+  box-shadow: 0 clamp(0.125rem, 0.3vw, 0.1875rem) clamp(0.375rem, 0.8vw, 0.625rem) rgba(26, 90, 98, 0.2);
+}
+
+.configuraciones-content .create-form__button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== ESTADOS DE CARGA - COMPACTOS ===== */
+.configuraciones-content .category-manager__loading {
+  text-align: center;
+  padding: clamp(1rem, 2vh, 1.5rem);
+  color: var(--teal-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.375rem, 0.8vh, 0.5rem);
+}
+
+.configuraciones-content .loading__spinner {
+  width: clamp(1.25rem, 3vw, 1.75rem);
+  height: clamp(1.25rem, 3vw, 1.75rem);
+  border: clamp(0.0625rem, 0.2vw, 0.125rem) solid rgba(26, 90, 98, 0.2);
+  border-top: clamp(0.0625rem, 0.2vw, 0.125rem) solid var(--teal-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.configuraciones-content .category-manager__empty {
+  text-align: center;
+  padding: clamp(1rem, 2vh, 1.5rem);
+  color: rgba(26, 90, 98, 0.6);
+  font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+}
+
+/* ===== LISTA DE CATEGORÍAS - COMPACTA ===== */
+.configuraciones-content .list__title {
+  font-size: clamp(0.75rem, 1.3vw, 0.9375rem);
+  font-weight: 600;
+  margin: 0 0 clamp(0.375rem, 0.8vh, 0.5rem) 0;
+  color: var(--teal-primary);
+}
+
+/* ===== TARJETAS DE CATEGORÍA - ULTRA COMPACTAS ===== */
+.configuraciones-content .category-card {
+  background: rgba(247, 250, 251, 0.7);
+  border: 1px solid rgba(26, 90, 98, 0.08);
+  border-radius: clamp(0.375rem, 0.8vw, 0.5rem);
+  padding: clamp(0.5rem, 1vh, 0.75rem);
+  margin-bottom: clamp(0.375rem, 0.8vh, 0.5rem);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(26, 90, 98, 0.06);
+}
+
+.configuraciones-content .category-card:hover {
+  transform: translateY(-0.03125rem);
+  box-shadow: 0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(26, 90, 98, 0.1);
+}
+
+.configuraciones-content .category-card--inactive {
+  background: rgba(247, 250, 251, 0.4);
+  opacity: 0.8;
+}
+
+/* ===== VISTA DE CATEGORÍA - COMPACTA ===== */
+.configuraciones-content .view__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(0.25rem, 0.6vh, 0.375rem);
+  gap: clamp(0.375rem, 0.8vw, 0.5rem);
+  flex-wrap: wrap;
+}
+
+.configuraciones-content .view__name {
+  font-size: clamp(0.6875rem, 1.2vw, 0.875rem);
+  font-weight: 600;
+  margin: 0;
+  color: var(--teal-primary);
+}
+
+.configuraciones-content .view__status {
+  padding: clamp(0.125rem, 0.3vh, 0.1875rem) clamp(0.25rem, 0.6vw, 0.375rem);
+  border-radius: clamp(0.375rem, 0.8vw, 0.5rem);
+  font-size: clamp(0.5rem, 0.9vw, 0.625rem);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.configuraciones-content .view__status--active {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.configuraciones-content .view__status--inactive {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error-color);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.configuraciones-content .view__details {
+  display: flex;
+  gap: clamp(0.5rem, 1.2vw, 0.75rem);
+  margin-bottom: clamp(0.375rem, 0.8vh, 0.5rem);
+  flex-wrap: wrap;
+}
+
+.configuraciones-content .detail__label {
+  color: rgba(26, 90, 98, 0.7);
+  font-size: clamp(0.5rem, 0.9vw, 0.625rem);
+  font-weight: 500;
+}
+
+.configuraciones-content .detail__value {
+  color: var(--teal-primary);
+  font-size: clamp(0.5rem, 0.9vw, 0.625rem);
+  font-weight: 600;
+}
+
+.configuraciones-content .view__actions {
+  display: flex;
+  gap: clamp(0.25rem, 0.6vw, 0.375rem);
+  flex-wrap: wrap;
+}
+
+.configuraciones-content .view__button {
+  padding: clamp(0.25rem, 0.6vh, 0.375rem) clamp(0.5rem, 1.2vw, 0.75rem);
+  border: none;
+  border-radius: clamp(0.1875rem, 0.5vw, 0.3125rem);
+  font-size: clamp(0.5rem, 0.9vw, 0.625rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.125rem, 0.3vw, 0.1875rem);
+  min-width: clamp(4rem, 12vw, 6rem);
+  justify-content: center;
+}
+
+.configuraciones-content .view__button--edit {
+  background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(245, 158, 11, 0.2);
+}
+
+.configuraciones-content .view__button--edit:hover:not(:disabled) {
+  transform: translateY(-0.03125rem);
+  box-shadow: 0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(245, 158, 11, 0.25);
+}
+
+.configuraciones-content .view__button--delete {
+  background: linear-gradient(135deg, var(--error-color) 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(239, 68, 68, 0.2);
+}
+
+.configuraciones-content .view__button--delete:hover:not(:disabled) {
+  transform: translateY(-0.03125rem);
+  box-shadow: 0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(239, 68, 68, 0.25);
+}
+
+.configuraciones-content .view__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== MODO EDICIÓN - COMPACTO ===== */
+.configuraciones-content .edit__field {
+  margin-bottom: clamp(0.375rem, 0.8vh, 0.5rem);
+}
+
+.configuraciones-content .edit__field--checkbox {
+  margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+}
+
+.configuraciones-content .field__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.25rem, 0.6vw, 0.375rem);
+  cursor: pointer;
+  color: var(--teal-primary);
+  font-size: clamp(0.625rem, 1vw, 0.75rem);
+  font-weight: 500;
+}
+
+.configuraciones-content .field__checkbox {
+  width: clamp(0.75rem, 1.5vw, 1rem);
+  height: clamp(0.75rem, 1.5vw, 1rem);
+  accent-color: var(--teal-primary);
+  cursor: pointer;
+}
+
+.configuraciones-content .edit__actions {
+  display: flex;
+  gap: clamp(0.25rem, 0.6vw, 0.375rem);
+  flex-wrap: wrap;
+  padding-top: clamp(0.25rem, 0.6vh, 0.375rem);
+  border-top: 1px solid rgba(26, 90, 98, 0.1);
+}
+
+.configuraciones-content .edit__button {
+  padding: clamp(0.25rem, 0.6vh, 0.375rem) clamp(0.5rem, 1.2vw, 0.75rem);
+  border: none;
+  border-radius: clamp(0.1875rem, 0.5vw, 0.3125rem);
+  font-size: clamp(0.5rem, 0.9vw, 0.625rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.125rem, 0.3vw, 0.1875rem);
+  min-width: clamp(4.5rem, 13vw, 6.5rem);
+  justify-content: center;
+}
+
+.configuraciones-content .edit__button--save {
+  background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(16, 185, 129, 0.2);
+}
+
+.configuraciones-content .edit__button--save:hover:not(:disabled) {
+  transform: translateY(-0.03125rem);
+  box-shadow: 0 clamp(0.0625rem, 0.2vw, 0.125rem) clamp(0.25rem, 0.6vw, 0.5rem) rgba(16, 185, 129, 0.25);
+}
+
+.configuraciones-content .edit__button--cancel {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+  box-shadow: 0 clamp(0.0625rem, 0.15vw, 0.125rem) clamp(0.1875rem, 0.4vw, 0.3125rem) rgba(107, 114, 128, 0.1);
+}
+
+.configuraciones-content .edit__button--cancel:hover:not(:disabled) {
+  background: rgba(107, 114, 128, 0.15);
+  border-color: rgba(107, 114, 128, 0.3);
+  transform: translateY(-0.03125rem);
+}
+
+.configuraciones-content .edit__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== PLACEHOLDER CONTENT - COMPACTO ===== */
+.placeholder-content {
+  text-align: center;
+  padding: clamp(1rem, 2vh, 1.5rem);
+  color: var(--teal-primary);
+}
+
+.placeholder-content h3 {
+  font-size: clamp(0.875rem, 1.6vw, 1.125rem);
+  margin: 0 0 clamp(0.375rem, 0.8vh, 0.5rem) 0;
+  font-weight: 600;
+}
+
+.placeholder-content p {
+  font-size: clamp(0.625rem, 1.1vw, 0.8125rem);
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Mobile Portrait (0px - 480px) */
+@media (max-width: 480px) {
+  .configuraciones-container {
+    padding: clamp(0.375rem, 0.8vh, 0.5rem);
+  }
+  
+  .configuraciones-navigation {
+    flex-direction: column;
+    gap: clamp(0.1875rem, 0.4vw, 0.25rem);
+    padding: clamp(0.375rem, 0.8vh, 0.5rem);
+  }
+  
+  .configuraciones-tab {
+    min-width: 100%;
+    max-width: 100%;
+    padding: clamp(0.375rem, 0.8vh, 0.5rem);
+    justify-content: center;
+  }
+  
+  .configuraciones-header h2 {
+    font-size: clamp(0.875rem, 1.8vw, 1.125rem);
+  }
+  
+  .configuraciones-content .view__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(0.1875rem, 0.4vh, 0.25rem);
+  }
+  
+  .configuraciones-content .view__details {
+    flex-direction: column;
+    gap: clamp(0.1875rem, 0.4vh, 0.25rem);
+  }
+  
+  .configuraciones-content .view__actions,
+  .configuraciones-content .edit__actions {
+    flex-direction: column;
+    gap: clamp(0.1875rem, 0.4vh, 0.25rem);
+  }
+  
+  .configuraciones-content .view__button,
+  .configuraciones-content .edit__button {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .configuraciones-content .field__input--text {
+    max-width: 100%;
+  }
+  
+  .configuraciones-content .field__input--number {
+    max-width: clamp(4rem, 40vw, 6rem);
+  }
+}
+
+/* Mobile Landscape and Small Tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .configuraciones-navigation {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .configuraciones-tab {
+    flex: 0 1 auto;
+    min-width: clamp(5rem, 25vw, 8rem);
+    max-width: clamp(8rem, 35vw, 11rem);
+  }
+  
+  .configuraciones-content .view__header {
+    flex-wrap: wrap;
+  }
+  
+  .configuraciones-content .view__details {
+    flex-wrap: wrap;
+    gap: clamp(0.375rem, 0.8vw, 0.5rem);
+  }
+  
+  .configuraciones-content .field__input--text {
+    max-width: clamp(10rem, 50vw, 15rem);
+  }
+}
+
+/* Large Tablets and Desktop (769px+) */
+@media (min-width: 769px) {
+  .configuraciones-navigation {
+    justify-content: center;
+  }
+  
+  .configuraciones-tab {
+    flex: 0 1 auto;
+    min-width: clamp(6rem, 18vw, 9rem);
+    max-width: clamp(9rem, 22vw, 12rem);
+  }
+  
+  .configuraciones-content .view__actions,
+  .configuraciones-content .edit__actions {
+    justify-content: flex-start;
+  }
+  
+  .configuraciones-content .view__button,
+  .configuraciones-content .edit__button {
+    flex: 0 0 auto;
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+.configuraciones-tab,
+.configuraciones-content .view__button,
+.configuraciones-content .edit__button,
+.configuraciones-content .create-form__button {
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .configuraciones-tab,
+  .configuraciones-content .category-card,
+  .configuraciones-content .view__button,
+  .configuraciones-content .edit__button,
+  .configuraciones-content .create-form__button,
+  .configuraciones-content .field__input {
+    transition: none !important;
+  }
+  
+  .configuraciones-tab:hover,
+  .configuraciones-tab.active,
+  .configuraciones-content .category-card:hover,
+  .configuraciones-content .view__button:hover,
+  .configuraciones-content .edit__button:hover,
+  .configuraciones-content .create-form__button:hover {
+    transform: none !important;
+  }
+  
+  .configuraciones-content .loading__spinner {
+    animation: none !important;
+  }
+  
+  .configuraciones-content .category-manager__message {
+    animation: none !important;
+  }
+}
+
+/* ===== ESTADOS DE FOCUS PARA ACCESIBILIDAD ===== */
+.configuraciones-content .view__button:focus-visible,
+.configuraciones-content .edit__button:focus-visible,
+.configuraciones-content .create-form__button:focus-visible {
+  outline: 2px solid rgba(26, 90, 98, 0.5);
+  outline-offset: 1px;
+}
+
+.configuraciones-content .field__input:focus-visible {
+  outline: 2px solid rgba(26, 90, 98, 0.3);
+  outline-offset: 1px;
+}
+
+.configuraciones-content .field__checkbox:focus-visible {
+  outline: 2px solid rgba(26, 90, 98, 0.5);
+  outline-offset: 1px;
+}
+
+/* ===== MEJORAS DE CONTRASTE ===== */
+@media (prefers-contrast: high) {
+  .configuraciones-content .category-card {
+    border-width: 2px;
+  }
+  
+  .configuraciones-content .view__status--active {
+    background: rgba(16, 185, 129, 0.25);
+  }
+  
+  .configuraciones-content .view__status--inactive {
+    background: rgba(239, 68, 68, 0.25);
+  }
+  
+  .configuraciones-content .field__input {
+    border-width: 2px;
+  }
+}
+
+/* ===== OPTIMIZACIÓN EXTREMA PARA PANTALLAS PEQUEÑAS ===== */
+@media (max-width: 360px) {
+  .configuraciones-container {
+    padding: clamp(0.25rem, 0.6vh, 0.375rem);
+  }
+  
+  .configuraciones-content {
+    padding: clamp(0.25rem, 0.6vh, 0.375rem);
+  }
+  
+  .configuraciones-content .category-manager {
+    padding: clamp(0.25rem, 0.6vh, 0.375rem);
+  }
+  
+  .configuraciones-content .category-card {
+    padding: clamp(0.25rem, 0.6vh, 0.375rem);
+    margin-bottom: clamp(0.1875rem, 0.4vh, 0.25rem);
+  }
+}
+
+/* ===== OPTIMIZACIÓN PARA PANTALLAS GRANDES ===== */
+@media (min-width: 1440px) {
+  .configuraciones-container {
+    max-width: 85vw;
+    margin: 0 auto;
+  }
+  
+  .configuraciones-content {
+    max-width: 100%;
+  }
+  
+  .configuraciones-content .field__input--text {
+    max-width: clamp(15rem, 30vw, 20rem);
+  }
+  
+  .configuraciones-content .field__input--number {
+    max-width: clamp(6rem, 12vw, 8rem);
+  }
+}

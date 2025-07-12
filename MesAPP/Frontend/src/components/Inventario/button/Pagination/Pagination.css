@@ -1,0 +1,248 @@
+/* ✨ PAGINATION ELEGANTE - VERSIÓN ORIGINAL LIMPIA */
+.pagination-container {
+  /* Variables CSS para consistencia total */
+  --base-size: clamp(0.875rem, 2.5vw, 1rem);
+  --teal-primary: #1a5a62;
+  --teal-dark: #0f3c42;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(26, 90, 98, 0.1);
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.08);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Layout principal */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--base-size) * 0.75);
+  padding: calc(var(--base-size) * 0.5) calc(var(--base-size) * 1.25);
+  
+  /* Diseño glassmorphism elegante */
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: calc(var(--base-size) * 0.75);
+  box-shadow: var(--shadow-subtle);
+  
+  /* Tipografía y altura */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: calc(var(--base-size) * 3);
+  transition: var(--transition);
+}
+
+.pagination-container:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(26, 90, 98, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ✨ INFORMACIÓN DE PÁGINA - ELEGANTE */
+.pagination-info {
+  padding: calc(var(--base-size) * 0.4) calc(var(--base-size) * 0.8);
+  background: rgba(26, 90, 98, 0.05);
+  border-radius: calc(var(--base-size) * 0.5);
+  border: 1px solid rgba(26, 90, 98, 0.08);
+}
+
+.pagination-info span {
+  font-size: calc(var(--base-size) * 0.85);
+  font-weight: 600;
+  color: var(--teal-primary);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+/* ✨ CONTROLES - LAYOUT CENTRADO */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base-size) * 0.5);
+}
+
+/* ✨ BOTONES DE NAVEGACIÓN - ESTILO MODERNO */
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--base-size) * 2.5);
+  height: calc(var(--base-size) * 2.5);
+  
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: calc(var(--base-size) * 0.5);
+  cursor: pointer;
+  transition: var(--transition);
+  
+  box-shadow: 
+    0 2px 6px rgba(26, 90, 98, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto shimmer en hover */
+.pagination-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s ease;
+}
+
+.pagination-btn:hover:not(.disabled)::before {
+  left: 100%;
+}
+
+.pagination-btn:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 16px rgba(26, 90, 98, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.pagination-btn:active:not(.disabled) {
+  transform: translateY(-1px);
+}
+
+.pagination-btn.disabled {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ✨ FLECHAS - TIPOGRAFÍA REFINADA */
+.arrow-text-double {
+  font-size: calc(var(--base-size) * 1.1);
+  font-weight: 800;
+  user-select: none;
+  line-height: 1;
+}
+
+/* ✨ NÚMEROS DE PÁGINA - CONTENEDOR ELEGANTE */
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base-size) * 0.25);
+  padding: calc(var(--base-size) * 0.25);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(26, 90, 98, 0.06);
+  border-radius: calc(var(--base-size) * 0.6);
+  backdrop-filter: blur(8px);
+}
+
+/* ✨ NÚMEROS INDIVIDUALES - DISEÑO PREMIUM */
+.page-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--base-size) * 2.2);
+  height: calc(var(--base-size) * 2.2);
+  
+  background: transparent;
+  color: #64748b;
+  border: 1px solid transparent;
+  border-radius: calc(var(--base-size) * 0.4);
+  
+  font-size: calc(var(--base-size) * 0.9);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: var(--transition);
+  
+  position: relative;
+  user-select: none;
+}
+
+.page-number:hover:not(.active) {
+  background: rgba(26, 90, 98, 0.08);
+  color: var(--teal-primary);
+  border-color: rgba(26, 90, 98, 0.12);
+  transform: translateY(-1px);
+}
+
+/* ✨ PÁGINA ACTIVA - DESTACADA ELEGANTEMENTE */
+.page-number.active {
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-dark) 100%);
+  color: white;
+  border-color: var(--teal-primary);
+  box-shadow: 
+    0 3px 8px rgba(26, 90, 98, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+}
+
+.page-number.active:hover {
+  transform: none;
+  box-shadow: 
+    0 4px 12px rgba(26, 90, 98, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* ✨ RESPONSIVE - PROPORCIONES PERFECTAS */
+@media (max-width: 768px) {
+  .pagination-container {
+    --base-size: clamp(0.75rem, 3vw, 0.875rem);
+    flex-direction: column;
+    gap: calc(var(--base-size) * 0.75);
+    padding: calc(var(--base-size) * 0.75);
+  }
+  
+  .pagination-info {
+    order: 2;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .pagination-controls {
+    order: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-container {
+    --base-size: clamp(0.6875rem, 3.5vw, 0.75rem);
+  }
+  
+  .page-numbers {
+    gap: calc(var(--base-size) * 0.125);
+    padding: calc(var(--base-size) * 0.1875);
+  }
+}
+
+/* ✨ PERFORMANCE Y ACCESIBILIDAD */
+.pagination-btn,
+.page-number,
+.pagination-container {
+  will-change: transform, box-shadow;
+}
+
+.pagination-btn:focus-visible,
+.page-number:focus-visible {
+  outline: 2px solid var(--teal-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .pagination-btn::before {
+    display: none;
+  }
+  
+  .pagination-container:hover,
+  .pagination-btn:hover,
+  .page-number:hover {
+    transform: none !important;
+  }
+}

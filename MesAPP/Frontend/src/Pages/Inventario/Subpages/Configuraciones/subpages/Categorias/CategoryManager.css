@@ -1,0 +1,572 @@
+/* CategoryManager.css - CON FORMATO IDÉNTICO A FLAVORCATEGORYMANAGER */
+
+/* Variables del sistema */
+.category-manager {
+  --primary-color: #1a5a62;
+  --secondary-color: #1f484e;
+  --success-color: #059669;
+  --danger-color: #dc2626;
+  --warning-color: #d97706;
+  --bg-subtle: #f8f9fa;
+  --border-light: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --shadow-minimal: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Contenedor principal */
+.category-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  font-family: var(--font-main);
+}
+
+/* Mensajes - COPIADO DE FLAVORCATEGORYMANAGER */
+.category-manager__message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.category-manager__message--success {
+  background: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid var(--success-color);
+}
+
+.category-manager__message--error {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid var(--danger-color);
+}
+
+.category-manager__message-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s ease;
+}
+
+.category-manager__message-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Header - MEJORADO BASADO EN FLAVORCATEGORYMANAGER */
+.category-manager__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.40rem 0.40rem;
+  background: var(--bg-subtle);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-card);
+  gap: 2rem;
+  min-height: 4rem;
+}
+
+.category-manager__title h2 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-left: 1.5rem;
+}
+
+.category-manager__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Contenedor de tabla - MEJORADO */
+.category-manager__table-container {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.category-manager__table-wrapper {
+  overflow-x: auto;
+}
+
+/* Tabla - MEJORADA CON ESTILOS DE FLAVORCATEGORYMANAGER */
+.category-manager__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  table-layout: fixed; /* Fuerza anchos de columna */
+}
+
+.category-manager__table thead {
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.category-manager__table th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.category-manager__table th:last-child {
+  text-align: center;
+  border-right: none;
+}
+
+/* Anchos específicos para cada columna */
+.category-manager__table th:nth-child(1) { /* Nombre */
+  width: 35%;
+}
+
+.category-manager__table th:nth-child(2) { /* Estado */
+  width: 25%;
+  text-align: center;
+}
+
+.category-manager__table th:nth-child(3) { /* Stock Bajo */
+  width: 25%;
+  text-align: center;
+}
+
+.category-manager__table th:nth-child(4) { /* Acciones */
+  width: 15%;
+  text-align: center;
+}
+
+/* Filas de la tabla - MEJORADAS */
+.category-manager__table-row {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.category-manager__table-row:hover {
+  background: var(--bg-subtle);
+}
+
+.category-manager__table-row:last-child {
+  border-bottom: none;
+}
+
+/* Celdas - MEJORADAS CON ALINEACIÓN CORRECTA */
+.category-manager__table td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle;
+  border-right: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.category-manager__table td:last-child {
+  border-right: none;
+}
+
+/* Celda de nombre - MEJORADA */
+.category-manager__name-cell {
+  font-weight: 500;
+  text-align: left;
+}
+
+.category-manager__name {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Celda de estado - MEJORADA CENTRADA */
+.category-manager__status-cell {
+  text-align: center;
+}
+
+.category-manager__status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  min-width: 4.5rem;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.category-manager__status-badge.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.category-manager__status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Celda de stock - MEJORADA CENTRADA */
+.category-manager__stock-cell {
+  text-align: center;
+}
+
+.category-manager__stock-value {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+/* Acciones - MEJORADAS BASADAS EN FLAVORCATEGORYMANAGER */
+.category-manager__actions-cell {
+  text-align: center;
+}
+
+.category-manager__actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.category-manager__action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.category-manager__action-btn--edit {
+  color: var(--text-secondary);
+}
+
+.category-manager__action-btn--edit:hover {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+.category-manager__action-btn--delete {
+  color: var(--text-secondary);
+}
+
+.category-manager__action-btn--delete:hover {
+  background: #fee2e2;
+  color: var(--danger-color);
+}
+
+/* ESPECÍFICOS PARA CATEGORYMANAGER: Botones de edición */
+.category-manager__action-btn--save {
+  color: var(--success-color) !important; /* Verde para el ✓ */
+  font-size: 1.1rem;
+}
+
+.category-manager__action-btn--save:hover {
+  background: #d1fae5;
+  color: #047857 !important;
+  transform: scale(1.1);
+}
+
+.category-manager__action-btn--cancel {
+  color: var(--danger-color) !important; /* Rojo para la ✕ */
+  font-size: 1.1rem;
+}
+
+.category-manager__action-btn--cancel:hover {
+  background: #fee2e2;
+  color: #b91c1c !important;
+  transform: scale(1.1);
+}
+
+.category-manager__action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ESPECÍFICOS PARA CATEGORYMANAGER: Celdas de edición */
+.category-manager__edit-cell {
+  padding: 0.75rem 1.25rem !important;
+}
+
+.category-manager__edit-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.category-manager__edit-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(26, 90, 98, 0.1);
+}
+
+.category-manager__edit-input--number {
+  text-align: center;
+}
+
+/* Checkbox personalizado - MEJORADO */
+.category-manager__checkbox-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 0.5rem;
+}
+
+.category-manager__checkbox {
+  margin: 0;
+}
+
+/* Acciones de edición - MEJORADAS */
+.category-manager__edit-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Loading - MEJORADO */
+.category-manager__loading-cell {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.category-manager__loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.category-manager__loading-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: categoryManagerSpin 1s linear infinite;
+}
+
+@keyframes categoryManagerSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.category-manager__empty-cell {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.category-manager__empty-content {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+/* Responsive - MEJORADO BASADO EN FLAVORCATEGORYMANAGER */
+@media (max-width: 768px) {
+  .category-manager__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .category-manager__table {
+    font-size: 0.75rem;
+  }
+  
+  .category-manager__table th,
+  .category-manager__table td {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .category-manager__table th {
+    font-size: 0.6875rem;
+  }
+  
+  .category-manager__actions {
+    gap: 0.25rem;
+  }
+  
+  .category-manager__action-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0.25rem;
+  }
+  
+  .category-manager__status-badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+    min-width: 3.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-manager__table-wrapper {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .category-manager__table {
+    min-width: 500px;
+  }
+  
+  .category-manager__edit-input {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.375rem;
+  }
+}
+
+/* Accesibilidad - COPIADO DE FLAVORCATEGORYMANAGER */
+.category-manager__action-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Alto contraste - COPIADO DE FLAVORCATEGORYMANAGER */
+@media (prefers-contrast: high) {
+  .category-manager__table {
+    border: 2px solid var(--text-primary);
+  }
+  
+  .category-manager__table-row {
+    border-bottom: 1px solid var(--text-primary);
+  }
+  
+  .category-manager__status-badge.active {
+    background: #065f46;
+    color: white;
+  }
+  
+  .category-manager__status-badge.inactive {
+    background: #991b1b;
+    color: white;
+  }
+}
+
+/* ========================================
+   OVERRIDE PARA TABLEINFOBAR - NEUTRALIZAR ESPACIADO EXTRA
+   ======================================== */
+
+/* Neutralizar contenedor principal de TableInfoBar */
+.category-manager .table-info-bar {
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important; /* Consistente con gap del contenedor padre */
+  padding: 0.75rem 1rem !important;
+  background: var(--bg-subtle) !important; /* Mantener consistencia visual */
+  border: none !important;
+  box-shadow: var(--shadow-card) !important; /* Misma sombra que otros contenedores */
+  border-radius: 0.5rem !important; /* Mismo border-radius que header y tabla */
+  min-height: auto !important;
+  font-family: var(--font-main) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Simplificar estadísticas para mantener consistencia */
+.category-manager .info-stats {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
+  flex: 1 !important;
+}
+
+.category-manager .stat-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Etiquetas con estilo consistente */
+.category-manager .stat-label {
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  line-height: 1.5 !important;
+}
+
+/* Valores con estilo consistente */
+.category-manager .stat-value {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+}
+
+/* Ocultar botón expandir ya que se pasa isExpanded={true} */
+.category-manager .expand-button {
+  display: none !important;
+}
+
+/* Responsive overrides para TableInfoBar */
+@media (max-width: 768px) {
+  .category-manager .table-info-bar {
+    padding: 0.5rem 0.75rem !important;
+    gap: 1rem !important;
+  }
+  
+  .category-manager .info-stats {
+    gap: 1rem !important;
+  }
+  
+  .category-manager .stat-label,
+  .category-manager .stat-value {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-manager .table-info-bar {
+    padding: 0.5rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  
+  .category-manager .info-stats {
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+  
+  .category-manager .stat-item {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0.125rem !important;
+  }
+  
+  .category-manager .stat-label,
+  .category-manager .stat-value {
+    font-size: 0.6875rem !important;
+  }
+}

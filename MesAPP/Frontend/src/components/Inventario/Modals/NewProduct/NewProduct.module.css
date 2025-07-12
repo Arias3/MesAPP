@@ -1,0 +1,484 @@
+/* Variables para la nueva paleta */
+:root {
+  --teal-primary: #1a5a62;
+  --teal-secondary: #1f484e;
+  --teal-accent: #2a6b6e;
+  --teal-light: #f7fafb;
+  --teal-border: #c2d1d3;
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* ✅ BOTÓN NUEVO PRODUCTO - EXACTAMENTE IGUAL QUE IMPORTAR/EXPORTAR */
+.newProductButton {
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(26, 90, 98, 0.25);
+  font-family: var(--font-main);
+}
+
+.newProductButton:hover {
+  background: linear-gradient(135deg, #145055 0%, #1a3d42 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(26, 90, 98, 0.35);
+}
+
+.newProductButton:active {
+  transform: translateY(0);
+}
+
+.newProductButton:disabled {
+  background: linear-gradient(135deg, var(--teal-border) 0%, var(--teal-border) 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.buttonIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ✅ MODAL - EXACTAMENTE IGUAL QUE IMPORT/EXPORT */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 90, 98, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modalContainer {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(31, 72, 78, 0.15);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 20px 24px;
+  margin-bottom: 20px;
+  background:  linear-gradient(135deg, #1a5a62 0%, #1f484e 50%, #2a6b6e 100%);
+}
+
+.modalTitleSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modalIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: white;
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  font-family: var(--font-main);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--teal-border);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: var(--teal-border);
+}
+
+.closeIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ✅ FORMULARIO CON ESTILOS TEAL */
+.form {
+  padding: 0 24px 24px 24px;
+  font-family: var(--font-main);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  color: var(--teal-secondary);
+  margin-bottom: 4px;
+  font-family: var(--font-main);
+  font-weight: 500;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--teal-border);
+  border-radius: 8px;
+  font-size: 13px;
+  transition: border-color 0.2s ease;
+  font-family: var(--font-main);
+  background-color: var(--teal-light);
+  color: var(--teal-primary);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--teal-secondary);
+  box-shadow: 0 0 0 3px rgba(31, 72, 78, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ✅ NUEVOS ESTILOS PARA ESTADOS DE ADVERTENCIA */
+
+/* Campo con advertencia (fondo amarillo) */
+.inputWarning {
+  background-color: #fef3c7 !important; /* Amarillo suave */
+  border-color: #f59e0b !important; /* Borde amarillo más fuerte */
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+}
+
+.inputWarning:focus {
+  background-color: #fef3c7 !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2) !important;
+}
+
+/* Mensaje de ayuda para campos con error */
+.fieldHint {
+  display: block;
+  font-size: 12px;
+  color: #d97706;
+  margin-top: 4px;
+  font-weight: 500;
+  font-family: var(--font-main);
+}
+
+/* ✅ ESTILOS PARA DROPDOWN DE CATEGORÍAS */
+
+/* Contenedor principal del dropdown */
+.dropdownContainer {
+  position: relative;
+  width: 100%;
+}
+
+/* Botón principal del dropdown */
+.dropdownButton {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--teal-border);
+  border-radius: 8px;
+  background-color: var(--teal-light);
+  color: var(--teal-primary);
+  font-size: 13px;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.dropdownButton:hover {
+  border-color: var(--teal-secondary);
+  background-color: #f0f9ff;
+}
+
+.dropdownButton:focus {
+  outline: none;
+  border-color: var(--teal-secondary);
+  box-shadow: 0 0 0 3px rgba(31, 72, 78, 0.1);
+}
+
+.dropdownButton:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border-color: #d1d5db;
+}
+
+/* Texto del dropdown */
+.dropdownText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Icono del dropdown */
+.dropdownIcon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--teal-secondary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.dropdownButton:hover .dropdownIcon {
+  color: var(--teal-primary);
+}
+
+/* Menu desplegable */
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--teal-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(31, 72, 78, 0.15);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+  animation: dropdownSlideIn 0.2s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Items del dropdown */
+.dropdownItem {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 13px;
+  font-family: var(--font-main);
+  color: var(--teal-primary);
+}
+
+.dropdownItem:hover {
+  background-color: var(--teal-light);
+}
+
+.dropdownItem:focus {
+  outline: none;
+  background-color: var(--teal-light);
+}
+
+.dropdownItem:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  background-color: transparent;
+}
+
+/* Estado vacío del dropdown */
+.dropdownEmpty {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
+  font-family: var(--font-main);
+  font-style: italic;
+}
+
+/* ✅ PREVIEW DEL MARGEN CON ESTILO TEAL */
+.marginPreview {
+  background: #f9fafb;
+  border: 1px solid var(--teal-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.marginLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--teal-primary);
+  font-family: var(--font-main);
+}
+
+.marginValue {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--teal-primary);
+  font-family: var(--font-main);
+}
+
+/* ✅ BOTONES DE ACCIÓN - EXACTAMENTE IGUAL QUE IMPORT/EXPORT */
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--teal-border);
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: 1px solid var(--teal-border);
+  background: white;
+  color: var(--teal-primary);
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-main);
+}
+
+.cancelButton:hover {
+  background: #f9fafb;
+  border-color: var(--teal-secondary);
+}
+
+.submitButton {
+  flex: 1;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--teal-primary) 0%, var(--teal-secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.submitButton:hover {
+  background: linear-gradient(135deg, #145055 0%, #1a3d42 100%);
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  background: var(--teal-border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ✅ SPINNER PARA LOADING */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--teal-border);
+  border-top: 2px solid var(--teal-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ✅ RESPONSIVE - EXACTAMENTE IGUAL QUE IMPORT/EXPORT */
+@media (max-width: 640px) {
+  .modalContainer {
+    margin: 16px;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+  }
+  
+  .newProductButton {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+  
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modalHeader {
+    padding: 1rem;
+  }
+  
+  .form {
+    padding: 0 1rem 1rem 1rem;
+  }
+  
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Responsive específico para dropdown */
+  .dropdownMenu {
+    max-height: 150px;
+  }
+}
