@@ -15,6 +15,7 @@ const staffRoutes = require('./routes/staff.routes');
 const salesRoutes = require('./routes/sales.routes');
 const cajaRoutes = require('./routes/caja.routes');
 const mesasRoutes = require('./routes/mesas.routes');
+const reportesRoutes = require('./routes/reportes.routes');
 const app = express();
 
 // === CONFIGURACIÓN DE MIDDLEWARES ===
@@ -49,6 +50,7 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/ventas', salesRoutes);
 app.use('/api/caja', cajaRoutes);
 app.use('/api/mesas', mesasRoutes);
+app.use('/api/reportes', reportesRoutes);
 // Ruta de login (debe ir después de las rutas de API)
 app.use('/', loginRoutes);
 

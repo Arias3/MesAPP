@@ -64,14 +64,14 @@ const TABLES = {
 `,
   daily_closures: `
     CREATE TABLE IF NOT EXISTS daily_closures (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      date DATE NOT NULL,
-      time TIME NOT NULL,
-      cash DECIMAL(10,2) DEFAULT 0.00,
-      electronic DECIMAL(10,2) DEFAULT 0.00,
-      declared_total DECIMAL(10,2) DEFAULT 0.00,
-      expenses DECIMAL(10,2) DEFAULT 0.00
-    ) ENGINE=InnoDB
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    efectivo DECIMAL(10,2) DEFAULT 0.00,
+    electronicos DECIMAL(10,2) DEFAULT 0.00,  
+    total DECIMAL(10,2) GENERATED ALWAYS AS (efectivo + electronicos) STORED,
+    expenses DECIMAL(10,2) DEFAULT 0.00 
+  ) ENGINE=InnoDB
   `,
   sales: `
     CREATE TABLE IF NOT EXISTS sales (
