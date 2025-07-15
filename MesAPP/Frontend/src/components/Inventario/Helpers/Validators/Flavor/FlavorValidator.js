@@ -1,15 +1,22 @@
 import { flavorCategoryService } from './../../../../../services/Flavors/FlavorCategoryService';
+import { CategoryValidator } from './../Category/CategoryValidator.js';
 
 export class FlavorValidator {
   constructor(apiConfig = {}) {
     // Usar el servicio de sabores y categorías que ya tienes implementado
     this.flavorCategoryService = flavorCategoryService;
     
+    // Integrar CategoryValidator para validación de categorías
+    this.categoryValidator = new CategoryValidator(apiConfig);
+    
     // Cache de sabores por categoría para evitar consultas repetidas
     this.flavorsByCategory = new Map();
     
     // Cache de categorías válidas procesadas
     this.processedCategories = new Set();
+    
+    // Cache del resumen completo de sabores por categoría
+    this.flavorsSummaryCache = null;
     
     console.log('🍦 FlavorValidator: Inicializado');
   }
@@ -40,7 +47,7 @@ export class FlavorValidator {
     return String(str).toLowerCase().trim();
   }
 
-  // ✅ FUNCIÓN PRINCIPAL: Obtener sabores activos para una categoría específica
+  // ✅ FUNCIÓN PRINCIPAL CORREGIDA: Obtener sabores activos para una categoría específica
   async fetchFlavorsForCategory(categoryName) {
     try {
       console.log('🔍 FlavorValidator: Obteniendo sabores para categoría:', categoryName);
@@ -68,7 +75,7 @@ export class FlavorValidator {
 
       console.log('📦 FlavorValidator: Categorías con sabores obtenidas:', categoriesResult.data.length);
 
-      // ✅ MEJORAR: Buscar la categoría específica con normalización robusta
+      // ✅ CORREGIDO: Buscar la categoría específica con normalización robusta
       const targetCategory = categoriesResult.data.find(category => 
         this.normalizeString(category.categoria) === normalizedCategoryName
       );
@@ -87,20 +94,27 @@ export class FlavorValidator {
 
       console.log('✅ FlavorValidator: Categoría encontrada:', targetCategory.categoria);
 
-      // Filtrar solo sabores activos
-      const activeFlavors = targetCategory.flavors.filter(flavor => flavor.status === 1);
+      // ✅ CORREGIDO: Manejar el caso donde la categoría existe pero no tiene sabores asociados
+      const allFlavors = targetCategory.flavors || []; // Asegurar que no sea undefined
+      const activeFlavors = allFlavors.filter(flavor => flavor.status === 1);
       
+      console.log('🍦 FlavorValidator: Sabores totales para', categoryName, ':', allFlavors.length);
       console.log('🍦 FlavorValidator: Sabores activos encontrados para', categoryName, ':', activeFlavors.length);
-      console.log('   - Sabores:', activeFlavors.map(f => f.name));
+      
+      if (activeFlavors.length > 0) {
+        console.log('   - Sabores activos:', activeFlavors.map(f => f.name));
+      } else {
+        console.log('   - No hay sabores activos asociados a esta categoría');
+      }
 
-      // ✅ GUARDAR en cache usando nombre normalizado
+      // ✅ GUARDAR en cache usando nombre normalizado (incluso si es array vacío)
       this.flavorsByCategory.set(normalizedCategoryName, activeFlavors);
       this.processedCategories.add(normalizedCategoryName);
 
       return {
         success: true,
         flavors: activeFlavors,
-        count: activeFlavors.length
+        count: activeFlavors.length // Puede ser 0, que es válido
       };
 
     } catch (error) {
@@ -119,28 +133,39 @@ export class FlavorValidator {
     try {
       console.log('🔍 FlavorValidator: Validando flavor_count:', flavorCountValue, 'para categoría:', categoryName);
       
-      // ✅ CAMBIO: Validar parámetros de entrada - categoría vacía es ERROR
+      // ✅ CORREGIDO: Validar parámetros de entrada - categoría vacía es ERROR
       if (this.isValueEmpty(categoryName)) {
+        // ✅ Obtener lista de categorías con conteos para el error
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
         return {
           valid: false,
           reason: 'EMPTY_CATEGORY',
           originalValue: flavorCountValue,
-          correctedValue: null, // ✅ No corregir, es un error
+          correctedValue: null,
           maxAllowed: null,
-          message: 'No se puede validar flavor_count: categoría vacía'
+          message: 'No se puede validar flavor_count: categoría vacía',
+          categoriesWithFlavors: categoriesWithFlavors
         };
       }
 
-      // Si flavor_count está vacío, asignar 0 por defecto
+      // ✅ CORREGIDO: Si flavor_count está vacío, ES ERROR (no auto-corregir)
       if (this.isValueEmpty(flavorCountValue)) {
-        console.log('   ℹ️ Flavor_count vacío, asignando 0');
+        console.log('   ❌ Flavor_count vacío no permitido');
+        
+        // ✅ Obtener lista de categorías con conteos para el error
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
         return {
-          valid: true,
-          reason: 'EMPTY_ASSIGNED_ZERO',
+          valid: false,
+          reason: 'EMPTY_FLAVOR_COUNT',
           originalValue: flavorCountValue,
-          correctedValue: 0,
-          maxAllowed: 0,
-          message: 'Flavor_count vacío, asignado 0 por defecto'
+          correctedValue: null,
+          maxAllowed: null,
+          message: 'Flavor_count no puede estar vacío. Debe ser un número mayor o igual a 0.',
+          categoriesWithFlavors: categoriesWithFlavors
         };
       }
 
@@ -148,26 +173,38 @@ export class FlavorValidator {
       const flavorCount = parseInt(flavorCountValue, 10);
       if (isNaN(flavorCount)) {
         console.log('   ❌ Flavor_count no es un número válido:', flavorCountValue);
+        
+        // ✅ Obtener lista de categorías con conteos para el error
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
         return {
           valid: false,
           reason: 'INVALID_NUMBER',
           originalValue: flavorCountValue,
-          correctedValue: null, // ✅ No corregir automáticamente
+          correctedValue: null,
           maxAllowed: null,
-          message: 'Flavor_count debe ser un número válido'
+          message: 'Flavor_count debe ser un número válido',
+          categoriesWithFlavors: categoriesWithFlavors
         };
       }
 
       // Los números negativos se consideran error
       if (flavorCount < 0) {
         console.log('   ❌ Flavor_count negativo no permitido:', flavorCount);
+        
+        // ✅ Obtener lista de categorías con conteos para el error
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
         return {
           valid: false,
           reason: 'NEGATIVE_NOT_ALLOWED',
           originalValue: flavorCountValue,
-          correctedValue: null, // ✅ No corregir automáticamente
+          correctedValue: null,
           maxAllowed: null,
-          message: 'Flavor_count no puede ser negativo'
+          message: 'Flavor_count no puede ser negativo. Debe ser 0 o mayor.',
+          categoriesWithFlavors: categoriesWithFlavors
         };
       }
 
@@ -177,15 +214,21 @@ export class FlavorValidator {
       // ✅ CAMBIO CRÍTICO: Si la categoría no existe en sabores, es ERROR
       if (!flavorsResult.success) {
         console.error('❌ FlavorValidator: Categoría no encontrada en base de datos de sabores:', categoryName);
+        
+        // ✅ Obtener lista de categorías con conteos para el error
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
         return {
           valid: false,
           reason: 'CATEGORY_NOT_FOUND_IN_FLAVORS',
           originalValue: flavorCountValue,
-          correctedValue: null, // ✅ No corregir
+          correctedValue: null,
           maxAllowed: null,
           message: `Categoría "${categoryName}" no encontrada en la base de datos de sabores. Verifique que la categoría sea válida.`,
           error: flavorsResult.error,
-          availableCategories: flavorsResult.availableCategories || []
+          availableCategories: flavorsResult.availableCategories || [],
+          categoriesWithFlavors: categoriesWithFlavors
         };
       }
 
@@ -195,17 +238,23 @@ export class FlavorValidator {
       // ✅ VALIDAR que no exceda el máximo
       if (flavorCount > maxAllowedFlavors) {
         console.log('   ⚠️ Flavor_count excede el máximo:', flavorCount, '>', maxAllowedFlavors);
+        
+        // ✅ Obtener lista de categorías con conteos para el error
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
         return {
-          valid: false, // ✅ CAMBIO: Marcarlo como inválido para que vaya a corrección manual
+          valid: false,
           reason: 'EXCEEDED_LIMIT',
           originalValue: flavorCountValue,
-          correctedValue: null, // ✅ No corregir automáticamente
+          correctedValue: null,
           maxAllowed: maxAllowedFlavors,
-          message: `Flavor_count ${flavorCount} excede el máximo de ${maxAllowedFlavors} sabores disponibles para "${categoryName}". Debe corregirse manualmente.`
+          message: `Flavor_count ${flavorCount} excede el máximo de ${maxAllowedFlavors} sabores disponibles para "${categoryName}". Debe corregirse manualmente.`,
+          categoriesWithFlavors: categoriesWithFlavors
         };
       }
 
-      // ✅ TODO está bien
+      // ✅ TODO está bien - devolver solo los datos necesarios (sin lista completa)
       console.log('   ✅ Flavor_count válido:', flavorCount, '<=', maxAllowedFlavors);
       return {
         valid: true,
@@ -214,24 +263,41 @@ export class FlavorValidator {
         correctedValue: flavorCount,
         maxAllowed: maxAllowedFlavors,
         message: `Flavor_count ${flavorCount} es válido para "${categoryName}"`
+        // ✅ NO incluir categoriesWithFlavors cuando es válido (optimización)
       };
 
     } catch (error) {
       console.error('❌ FlavorValidator: Error validando flavor_count:', error);
+      
+      // ✅ En caso de error técnico, también devolver lista de categorías
+      const summaryResult = await this.getFlavorsSummary();
+      const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+      
       return {
         valid: false,
         reason: 'VALIDATION_ERROR',
         originalValue: flavorCountValue,
-        correctedValue: null, // ✅ No corregir en caso de error
+        correctedValue: null,
         maxAllowed: null,
-        message: `Error validando flavor_count: ${error.message}`
+        message: `Error validando flavor_count: ${error.message}`,
+        categoriesWithFlavors: categoriesWithFlavors
       };
     }
   }
 
-  // ✅ FUNCIÓN DE CONVENIENCIA: Obtener resumen de sabores por categoría
+  // ✅ FUNCIÓN MEJORADA: Obtener resumen de sabores por categoría con cache
   async getFlavorsSummary() {
     try {
+      // ✅ Usar cache si ya lo tenemos
+      if (this.flavorsSummaryCache) {
+        console.log('✅ FlavorValidator: Usando resumen en caché');
+        return {
+          success: true,
+          data: this.flavorsSummaryCache,
+          message: `Resumen desde caché con ${this.flavorsSummaryCache.length} categorías`
+        };
+      }
+      
       console.log('📊 FlavorValidator: Generando resumen de sabores...');
       
       const categoriesResult = await this.flavorCategoryService.getCategoriesWithFlavors();
@@ -242,13 +308,17 @@ export class FlavorValidator {
 
       const summary = categoriesResult.data.map(category => ({
         categoryName: category.categoria,
-        totalFlavors: category.flavors.length,
-        activeFlavors: category.flavors.filter(f => f.status === 1).length,
-        inactiveFlavors: category.flavors.filter(f => f.status !== 1).length,
-        flavorNames: category.flavors
+        maxFlavors: (category.flavors || []).filter(f => f.status === 1).length, // ✅ Simplificado: solo el número máximo
+        totalFlavors: (category.flavors || []).length,
+        activeFlavors: (category.flavors || []).filter(f => f.status === 1).length,
+        inactiveFlavors: (category.flavors || []).filter(f => f.status !== 1).length,
+        flavorNames: (category.flavors || [])
           .filter(f => f.status === 1)
           .map(f => f.name)
       }));
+
+      // ✅ Guardar en cache
+      this.flavorsSummaryCache = summary;
 
       console.log('📋 FlavorValidator: Resumen generado:', summary);
       
@@ -268,11 +338,107 @@ export class FlavorValidator {
     }
   }
 
-  // ✅ FUNCIÓN DE UTILIDAD: Limpiar cache
+  // ✅ NUEVO MÉTODO PRINCIPAL: Validar categoría Y sabores (método puente)
+  async validateCategoryAndFlavors(categoryName, flavorCountValue) {
+    try {
+      console.log('🔗 FlavorValidator: Validando categoría y sabores:', { categoryName, flavorCountValue });
+      
+      // ✅ PASO 1: Asegurar que CategoryValidator tenga las categorías cargadas
+      const categoryResult = await this.categoryValidator.fetchValidCategories();
+      if (!categoryResult.success) {
+        throw new Error(`Error obteniendo categorías: ${categoryResult.error}`);
+      }
+      
+      // ✅ PASO 2: Validar la categoría usando CategoryValidator
+      const categoryValidation = this.categoryValidator.validateSingleCategory(categoryName);
+      console.log('   🏷️ Resultado CategoryValidator:', categoryValidation);
+      
+      // ✅ PASO 3: Si la categoría es inválida, devolver error con lista mejorada
+      if (!categoryValidation.valid) {
+        console.log('   ❌ Categoría inválida, obteniendo lista de categorías con conteos...');
+        
+        const summaryResult = await this.getFlavorsSummary();
+        const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+        
+        return {
+          valid: false,
+          reason: 'INVALID_CATEGORY',
+          categoryIssue: categoryValidation, // Información original de CategoryValidator
+          originalValues: {
+            categoryName: categoryName,
+            flavorCount: flavorCountValue
+          },
+          message: `Categoría "${categoryName}" no es válida. ${categoryValidation.reason === 'EMPTY' ? 'Categoría vacía.' : 'Categoría no encontrada.'}`,
+          categoriesWithFlavors: categoriesWithFlavors // ✅ Lista mejorada en lugar de lista simple
+        };
+      }
+      
+      // ✅ PASO 4: Si la categoría es válida, validar el flavor_count
+      console.log('   ✅ Categoría válida, validando flavor_count...');
+      const flavorValidation = await this.validateFlavorCount(categoryValidation.correctName, flavorCountValue);
+      console.log('   🍦 Resultado FlavorValidator:', flavorValidation);
+      
+      // ✅ PASO 5: Si flavor_count es inválido, ya tiene la lista mejorada
+      if (!flavorValidation.valid) {
+        console.log('   ❌ Flavor_count inválido, devolviendo error con lista');
+        return {
+          valid: false,
+          reason: 'INVALID_FLAVOR_COUNT',
+          categoryName: categoryValidation.correctName, // Nombre correcto de la categoría
+          flavorIssue: flavorValidation, // Información detallada del error de sabores
+          originalValues: {
+            categoryName: categoryName,
+            flavorCount: flavorCountValue
+          },
+          message: flavorValidation.message,
+          categoriesWithFlavors: flavorValidation.categoriesWithFlavors // Ya viene incluida
+        };
+      }
+      
+      // ✅ PASO 6: Todo está bien, devolver solo los datos necesarios
+      console.log('   ✅ Categoría y flavor_count válidos');
+      return {
+        valid: true,
+        reason: 'VALID',
+        categoryName: categoryValidation.correctName, // Nombre correcto de la categoría
+        flavorCount: flavorValidation.correctedValue, // Número validado
+        maxAllowed: flavorValidation.maxAllowed,
+        originalValues: {
+          categoryName: categoryName,
+          flavorCount: flavorCountValue
+        },
+        message: `Categoría "${categoryValidation.correctName}" y flavor_count ${flavorValidation.correctedValue} son válidos`
+        // ✅ NO incluir categoriesWithFlavors cuando todo está bien
+      };
+      
+    } catch (error) {
+      console.error('❌ FlavorValidator: Error en validateCategoryAndFlavors:', error);
+      
+      // ✅ En caso de error técnico, devolver lista de categorías
+      const summaryResult = await this.getFlavorsSummary();
+      const categoriesWithFlavors = summaryResult.success ? summaryResult.data : [];
+      
+      return {
+        valid: false,
+        reason: 'TECHNICAL_ERROR',
+        originalValues: {
+          categoryName: categoryName,
+          flavorCount: flavorCountValue
+        },
+        message: `Error técnico: ${error.message}`,
+        error: error.message,
+        categoriesWithFlavors: categoriesWithFlavors
+      };
+    }
+  }
+
+  // ✅ FUNCIÓN DE UTILIDAD MEJORADA: Limpiar cache
   clearCache() {
     this.flavorsByCategory.clear();
     this.processedCategories.clear();
-    console.log('🧹 FlavorValidator: Cache limpiado');
+    this.flavorsSummaryCache = null; // ✅ Limpiar también el cache del resumen
+    this.categoryValidator.clearCache(); // ✅ Limpiar cache de CategoryValidator también
+    console.log('🧹 FlavorValidator: Cache completo limpiado');
   }
 
   // ✅ FUNCIÓN DE UTILIDAD: Obtener sabores en cache para una categoría
@@ -293,8 +459,8 @@ export class FlavorValidator {
     
     const validator = new FlavorValidator(apiConfig);
     
-    // Pre-cargar datos si es necesario
-    // const summary = await validator.getFlavorsSummary();
+    // ✅ Pre-cargar CategoryValidator
+    await validator.categoryValidator.fetchValidCategories();
     
     return validator;
   }

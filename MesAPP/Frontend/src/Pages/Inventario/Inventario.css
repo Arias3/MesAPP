@@ -358,12 +358,11 @@
   }
   
   .tab-navigation {
-    background: #1f2937;
-    border-bottom-color: #374151;
+    margin-bottom: clamp(0.5rem, 1vh, 0.75rem); /* Nuevo - no estaba definido */
   }
-  
-  .tab-content {
-    background: #1f2937;
+  .tab-button {
+    padding: clamp(0.625rem, 0.8vw, 0.875rem) clamp(1.25rem, 1.5vw, 1.75rem);
+    font-size: clamp(0.75rem, 1vw, 0.875rem);
   }
 }
 

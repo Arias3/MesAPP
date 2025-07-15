@@ -18,8 +18,8 @@ export const ManualEditInterface = ({
   const [deletedRows, setDeletedRows] = useState(new Set());
   const [isSaved, setIsSaved] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false); // ✅ NUEVO: Estado de procesamiento
-  const [processingProgress, setProcessingProgress] = useState(''); // ✅ NUEVO: Progreso del procesamiento
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState('');
 
   const API_HOST = import.meta.env.VITE_API_HOST;
   const API_PORT = import.meta.env.VITE_API_PORT;
@@ -40,7 +40,58 @@ export const ManualEditInterface = ({
     console.log('🔧 ManualEditInterface: Modo actualizado a:', importMode);
   }, [importMode, logic]);
 
-  // CAMPOS REQUERIDOS (mantenemos los nombres originales para la lógica)
+  // ✅ NUEVO: Obtener categorías con sabores de forma compatible
+  const getCategoriesWithFlavors = () => {
+    // Soportar ambas estructuras para compatibilidad
+    if (data.categoriesWithFlavors) {
+      return data.categoriesWithFlavors;
+    }
+    
+    // Fallback a estructura antigua
+    if (data.availableCategories) {
+      return data.availableCategories.map(category => ({
+        categoryName: typeof category === 'string' ? category : category.categoryName,
+        maxFlavors: typeof category === 'object' ? category.maxFlavors : null
+      }));
+    }
+    
+    return [];
+  };
+
+  // ✅ NUEVO: Obtener información de una categoría específica
+  const getCategoryInfo = (categoryName) => {
+    const categories = getCategoriesWithFlavors();
+    const category = categories.find(cat => cat.categoryName === categoryName);
+    return category || { categoryName, maxFlavors: 0 };
+  };
+
+  // ✅ NUEVO: Manejar cambio de categoría y ajustar Flavor_Count automáticamente
+  const handleCategoryChange = (rowIndex, fieldName, value) => {
+    const categoryInfo = getCategoryInfo(value);
+    
+    // Actualizar categoría
+    setEditedRows(prev => ({
+      ...prev,
+      [rowIndex]: {
+        ...prev[rowIndex],
+        [fieldName]: value,
+        // ✅ AUTO-AJUSTAR Flavor_Count cuando cambia categoría
+        Flavor_Count: categoryInfo.maxFlavors === 0 ? 0 : (prev[rowIndex]?.Flavor_Count || 0)
+      }
+    }));
+
+    // Limpiar errores
+    setValidationErrors(prev => ({
+      ...prev,
+      [rowIndex]: {
+        ...prev[rowIndex],
+        [fieldName]: false,
+        Flavor_Count: false // También limpiar error de Flavor_Count
+      }
+    }));
+  };
+
+  // CAMPOS REQUERIDOS
   const requiredFields = [
     'Code', 'Category', 'Name', 'Cost', 'Price', 'Stock',
     'Barcode', 'Unit', 'Flavor_Count', 'Description'
@@ -212,7 +263,6 @@ export const ManualEditInterface = ({
     }, 300);
   };
 
-  // ✅ ACTUALIZADO: Usar ManualEditInterfaceLogic para procesar
   const handleFinalSave = async () => {
     if (isProcessing) return;
     
@@ -232,7 +282,6 @@ export const ManualEditInterface = ({
       console.log(`📊 Productos corregidos: ${correctedEditedRows.length}`);
       console.log(`🎯 Modo de importación: ${importMode}`);
 
-      // ✅ USAR ManualEditInterfaceLogic en lugar de fetch directo
       const result = await logic.processAllProducts(
         data.completeRows,
         correctedEditedRows,
@@ -243,7 +292,6 @@ export const ManualEditInterface = ({
         console.log('✅ ManualEditInterface: Procesamiento exitoso:', result);
         setProcessingProgress(result.message);
         
-        // Pequeña pausa para mostrar el mensaje final
         setTimeout(() => {
           handleCloseAfterSave();
         }, 2000);
@@ -257,9 +305,7 @@ export const ManualEditInterface = ({
       setProcessingProgress('');
       setIsProcessing(false);
       
-      // Mostrar error al usuario
       alert(`Error al procesar productos: ${error.message}`);
-      
     }
   };
 
@@ -343,7 +389,6 @@ export const ManualEditInterface = ({
               )}
             </div>
             
-            {/* ✅ NUEVO: Mostrar modo de importación */}
             <div className={styles.modeInfo}>
               <Info className={styles.infoIcon} />
               <span>Modo: <strong>{importMode === 'replace' ? 'Reemplazar Inventario' : 'Actualizar/Crear'}</strong></span>
@@ -360,7 +405,6 @@ export const ManualEditInterface = ({
                 <p><strong>Método de procesamiento:</strong> {importMode === 'replace' ? 'Reemplazar todo el inventario' : 'Actualizar existentes + crear nuevos'}</p>
               </div>
               
-              {/* ✅ MOSTRAR PROGRESO DE PROCESAMIENTO */}
               {isProcessing && (
                 <div className={styles.processingSection}>
                   <div className={styles.processingSpinner}></div>
@@ -420,6 +464,11 @@ export const ManualEditInterface = ({
     .filter(index => !deletedRows.has(index));
   const currentPosition = availableIndexes.indexOf(currentRowIndex) + 1;
 
+  // ✅ NUEVO: Información de categoría actual para Flavor_Count
+  const currentCategory = editedData['Category'];
+  const categoryInfo = getCategoryInfo(currentCategory);
+  const maxFlavors = categoryInfo.maxFlavors || 0;
+
   return (
     <>
       <div className={`${styles.modalOverlay} ${isClosing ? styles.modalClosing : ''}`} onClick={handleOverlayClick}>
@@ -428,7 +477,6 @@ export const ManualEditInterface = ({
             <div className={styles.headerContent}>
               <h3>Edición Manual de Datos</h3>
               <p>Producto {currentPosition} de {availableRows.length} (Producto {currentRow.rowNumber} del Excel)</p>
-              {/* ✅ NUEVO: Mostrar modo actual */}
               <div className={styles.modeIndicator}>
                 <Info className={styles.modeIcon} />
                 <span>Modo: <strong>{importMode === 'replace' ? 'Reemplazar' : 'Actualizar/Crear'}</strong></span>
@@ -471,7 +519,6 @@ export const ManualEditInterface = ({
               </button>
             </div>
 
-            {/* CAMPOS A COMPLETAR CON NOMBRES EN ESPAÑOL */}
             {editableFields.length > 0 && (
               <div className={styles.warningSection}>
                 <h5>Campos a Completar ({editableFields.length})</h5>
@@ -482,7 +529,6 @@ export const ManualEditInterface = ({
               </div>
             )}
 
-            {/* CAMPOS YA COMPLETADOS CON NOMBRES EN ESPAÑOL */}
             {nonEditableFields.length > 0 && (
               <div className={styles.infoSection}>
                 <h5>Campos Ya Completados ({nonEditableFields.length})</h5>
@@ -502,6 +548,8 @@ export const ManualEditInterface = ({
                 const spanishLabel = FieldTranslator.translate(fieldName);
                 
                 if (fieldName === 'Category') {
+                  const categoriesWithFlavors = getCategoriesWithFlavors();
+                  
                   return (
                     <div key={fieldName} className={styles.fieldGroup}>
                       <label className={hasError ? styles.errorLabel : ''}>
@@ -511,14 +559,18 @@ export const ManualEditInterface = ({
                       </label>
                       <select 
                         value={editedData[fieldName] || ''}
-                        onChange={(e) => handleFieldChange(currentRowIndex, fieldName, e.target.value)}
+                        onChange={(e) => handleCategoryChange(currentRowIndex, fieldName, e.target.value)}
                         className={hasError ? styles.error : (isEditable ? styles.editable : styles.readonly)}
                         disabled={!isEditable || isClosing || isProcessing}
                       >
                         <option value="">Seleccionar categoría...</option>
-                        {data.availableCategories.map(category => (
-                          <option key={category} value={category}>
-                            {category}
+                        {categoriesWithFlavors.map(category => (
+                          <option key={category.categoryName} value={category.categoryName}>
+                            {category.categoryName}
+                            {category.maxFlavors !== null && category.maxFlavors !== undefined 
+                              ? ` (${category.maxFlavors} sabores)` 
+                              : ''
+                            }
                           </option>
                         ))}
                       </select>
@@ -531,6 +583,68 @@ export const ManualEditInterface = ({
                   );
                 }
 
+                // ✅ NUEVO: DROPDOWN DINÁMICO PARA FLAVOR_COUNT
+                if (fieldName === 'Flavor_Count') {
+                  const currentFlavorCount = editedData[fieldName] || 0;
+                  const hasValidCategory = currentCategory && currentCategory !== '';
+                  const isFlavorCountEditable = isEditable && hasValidCategory;
+                  
+                  return (
+                    <div key={fieldName} className={styles.fieldGroup}>
+                      <label className={hasError ? styles.errorLabel : ''}>
+                        {spanishLabel}
+                        {hasError && <span className={styles.requiredIndicator}> *Obligatorio</span>}
+                        {!isEditable && <span className={styles.completeIndicator}> ✓</span>}
+                        {hasValidCategory && (
+                          <span className={styles.categoryInfo}> 
+                            (Máx: {maxFlavors})
+                          </span>
+                        )}
+                      </label>
+                      
+                      {maxFlavors === 0 ? (
+                        // Si la categoría no tiene sabores, mostrar input bloqueado con valor 0
+                        <input
+                          type="number"
+                          value={0}
+                          className={styles.readonly}
+                          disabled={true}
+                          placeholder="Sin sabores disponibles"
+                        />
+                      ) : (
+                        // Si la categoría tiene sabores, mostrar dropdown dinámico
+                        <select 
+                          value={currentFlavorCount}
+                          onChange={(e) => handleFieldChange(currentRowIndex, fieldName, parseInt(e.target.value))}
+                          className={hasError ? styles.error : (isFlavorCountEditable ? styles.editable : styles.readonly)}
+                          disabled={!isFlavorCountEditable || isClosing || isProcessing}
+                        >
+                          {!hasValidCategory && (
+                            <option value="">Primero selecciona categoría...</option>
+                          )}
+                          {hasValidCategory && Array.from({ length: maxFlavors + 1 }, (_, i) => (
+                            <option key={i} value={i}>
+                              {i} {i === 1 ? 'sabor' : 'sabores'}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      
+                      {hasError && (
+                        <span className={styles.errorMessage}>
+                          {FieldTranslator.getErrorMessage(fieldName)}
+                        </span>
+                      )}
+                      
+                      {!hasValidCategory && isEditable && (
+                        <span className={styles.helpText}>
+                        </span>
+                      )}
+                    </div>
+                  );
+                }
+
+                // Campos normales (sin cambios)
                 return (
                   <div key={fieldName} className={styles.fieldGroup}>
                     <label className={hasError ? styles.errorLabel : ''}>
@@ -539,7 +653,7 @@ export const ManualEditInterface = ({
                       {!isEditable && <span className={styles.completeIndicator}> ✓</span>}
                     </label>
                     <input
-                      type={['Cost', 'Price', 'Flavor_Count', 'Stock'].includes(fieldName) ? 'number' : 'text'}
+                      type={['Cost', 'Price', 'Stock'].includes(fieldName) ? 'number' : 'text'}
                       value={editedData[fieldName] || ''}
                       onChange={(e) => handleFieldChange(currentRowIndex, fieldName, e.target.value)}
                       className={hasError ? styles.error : (isEditable ? styles.editable : styles.readonly)}

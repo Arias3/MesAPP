@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
-import { X, Package, Save, Edit } from 'lucide-react';
+import { X, Package, Save, Edit, ChevronDown } from 'lucide-react';
+import { FlavorValidator } from './../../Helpers/Validators/Flavor/FlavorValidator.js'; // ✅ NUEVO IMPORT
 import styles from './EditProductModal.module.css';
 
-function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
+function EditProductModal({ product, onClose, onProductUpdated, apiConfig = {}, apiBaseUrl }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingFlavorInfo, setIsLoadingFlavorInfo] = useState(false); // ✅ NUEVO - específico para cargar info de sabores
+  
+  // ✅ NUEVOS ESTADOS para dropdown de sabores
+  const [currentCategoryFlavorInfo, setCurrentCategoryFlavorInfo] = useState(null);
+  const [showFlavorDropdown, setShowFlavorDropdown] = useState(false);
   
   const [formData, setFormData] = useState({
     codigo: '',
@@ -17,6 +23,64 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
     flavor_count: '',
     description: ''
   });
+
+  // ✅ NUEVA INSTANCIA del FlavorValidator
+  const [flavorValidator] = useState(() => new FlavorValidator(apiConfig));
+
+  // ✅ NUEVA FUNCIÓN: Cargar información de sabores para la categoría del producto
+  const loadFlavorInfoForCategory = async (categoryName) => {
+    if (!categoryName || categoryName.trim() === '') {
+      console.log('🏷️ EditProductModal: Categoría vacía, no se puede cargar info de sabores');
+      setCurrentCategoryFlavorInfo(null);
+      return;
+    }
+
+    try {
+      setIsLoadingFlavorInfo(true);
+      console.log('🏷️ EditProductModal: Cargando información de sabores para categoría:', categoryName);
+      
+      // ✅ OBTENER RESUMEN DE SABORES (incluye búsqueda insensible a mayúsculas)
+      const summaryResult = await flavorValidator.getFlavorsSummary();
+      
+      if (summaryResult.success) {
+        // ✅ BÚSQUEDA INSENSIBLE A MAYÚSCULAS/MINÚSCULAS
+        const normalizedSearchCategory = categoryName.toLowerCase().trim();
+        const matchingCategory = summaryResult.data.find(cat => 
+          cat.categoryName.toLowerCase().trim() === normalizedSearchCategory
+        );
+        
+        if (matchingCategory) {
+          console.log('✅ EditProductModal: Categoría encontrada:', matchingCategory);
+          setCurrentCategoryFlavorInfo(matchingCategory);
+        } else {
+          console.warn('⚠️ EditProductModal: Categoría no encontrada en base de sabores:', categoryName);
+          console.log('   📋 Categorías disponibles:', summaryResult.data.map(c => c.categoryName));
+          setCurrentCategoryFlavorInfo({
+            categoryName: categoryName,
+            maxFlavors: 0,
+            activeFlavors: 0,
+            flavorNames: []
+          });
+        }
+      } else {
+        console.error('❌ EditProductModal: Error obteniendo resumen de sabores:', summaryResult.error);
+        setCurrentCategoryFlavorInfo(null);
+      }
+    } catch (error) {
+      console.error('💥 EditProductModal: Excepción cargando información de sabores:', error);
+      setCurrentCategoryFlavorInfo(null);
+    } finally {
+      setIsLoadingFlavorInfo(false);
+    }
+  };
+
+  // ✅ EFECTO: Cargar información de sabores cuando se abre el modal
+  useEffect(() => {
+    if (product && product.category) {
+      console.log('🔄 EditProductModal: Producto recibido, cargando info de sabores para:', product.category);
+      loadFlavorInfoForCategory(product.category);
+    }
+  }, [product]);
 
   // Cargar datos del producto al abrir el modal
   useEffect(() => {
@@ -36,11 +100,42 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
     }
   }, [product]);
 
+  // ✅ NUEVA FUNCIÓN: Verificar si la categoría actual permite sabores
+  const canEditFlavors = () => {
+    if (!currentCategoryFlavorInfo) return false;
+    return currentCategoryFlavorInfo.maxFlavors > 0;
+  };
+
+  // ✅ NUEVA FUNCIÓN: Generar opciones para flavor_count dropdown
+  const generateFlavorCountOptions = () => {
+    if (!canEditFlavors()) return [];
+    
+    const maxFlavors = currentCategoryFlavorInfo.maxFlavors;
+    
+    return Array.from({ length: maxFlavors + 1 }, (_, i) => ({
+      value: i,
+      label: `${i} ${i === 1 ? 'sabor' : 'sabores'}`
+    }));
+  };
+
+  // ✅ NUEVA FUNCIÓN: Handler para seleccionar flavor_count
+  const handleFlavorCountSelect = (value) => {
+    handleInputChange('flavor_count', value.toString());
+    setShowFlavorDropdown(false);
+  };
+
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+
+    // ✅ Si cambia la categoría, recargar información de sabores
+    if (field === 'category') {
+      console.log('🔄 EditProductModal: Categoría cambiada a:', value);
+      loadFlavorInfoForCategory(value);
+      setShowFlavorDropdown(false); // Cerrar dropdown de sabores
+    }
   };
 
   // Calcular margen para preview
@@ -249,15 +344,114 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Cantidad de Sabores</label>
-              <input
-                type="number"
-                min="0"
-                value={formData.flavor_count}
-                onChange={(e) => handleInputChange('flavor_count', e.target.value)}
-                className={styles.input}
-                placeholder="0"
-              />
+              <label className={styles.label}>
+                Cantidad de Sabores
+                {currentCategoryFlavorInfo && (
+                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal' }}>
+                    {isLoadingFlavorInfo 
+                      ? ' (Verificando...)' 
+                      : canEditFlavors() 
+                      ? ` (Máx: ${currentCategoryFlavorInfo.maxFlavors})` 
+                      : ' (Sin sabores disponibles)'
+                    }
+                  </span>
+                )}
+              </label>
+              
+              {isLoadingFlavorInfo ? (
+                // ✅ ESTADO DE CARGA
+                <input
+                  type="text"
+                  value="Cargando información..."
+                  className={styles.input}
+                  disabled={true}
+                  style={{
+                    backgroundColor: '#f8f9fa',
+                    color: '#6c757d',
+                    cursor: 'wait'
+                  }}
+                />
+              ) : canEditFlavors() ? (
+                // ✅ DROPDOWN para categorías que SÍ permiten sabores
+                <div style={{ position: 'relative' }}>
+                  <button
+                    type="button"
+                    onClick={() => !isLoading && setShowFlavorDropdown(!showFlavorDropdown)}
+                    className={styles.input}
+                    disabled={isLoading}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      background: '#ffffff',
+                      width: '100%'
+                    }}
+                  >
+                    <span>
+                      {formData.flavor_count !== '' 
+                        ? `${formData.flavor_count} ${formData.flavor_count === '1' ? 'sabor' : 'sabores'}`
+                        : 'Seleccionar cantidad...'
+                      }
+                    </span>
+                    <ChevronDown style={{ width: '16px', height: '16px', color: '#64748b' }} />
+                  </button>
+                  
+                  {showFlavorDropdown && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      background: 'white',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      zIndex: 1000,
+                      maxHeight: '200px',
+                      overflowY: 'auto'
+                    }}>
+                      {generateFlavorCountOptions().map(option => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => handleFlavorCountSelect(option.value)}
+                          disabled={isLoading}
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            border: 'none',
+                            background: 'white',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            color: '#1e293b'
+                          }}
+                          onMouseEnter={(e) => e.target.style.background = '#f8fafc'}
+                          onMouseLeave={(e) => e.target.style.background = 'white'}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // ✅ INPUT DESHABILITADO para categorías que NO permiten sabores
+                <input
+                  type="number"
+                  min="0"
+                  value={currentCategoryFlavorInfo ? '0' : ''}
+                  className={styles.input}
+                  placeholder={currentCategoryFlavorInfo ? '0' : 'Categoría sin información de sabores'}
+                  disabled={true}
+                  style={{
+                    backgroundColor: '#f8f9fa',
+                    color: '#6c757d',
+                    cursor: 'not-allowed'
+                  }}
+                />
+              )}
             </div>
 
             {/* Fila 5: Código de Barras */}
@@ -341,7 +535,7 @@ function EditProductModal({ product, onClose, onProductUpdated, apiBaseUrl }) {
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={isLoading}
+              disabled={isLoading || isLoadingFlavorInfo}
             >
               {isLoading ? (
                 <>
