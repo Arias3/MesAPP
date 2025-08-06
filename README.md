@@ -63,4 +63,4 @@ Optimizar la toma de pedidos y la gestión de procesos internos en restaurantes,
 ![ventas](./ventas.png)
 ![caja](./caja.png)
 ![admin](./admin.png)
-![login2](./login2.png)
+![admin2](./admin2.png)
