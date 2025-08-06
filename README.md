@@ -58,3 +58,9 @@ Este sistema permite gestionar de manera integral las órdenes, ventas, usuarios
 Optimizar la toma de pedidos y la gestión de procesos internos en restaurantes, minimizando errores, mejorando tiempos de atención y ofreciendo herramientas de análisis para toma de decisiones.
 
 ---
+![login](./login.png)
+![ordenar](./ordenar.png)
+![ventas](./ventas.png)
+![caja](./caja.png)
+![admin](./admin.png)
+![login2](./login2.png)
